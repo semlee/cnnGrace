@@ -1,5 +1,50 @@
 ## Basic setup using Cloudlab machine
 
+0. Run basic configuration of ubuntu + resize
+
+```
+sudo apt update
+​
+sudo ln -fs /usr/share/zoneinfo/America/Chicago /etc/localtime
+sudo apt install -y tzdata
+sudo dpkg-reconfigure --frontend noninteractive tzdata
+​
+DEBIAN_FRONTEND=noninteractive sudo -E apt -o DPkg::Options::=--force-confdef upgrade -y
+​
+sudo apt  install -y htop
+
+sudo sed -e '/swap/ s/^#*/#/' -i /etc/fstab
+sudo swapoff /dev/sda3
+​
+sudo dd if=/dev/zero of=/swapfile bs=1024 count=3145728
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo "/swapfile none swap sw 0 0" | sudo tee -a /etc/fstab
+​
+sudo fdisk /dev/sda <<EOF
+p
+d
+2
+d
+3
+d
+4
+d
+n
+​
+​
+​
+​
+a
+p
+w
+EOF
+​
+sudo resize2fs /dev/sda1
+​
+df -H
+```
 1. pull libxsmm github and restore original version corresponding to paper
 ```
 git clone https://github.com/libxsmm/libxsmm.git. 
