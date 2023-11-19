@@ -66,19 +66,19 @@ for (int n = 0; n < N; n++) {
     }
 }
 
-//Naive Backward Propagation Loops
+//Backward Propagation Loops w/ small GeMM calls
 #pragma omp parallel for
 for (int n = 0; n < N; n++) {
-    for (int k = 0; k < K; k++) {
-        for (int c = 0; c < C; c++) {
+    for (int k_b = 0; k_b < K_b; k_b++) {
+        for (int c_b = 0; c_b < C_b; c_b++) {
             for (int oj = 0; oj < P; oj ++) {
-                for (int oi = 0; oi < Q; oi++) {
-                    int ij = stride * oj;
-                    int ii = stride * oi;
-                    for (int r = 0; r < R; r++) {
-                        for (int s = 0; s < S; s++) {
-                            dI[n][c][ij+r][ii+s] += dO[n][k][oj][oi] * W[k][c][r][s];
-                        }
+                ij = stride * oj;
+                oi = 0;
+                ii = 0;
+                for (int r = 0; r < R; r++) {
+                    for (int s = 0; s < S; s++) {
+                        //I[n][c][ij+r][ii+s] += O[n][k][oj][oi] * W[k][c][r][s];
+                        GEMM(&W[c_b][k_b][R - 1 - r][S - 1 -s][0][0], &dO[n][k_b][oj][oi][0], &dI[n][c_b][ij+r][ii+s][0]);
                     }
                 }
             }
@@ -86,18 +86,31 @@ for (int n = 0; n < N; n++) {
     }
 }
 
-//Naive Weight Update Gradient Loops
+//Optimized Weight Update Gradient Loops
+int P_b = P/B_p;
+int Q_b = Q/B_q;
+
 #pragma omp parallel for
-for (int i = 0; i < N; n++) {
-    for (int k = 0; k < K; k++) {
-        for (int c = 0; c < C; c++) {
-            for (int oj = 0; oj < P; oj ++) {
-                for (int oi = 0; oi < Q; oi++) {
-                    int ij = stride * oj;
-                    int ii = stride * oi;
+for (int n = 0; n < N; n++) {
+    for (int k_b = 0; k_b< K_b; k_b++) {
+        for (int c_b = 0; c_b < C_b; c_b++) {
+            for (int oj_b = 0; oj_b < P_b; oj_b++) {
+                for (int oi_b = 0; oi_b < Q_b; oi_b++) {
+                    int ij = stride * oj_b * B_p;
+                    int ii = stride * oi_b * B_q;
                     for (int r = 0; r < R; r++) {
                         for (int s = 0; s < S; s++) {
-                            dW[k][c][r][s] += I[n][c][ij+r][ii+s] * dO[n][k][oj][oi];
+                            for (int p = 0; p < B_p; p++) {
+                                for (int q = 0; q < B_q; q++) {
+                                    for (int k = 0; k < VLEN; k++) {
+                                        for (int c = 0; c < VLEN; c++) {
+                                            ii += stride * p;
+                                            ij += stride * q;
+                                            //dW[k_b][c_b][r][s][c][k] += I[n][c_b][ij+r][ii+s][c] * dO[n][k_b][oj+p][oi+q][k];
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
