@@ -17,6 +17,7 @@ Avx2 = 256 bits with FMA support
 
 So:
 16 * 10 * 2.60 = 416 GFLOPS [Theoretical Peak Performance per core, at low clock rate, without HTT]
+16 * 10 * 3.30 = 528 GFLOPS [Theoretical Peak Performance per core, at low clock rate, without HTT]
 
 Assuming for sustained avx2 we pick lower clock rate
 
