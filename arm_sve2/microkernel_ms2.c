@@ -45,18 +45,36 @@
 int P = (H + 2 * padding - R) / (stride + 1)
 int Q = (Q + 2 * padding - S) / (stride + 1)
 
-//Naive Forward Propagation Loops
+
+int C_b = C/VLEN;
+int K_b = K/VLEN;
+int P_b = P/RB_p;
+int Q_b = Q/RB_q;
+
+//Optimized Forward Propagation Loops : Register Blocking
 #pragma omp parallel for
 for (int n = 0; n < N; n++) {
-    for (int k = 0; k < K; k++) {
-        for (int c = 0; c < C; c++) {
-            for (int oj = 0; oj < P; oj++) {
-                for (int oi = 0; oi < Q; oi++) {
-                    int ij = stride * oj - padding;
-                    int ii = strid * oi - padding;
+    for (int k_b = 0; k_b < K; k_b++) {
+        for (int c_b = 0; c_b < C; c_b++) {
+            for (int oj_b = 0; oj_b < P; oj_b++) {
+                for (int oi_b = 0; oi_b < Q; oi_b++) {
+                    int ij = stride * oj * RB_p;
+                    int ii = stride * oi * RB_q;
+                    int oj = oj_b * RB_p;
+                    int oi = oi_b * RP_q;
                     for (int r = 0; r < R; r++) {
                         for (int s = 0; s < S; s++) {
-                            O[n][k][oj][oi] += I[n][c][ij + r][ii + s] ∗ W[k][c][r][s]
+                            for (int k = 0; k < VLEN + 1; k++) {
+                                for (int c = 0; c < VLEN + 1; c++) {
+                                    for (int p = 0; p < RB_p + 1; p++) {
+                                        for (int q = 0; q < RB_q + 1; q++) {
+                                            int ijo = ij + stride * p;
+                                            int iio = ii + stride * q;
+                                              O[n][k][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ij0 + r][ii0 + s][c]
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -100,10 +118,10 @@ for (int n = 0; n < N; n++) {
                     int ii = stride * oi_b * B_q;
                     for (int r = 0; r < R; r++) {
                         for (int s = 0; s < S; s++) {
-                            for (int p = 0; p < B_p; p++) {
-                                for (int q = 0; q < B_q; q++) {
-                                    for (int k = 0; k < VLEN; k++) {
-                                        for (int c = 0; c < VLEN; c++) {
+                            for (int p = 0; p < B_p + 1; p++) {
+                                for (int q = 0; q < B_q + 1; q++) {
+                                    for (int k = 0; k < VLEN + 1; k++) {
+                                        for (int c = 0; c < VLEN + 1; c++) {
                                             ii += stride * p;
                                             ij += stride * q;
                                             //dW[k_b][c_b][r][s][c][k] += I[n][c_b][ij+r][ii+s][c] * dO[n][k_b][oj+p][oi+q][k];
