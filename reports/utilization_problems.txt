@@ -1,0 +1,71 @@
+Issues we are running into when trying to compute the baseline for intel avx2 machine:
+
+We are running on an Intel(R) Xeon(R) CPU E5-2660 v3 @ 2.60GHz machine.
+
+
+Specs:
+1. 2.60 Ghz - (Boosted 3.30 Ghz)
+2. 10 physical cores
+3. 2 sockets
+4. HTT (Hyperthreading) enabled
+
+Computed theoretical peak performance for the machine:
+Avx2 = 256 bits with FMA support
+
+(256/32) = 8 Elements can be operated on at once 
+8 * 2 = 16 because FMA FLOPS/cycle
+
+So:
+16 * 10 * 2.60 = 416 GFLOPS [Theoretical Peak Performance per core, at low clock rate, without HTT]
+
+Assuming for sustained avx2 we pick lower clock rate
+
+------
+
+Skylake SP (from paper) theoretical peak performance is around 4000 GFLOPS as per figure 4
+
+Specs:
+1. 2.30 Ghz for sustained avx512
+2. 28 physical cores
+3. 1 socket
+4. HTT (?)
+5. Has 2 AVX512  units per core
+
+Computed theoretical machine peak:
+Avx512 = 512 bits with FMA support
+(512/32) = 16 Elements can be operated on at once
+2 * 16 = 32 because FMA FLOPS/cycle
+2 * 32 = 64 because 2 AVX512 units per core 
+
+So:
+64 * 28 * 2.30 = 4160 GFLOPS [Theoretical Peak Performance per core, at low clock rate, without HTT]
+
+______
+
+Intel APP Metrics sheets
+1. Reports the machine peak for the E5 as 416 GFLOPS (This checks out with our computation)
+2. Reports the machine peak for Skylake as 1033.6 GFLOPS (????)
+_____
+
+Issues:
+1. Seungmin ran the experiment on Xeon and reports higher performance than theoretical machine peak.
+2. Discrepancy between Skylake paper and Intel APP Metrics sheet (which makes our sanity check for E5 questionable)
+_____
+
+Possibliies:
+1. HTT is enabled on the machine, and the theoretical peak is computed without HTT
+	a) Seems like Skylake paper does not have HTT enabled, so it would not be a fair comparison
+
+2. We are running on a machine with 2 sockets, and could possibly have had the program run on both sockets
+	a) We have, in accordance with the shell scripts, tried to force the program to run on a single socket
+	b) Seungmin has tried a few variations in the script, but we get the same result
+
+3. There could be more than one Avx2 unit in the machine
+	a) Unlikely, this is a server chip. Plus could not find anything online supporting this
+
+4. Error in computing machine peak
+_____
+
+Possible ideas to try:
+1. Use taskset to force the program to run with physical cores only : taskset -c 0-20:2 ./run_resnet50.sh
+_____ 
