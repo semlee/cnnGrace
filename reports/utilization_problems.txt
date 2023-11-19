@@ -65,6 +65,8 @@ Possibliies:
 
 4. Error in computing machine peak
 _____
+Steps to ensure an accurate hardware setup [TODO: Seungmin]
+_____
 
 Possible ideas to try:
 1. Use taskset to force the program to run with physical cores only : taskset -c 0-20:2 ./run_resnet50.sh
