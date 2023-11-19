@@ -21,7 +21,7 @@
   char format = 'A';      /* 'A': ALL, 'L': LIBXSMM, 'T': Tensorflow, 'M', Mixed */
 
 
-// Algorithm 1: Naive Algorithm using OpenMP
+// Algorithm 2: Optimized Algorithm using OpenMP + Register Blocking
 
 /*
     N = # of input image (NImg)
