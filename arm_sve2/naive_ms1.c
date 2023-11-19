@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 
 // Algorithm 1: Naive Algorithm using OpenMP
 /*
@@ -24,8 +25,7 @@
 int P = (H + 2 * padding - R) / (stride + 1)
 int Q = (Q + 2 * padding - S) / (stride + 1)
 
-// pragma openmp 
-
+#pragma omp parallel for
 for (int n = 0; n < N; n++) {
     for (int k = 0; k < K; k++) {
         for (int c = 0; c < C; c++) {
