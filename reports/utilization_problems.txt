@@ -72,3 +72,13 @@ _____
 Possible ideas to try:
 1. Use taskset to force the program to run with physical cores only : taskset -c 0-20:2 ./run_resnet50.sh
 _____ 
+
+Results of running taskset -c 0-20:2 ./run_resnet50.sh were used to create the figure sent below
+	a) chose -c 0-20:2 so it runs on 10 physical cores of chip on socket 1
+
+____
+
+_____
+
+
+SOLVED: AVX-2 requires 2 Units per core, so the theoretical peak is 2 * 16 * 10 * 2.60 = 832 GFLOPS
