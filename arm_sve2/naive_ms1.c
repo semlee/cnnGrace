@@ -46,7 +46,7 @@ int P = (H + 2 * padding - R) / (stride + 1)
 int Q = (Q + 2 * padding - S) / (stride + 1)
 
 //Naive Forward Propagation Loops
-#pragma omp parallel for
+/*
 for (int n = 0; n < N; n++) {
     for (int k = 0; k < K; k++) {
         for (int c = 0; c < C; c++) {
@@ -65,6 +65,38 @@ for (int n = 0; n < N; n++) {
         }
     }
 }
+*/
+
+void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+#if defined (OPENMP)
+    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+#endif
+    for (img = 0; img < nImg; ++img) {
+        for (ofm = 0; ofm < nOfm; ++ofm) {
+            for (ifm = 0; ifm < nIfm; ++ifm) {
+                for (oj = 0; oj < ofh; ++oj) {
+                    ij = oj * stride_h - pad_h;
+                    for (oi = 0; oi < ofw; ++oi) {
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; ++kj) {
+                            if (ij+kj < 0 || ij+kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ++ki) {
+                                if (ii+ki < 0 || ii+ki >= ifw) continue;
+                                LIBXSMM_VLA_ACCESS(  4, output_t, img, ofm, oj, oi, nOfm, ofhp, ofwp) +=
+                                LIBXSMM_VLA_ACCESS(4,  input_t, img, ifm, ij + kj, ii + ki, nIfm, ifhp, ifwp)
+                                * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
+                                output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    
+}
+
 
 //Naive Backward Propagation Loops
 #pragma omp parallel for
