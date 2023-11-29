@@ -116,7 +116,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     /* loop counters */
     int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
 
-#if defined (OPENMP)
+#if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
     for (img = 0; img < nImg; ++img) {
@@ -171,7 +171,7 @@ voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, cons
     /* loop counters */
     int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
 
-#if defined (OPENMP)
+#if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
     //Naive Backward Propagation Loops  
@@ -225,7 +225,7 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
     int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
 
 
-#if defined (OPENMP)
+#if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
     //Naive Weight Update Gradient Loops
@@ -287,6 +287,63 @@ int main (void) {
     char type = 'A';        /* 'A': ALL, 'F': FP, 'B': BP, 'U', WU */
     char format = 'A';      /* 'A': ALL, 'L': LIBXSMM, 'T': Tensorflow, 'M', Mixed */
 
+#if defined(_OPENMP)
+    int nThreads = omp_get_max_threads(); /* number of threads */
+#else
+    int nThreads = 1; /* number of threads */
+#endif
+
+    /* reading new values from cli */
+    i = 1;
+    if (argc > i) iters      = atoi(argv[i++]);
+    if (argc > i) ifw        = atoi(argv[i++]);
+    if (argc > i) ifh        = atoi(argv[i++]);
+    if (argc > i) nImg       = atoi(argv[i++]);
+    if (argc > i) nIfm       = atoi(argv[i++]);
+    if (argc > i) nOfm       = atoi(argv[i++]);
+    if (argc > i) kw         = atoi(argv[i++]);
+    if (argc > i) kh         = atoi(argv[i++]);
+    if (argc > i) padw       = atoi(argv[i++]);
+    if (argc > i) padh       = atoi(argv[i++]);
+    if (argc > i) stride     = atoi(argv[i++]);
+    if (argc > i) type       = *(argv[i++]);
+    if (argc > i) format     = *(argv[i++]);
+    if (argc > i) padding_mode = atoi(argv[i++]);
+
+    if (type != 'A' && type != 'F' && type != 'B' && type != 'U') {
+        printf("type needs to be 'A' (All), 'F' (FP only), 'B' (BP only), 'U' (WU only)\n");
+        return 0;
+    }
+
+
+    stride_w = stride;
+    stride_h = stride;
+    pad_w = padw;
+    pad_h = padh;
+
+    if (0 == padding_mode) {
+        pad_h_in = 0;
+        pad_w_in = 0;
+        pad_h_out = 0;
+        pad_w_out = 0;
+    }
+    else {
+        /* TODO: change "1" to "0" if "padding_mode = -1" is acknowledged */
+        if (1 < padding_mode) pad_w = padding_mode;
+        pad_h_in = pad_h;
+        pad_w_in = pad_w;
+        pad_h_out = pad_h;
+        pad_w_out = pad_w;
+    }
+
+    /* deriving some values for naive code */
+    ofh = (ifh + 2 * pad_h - kh) / stride_h + 1;
+    ofw = (ifw + 2 * pad_w - kw) / stride_w + 1;
+    ifhp = ifh + 2 * pad_h_in;
+    ifwp = ifw + 2 * pad_w_in;
+    ofhp = ofh + 2 * pad_h_out;
+    ofwp = ofw + 2 * pad_w_out;
+    
     /* set struct for naive convolution */
     naive_param.nImg = nImg;
     naive_param.nIfm = nIfm;
