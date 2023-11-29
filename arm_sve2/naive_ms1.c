@@ -144,7 +144,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -197,7 +197,7 @@ voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, cons
     }
 }
 
-void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const float* filter) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -383,7 +383,7 @@ int main (void) {
 
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
 
-    naive_conv_bp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
 
-    naive_conv_uw(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
 }
