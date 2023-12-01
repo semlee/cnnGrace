@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
-#include <vector>
+#include <arm_sve.h>
 
 // Algorithm 1: Naive Algorithm using OpenMP
 
@@ -251,6 +251,17 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
     } 
 } 
 
+void fill_random(float* input_array, int A = 1, int B = 1, int C = 1 int D = 1) {
+    for (int i = 0; i < A; i++) {
+        for (int j = 0; j < B; j++) {
+            for (int k = 0; k < C; k++) {
+                for (int l = 0; l < D; l++) {
+                    srand(input_array[i][j][k][l]);
+                }
+            }
+        }
+    }
+}
 
 int main (void) {
 
@@ -383,6 +394,18 @@ int main (void) {
     naive_bias            = (float*)libxsmm_aligned_malloc( nOfm*               sizeof(float), 2097152);
     naive_dbias           = (float*)libxsmm_aligned_malloc( nOfm*               sizeof(float), 2097152);
     
+    svuint32_t naive_input           [nImg][nIfm][ifhp][ifwp];
+    svuint32_t naive_input_save      [nImg][nIfm][ifhp][ifwp];
+    svuint32_t naive_output          [nImg][nOfm][ofhp][ofwp];
+    svuint32_t naive_output_save     [nImg][nOfm][ofhp][ofwp];
+    svuint32_t naive_output_bp       [nImg][nOfm][ofhp][ofwp];
+    svuint32_t naive_output_wu       [nImg][nOfm][ofhp][ofwp];
+    svuint32_t naive_filter          [nOfm][nIfm][kh][kw];
+    svuint32_t naive_filter_save     [nOfm][nIfm][kh][kw];
+    svuint32_t naive_filter_wu       [nOfm][nIfm][kh][kw];
+    svuint32_t naive_bias            [nOfm];
+    svuint32_t naive_dbias           [nOfm];
+
     naive_input           = (float*)malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
     naive_input_save      = (float*)malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
     naive_output          = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
@@ -398,6 +421,7 @@ int main (void) {
     naive_libxsmm_filter  = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
     naive_bias            = (float*)malloc( nOfm*               sizeof(float), 2097152);
     naive_dbias           = (float*)malloc( nOfm*               sizeof(float), 2097152);
+
     */
     
     float naive_input           [nImg][nIfm][ifhp][ifwp];
@@ -411,6 +435,12 @@ int main (void) {
     float naive_filter_wu       [nOfm][nIfm][kh][kw];
     float naive_bias            [nOfm];
     float naive_dbias           [nOfm];
+
+    fill_random(&naive_input, nImg, nIfm, ifhp, ifwp);
+    fill_random(&naive_input_save, nImg, ifhp, ifwp);
+    fill_random(&naive_filter, nOfm, nIfm, kh, kw);
+    fill_random(&naive_filter_save, nOfm, nIfm, kh, kw);
+    fill_random(&naive_filter_wu, nOfm, nIfm, kh, kw);
 
     /* print some summary */
     printf("##########################################\n");
