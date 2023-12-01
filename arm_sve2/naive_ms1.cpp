@@ -1,9 +1,22 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
+//used for performance count
+#include <chrono>
+#include <ratio>
+#include <cmath>
+
+//additional header for parallelization
 #include <omp.h>
 #include <arm_sve.h>
+
+
+using std::cout;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
+
 
 // Algorithm 1: Naive Algorithm using OpenMP
 
@@ -268,7 +281,7 @@ void fill_random(float* input_array, int A = 1, int B = 1, int C = 1 int D = 1) 
     }
 }
 
-int main (void) {
+int main (int argc, char** argv) {
 
     // float *naive_input, *naive_output, *naive_output_save, *naive_filter, *naive_filter_wu, *naive_output_bp, *naive_output_wu, *naive_libxsmm_output;
     // float *naive_libxsmm_input, *naive_libxsmm_filter, *naive_input_save, *naive_filter_save, *naive_filter_kcrs;
@@ -461,9 +474,24 @@ int main (void) {
     printf("SIZE Output  (1): %10.2f MiB\n", (double)(1*nOfm*ofhp*ofwp*   sizeof(float))/(1024.0*1024.0) );
     printf("SIZE Weight     : %10.2f MiB\n", (double)(nIfm*nOfm*kw*kh*    sizeof(float))/(1024.0*1024.0) );
 
+    high_resolution_clock::time_point start;
+    high_resolution_clock::time_point end;
+    duration<double, std::milli> duration_sec;
+
+    printf("##########################################\n");
+    printf("#         Performance Analysis           #\n");
+    printf("##########################################\n");
+
+    start = high_resolution_clock::now();
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    end = high_resolution_clock::now();
 
-    naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    cout << "Total time: " << duration_sec.count() << "ms\n";
 
-    naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+    //naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+
+    //naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+
+    return 0;
 }
