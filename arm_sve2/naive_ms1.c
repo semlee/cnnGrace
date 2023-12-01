@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
 #include <omp.h>
 #include <arm_sve.h>
 
@@ -252,11 +254,14 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
 } 
 
 void fill_random(float* input_array, int A = 1, int B = 1, int C = 1 int D = 1) {
+    time_t t;
+    srand((unsigned) time(&t));
+
     for (int i = 0; i < A; i++) {
         for (int j = 0; j < B; j++) {
             for (int k = 0; k < C; k++) {
                 for (int l = 0; l < D; l++) {
-                    srand(input_array[i][j][k][l]);
+                    input_array[i][j][k][l] = round((rand() % 1000)/ 1000, 3);
                 }
             }
         }
