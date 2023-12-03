@@ -10,7 +10,7 @@
 
 //additional header for parallelization
 #include <omp.h>
-#include <arm_sve.h>
+// #include <arm_sve.h>
 
 
 using std::cout;
@@ -165,7 +165,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-void naive_conv_bp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* naive_input_save) {
+void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -225,7 +225,7 @@ void naive_conv_bp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const float* filter) {
+void naive_conv_uw(naive_conv_t* param, const float* input, const float* output, float* filter) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -483,18 +483,18 @@ int main (int argc, char** argv) {
     float* naive_bias = new float[nOfm];
     float* naive_dbias = new float[nOfm];
 
-    fill_random(&naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(&naive_input_save, nImg, ifhp, ifwp);
-    fill_random(&naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(&naive_filter_save, nOfm, nIfm, kh, kw);
-    fill_random(&naive_filter_wu, nOfm, nIfm, kh, kw);
+    fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
+    fill_random(naive_input_save, nImg, ifhp, ifwp);
+    fill_random(naive_filter, nOfm, nIfm, kh, kw);
+    fill_random(naive_filter_save, nOfm, nIfm, kh, kw);
+    fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
 
     /* print some summary */
     printf("##########################################\n");
     printf("#          Setting Up (Common)           #\n");
     printf("##########################################\n");
     printf("PARAMS: W:%d  H:%d  N:%d  C:%d  K:%d  R:%d  S:%d  P:%d  Q:%d  STRIDE:%d\n", ifw, ifh, nImg, nIfm, nOfm, kw, kh, ofh, ofw, stride);
-    printf("PARAMS: ITERS:%d", iters); if (LIBXSMM_FEQ(0, check)) printf("  Threads:%d\n", nThreads); else printf("\n");
+
     printf(" InImg %dx%d Padded (%dx%d)\n", ifh, ifw, ifhp, ifwp);
     printf("OutImg %dx%d Padded (%dx%d)\n", ofh, ofw, ofhp, ofwp);
     printf("SIZE Input  (MB): %10.2f MiB\n", (double)(nImg*nIfm*ifhp*ifwp*sizeof(float))/(1024.0*1024.0) );
@@ -512,9 +512,9 @@ int main (int argc, char** argv) {
     printf("##########################################\n");
 
     ///*
-    cout << "##########################################" << endl;
-    cout << "               FORWARD PASS               " << endl;
-    cout << "##########################################" << endl;
+    cout << "##########################################\n";
+    cout << "               FORWARD PASS               \n";
+    cout << "##########################################\n";
 
     start = high_resolution_clock::now();
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
@@ -524,9 +524,9 @@ int main (int argc, char** argv) {
     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     //*/
     /*
-    cout << "##########################################" << endl;
-    cout << "               BACKWARD PASS              " << endl;
-    cout << "##########################################" << endl;
+    cout << "##########################################\n";
+    cout << "               BACKWARD PASS              \n";
+    cout << "##########################################\n";
 
     start = high_resolution_clock::now();
     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
@@ -536,9 +536,9 @@ int main (int argc, char** argv) {
     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
      */
     /*
-    cout << "##########################################" << endl;
-    cout << "               UPDATE WEIGHT              " << endl;
-    cout << "##########################################" << endl;
+    cout << "##########################################\n";
+    cout << "               UPDATE WEIGHT              \n";
+    cout << "##########################################\n";
 
     start = high_resolution_clock::now();
     naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
