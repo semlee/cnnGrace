@@ -39,3 +39,8 @@ else
     echo "Compilation failed"
 fi
 
+# Single CG1 node run
+srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
+
+# Full CG4 node run
+srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
