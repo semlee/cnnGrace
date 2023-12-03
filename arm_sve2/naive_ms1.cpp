@@ -149,7 +149,13 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
                                 // LIBXSMM_VLA_ACCESS(4,  input_t, img, ifm, ij + kj, ii + ki, nIfm, ifhp, ifwp)
                                 // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
                                 // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
-                                output[img][ojm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
+                                // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
+                                size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
+                                size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+                                
+                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+
                             }
                         }
                     }
@@ -159,7 +165,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* naive_input_save) {
+void naive_conv_bp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -202,7 +208,14 @@ voide naive_conv_bp(naive_conv_t* param, const float* input, float* output, cons
                             for (ki = 0; ki < kw; ++ki) {
                                 if (ii+ki < 0 || ii+ki >= ifw) continue;
                                 //dI[n][c][ij+r][ii+s] += dO[n][k][oj][oi] * W[k][c][r][s];
-                                input[img][ifm][ij+kj][ii+ki] += output[img][ofm][oj][oi] ∗ filter[ofm][ifm][kj][ki];
+                                //input[img][ifm][ij+kj][ii+ki] += output[img][ofm][oj][oi] ∗ filter[ofm][ifm][kj][ki];
+                                // Compute flat indices
+                                size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
+                                size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+
+                                // Perform the convolution
+                                input[inputIndex] += output[outputIndex] * filter[filterIndex];
                             }
                         }
                     }
@@ -256,7 +269,11 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
                             for (ki = 0; ki < kw; ++ki) {
                                 if (ii+ki < 0 || ii+ki >= ifw) continue;
                                 // dW[k][c][r][s] += I[n][c][ij+r][ii+s] * dO[n][k][oj][oi];
-                                filter[ofm][ifm][kj][ki] += input[img][ifm][ij + kj][ii + ki] * output[img][ojm][oj][oi];
+                                //filter[ofm][ifm][kj][ki] += input[img][ifm][ij + kj][ii + ki] * output[img][ofm][oj][oi];
+                                size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
+                                size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+                                filter[filterIndex] += input[inputIndex] * output[outputIndex];
                             }
                         }
                     }
@@ -266,15 +283,21 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
     } 
 } 
 
-void fill_random(float* input_array, int A = 1, int B = 1, int C = 1 int D = 1) {
+void fill_random(float* input_array, size_t A, size_t B, size_t C, size_t D) {
+    // Seed the random number generator
     time_t t;
-    srand((unsigned) time(&t));
+    srand(static_cast<unsigned int>(time(&t)));
 
-    for (int i = 0; i < A; i++) {
-        for (int j = 0; j < B; j++) {
-            for (int k = 0; k < C; k++) {
-                for (int l = 0; l < D; l++) {
-                    input_array[i][j][k][l] = round((rand() % 1000)/ 1000, 3);
+    for (size_t i = 0; i < A; i++) {
+        for (size_t j = 0; j < B; j++) {
+            for (size_t k = 0; k < C; k++) {
+                for (size_t l = 0; l < D; l++) {
+                    // Convert multi-dimensional indices to a flat index
+                    size_t flatIndex = i * B * C * D + j * C * D + k * D + l;
+                    // Generate a random float value between 0 and 1
+                    float random_value = static_cast<float>(rand()) / RAND_MAX;
+                    // Round to the thousandth place
+                    input_array[flatIndex] = round(random_value * 1000) / 1000.0f;
                 }
             }
         }
@@ -323,7 +346,7 @@ int main (int argc, char** argv) {
 #endif
 
     /* reading new values from cli */
-    i = 1;
+    int i = 1;
     if (argc > i) iters      = atoi(argv[i++]);
     if (argc > i) ifw        = atoi(argv[i++]);
     if (argc > i) ifh        = atoi(argv[i++]);
@@ -442,17 +465,23 @@ int main (int argc, char** argv) {
 
     */
     
-    float naive_input           [nImg][nIfm][ifhp][ifwp];
-    float naive_input_save      [nImg][nIfm][ifhp][ifwp];
-    float naive_output          [nImg][nOfm][ofhp][ofwp];
-    float naive_output_save     [nImg][nOfm][ofhp][ofwp];
-    float naive_output_bp       [nImg][nOfm][ofhp][ofwp];
-    float naive_output_wu       [nImg][nOfm][ofhp][ofwp];
-    float naive_filter          [nOfm][nIfm][kh][kw];
-    float naive_filter_save     [nOfm][nIfm][kh][kw];
-    float naive_filter_wu       [nOfm][nIfm][kh][kw];
-    float naive_bias            [nOfm];
-    float naive_dbias           [nOfm];
+    // Calculate the total sizes
+    size_t inputSize = nImg * nIfm * ifhp * ifwp;
+    size_t outputSize = nImg * nOfm * ofhp * ofwp;
+    size_t filterSize = nOfm * nIfm * kh * kw;
+
+    // Allocate memory for the arrays
+    float* naive_input = new float[inputSize];
+    float* naive_input_save = new float[inputSize];
+    float* naive_output = new float[outputSize];
+    float* naive_output_save = new float[outputSize];
+    float* naive_output_bp = new float[outputSize];
+    float* naive_output_wu = new float[outputSize];
+    float* naive_filter = new float[filterSize];
+    float* naive_filter_save = new float[filterSize];
+    float* naive_filter_wu = new float[filterSize];
+    float* naive_bias = new float[nOfm];
+    float* naive_dbias = new float[nOfm];
 
     fill_random(&naive_input, nImg, nIfm, ifhp, ifwp);
     fill_random(&naive_input_save, nImg, ifhp, ifwp);
@@ -492,6 +521,19 @@ int main (int argc, char** argv) {
     //naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
 
     //naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
-
+    
+    //free allocated memory
+    delete[] naive_input;
+    delete[] naive_input_save;
+    delete[] naive_output;
+    delete[] naive_output_save;
+    delete[] naive_output_bp;
+    delete[] naive_output_wu;
+    delete[] naive_filter;
+    delete[] naive_filter_save;
+    delete[] naive_filter_wu;
+    delete[] naive_bias;
+    delete[] naive_dbias;
+    
     return 0;
 }

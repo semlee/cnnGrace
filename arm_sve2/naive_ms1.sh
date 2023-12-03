@@ -1,10 +1,10 @@
 #!/bin/bash
 
-
 #SBATCH -p cg1
 #SBATCH -t 0-00:30:00
 #SBATCH -J naive_run
 #SBATCH -o output-%j.out -e output-%j.err
+#SBATCH -c 1
 
 iters=1000
 ifw=16
@@ -38,3 +38,4 @@ if [ $? -eq 0 ]; then
 else
     echo "Compilation failed"
 fi
+
