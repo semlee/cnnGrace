@@ -283,7 +283,7 @@ void naive_conv_uw(naive_conv_t* param, const float* input, float* output, const
     } 
 } 
 
-void fill_random(float* input_array, size_t A, size_t B, size_t C, size_t D) {
+void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
     // Seed the random number generator
     time_t t;
     srand(static_cast<unsigned int>(time(&t)));
@@ -508,20 +508,49 @@ int main (int argc, char** argv) {
     duration<double, std::milli> duration_sec;
 
     printf("##########################################\n");
-    printf("#         Performance Analysis           #\n");
+    printf("#           Performance Analysis         #\n");
     printf("##########################################\n");
+
+    ///*
+    cout << "##########################################" << endl;
+    cout << "               FORWARD PASS               " << endl;
+    cout << "##########################################" << endl;
 
     start = high_resolution_clock::now();
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
     end = high_resolution_clock::now();
 
     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-    cout << "Total time: " << duration_sec.count() << "ms\n";
+    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    //*/
+    /*
+    cout << "##########################################" << endl;
+    cout << "               BACKWARD PASS              " << endl;
+    cout << "##########################################" << endl;
 
-    //naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+    start = high_resolution_clock::now();
+    naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+    end = high_resolution_clock::now();
 
-    //naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
-    
+    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+     */
+    /*
+    cout << "##########################################" << endl;
+    cout << "               UPDATE WEIGHT              " << endl;
+    cout << "##########################################" << endl;
+
+    start = high_resolution_clock::now();
+    naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+    end = high_resolution_clock::now();
+
+    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    */
+    printf("##########################################\n");
+    printf("#           Cleaning Up data...          #\n");
+    printf("##########################################\n");
+
     //free allocated memory
     delete[] naive_input;
     delete[] naive_input_save;
@@ -535,5 +564,8 @@ int main (int argc, char** argv) {
     delete[] naive_bias;
     delete[] naive_dbias;
     
+    printf("##########################################\n");
+    printf("#                Complete.               #\n");
+    printf("##########################################\n");
     return 0;
 }
