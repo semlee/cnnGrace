@@ -1,0 +1,427 @@
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,0
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 20
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 20
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 40
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 40
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 40
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 40
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 40
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 40
+KMP_AFFINITY: granularity=fine,compact,0,1
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 40
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 40
+KMP_AFFINITY: granularity=fine,compact,0,1
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,proclist=[0-9],explicit
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,proclist=[0-9],explicit
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,compact,1,2
+KMP_HW_SUBSET: 
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CUT: /usr/bin/cut
+WC: /usr/bin/wc
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: 1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 2
+NC: 20
+NT: 40
+HT: 2
+NN: 2
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,proclist=[0-19],explicit
+KMP_HW_SUBSET: 
+single_resnet50.sh input data
+UNAME: /usr/bin/uname
+SORT: /usr/bin/sort
+GREP: /usr/bin/grep
+CHECK_DNN_MB: 64
+CHECK_DNN_ITERS: 1000
+MB: 10
+ITERS: 1000
+NUMA: -1
+BIN: f32
+TYPE: F
+FORMAT: L
+PAD: 1
+NS: 1
+NC: 10
+NT: 20
+HT: 2
+NN: 1
+NUMACTL: 
+OMP_NUM_THREADS: 10
+KMP_AFFINITY: granularity=fine,proclist=[0-19],explicit
+KMP_HW_SUBSET: 
