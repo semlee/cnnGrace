@@ -14,3 +14,7 @@
 | L3 cache | 50 MiB (25MB shared memory) | 
 | DDR4 size | 768 GB |
 | Memory bandwidth | upto 64GB/s |
+
+2. parameters
+
+https://www.cloudlab.us/p/PortalProfiles/small-lan&rerun_paramset=c29bb6f45354157f80c52d0ab2b5d7d8ccc16bce
