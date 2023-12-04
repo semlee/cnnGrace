@@ -21,7 +21,7 @@ format='L'
 padding_mode=0
 
 # Compile the C++ file
-g++-12.3 -o naive_layer naive_ms1.cpp -std=c++11
+g++ -o naive_layer naive_ms1.cpp -std=c++11
 
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
