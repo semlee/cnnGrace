@@ -24,23 +24,22 @@ padding_mode=0
 # Compile the C++ file
 g++-12.3 -o naive_layer naive_ms1.cpp -std=c++11
 
-
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
     echo "Compilation successful"
 
-    # Run the compiled program with command-line arguments
+    # Run the compiled program with command-line arguments using srun
     #./naive_ms1 iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
-    ./naive_layer $iters $ifw $ifh $nImg $nIfm $Ofm $kw $kh $padw $padh $stride $type $format $padding_mode
+    srun -N 1 -p cg1-high --exclusive ./naive_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
 
     # Optionally, you can pass command-line arguments stored in a file
-    # ./naive_layer $(cat input_args.txt)
+    # srun -N 1 -p cg1-high --exclusive ./naive_layer $(cat input_args.txt)
 else
     echo "Compilation failed"
 fi
 
 # Single CG1 node run
-srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
+# srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
 
 # Full CG4 node run
-srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
+# srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
