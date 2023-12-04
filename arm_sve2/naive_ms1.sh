@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#SBATCH -p cg1
 #SBATCH -t 0-00:30:00
 #SBATCH -J naive_run
 #SBATCH -o output-%j.out -e output-%j.err
