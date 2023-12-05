@@ -1,6 +1,6 @@
 #!/bin/bash
 
-g++ -o naive_layer -mavx2 run_naive_ms1.cpp -std=c++11
+g++ -o naive_layer -mavx2 -O3 run_naive_ms1.cpp -std=c++11
 
 objdump -D -Mintel naive_layer | grep "vex.v"
 
