@@ -169,6 +169,66 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
+void naive_conv_fp_original(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh        = param->kh;
+    int kw        = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    /* loop counters */
+    int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
+
+#if defined (_OPENMP)
+    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+#endif
+    for (img = 0; img < nImg; ++img) {
+        for (ofm = 0; ofm < nOfm; ++ofm) {
+            for (ifm = 0; ifm < nIfm; ++ifm) {
+                for (oj = 0; oj < ofh; ++oj) {
+                    ij = oj * stride_h - pad_h;
+                    for (oi = 0; oi < ofw; ++oi) {
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; ++kj) {
+                            if (ij+kj < 0 || ij+kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ++ki) {
+                                if (ii+ki < 0 || ii+ki >= ifw) continue;
+                                // LIBXSMM_VLA_ACCESS(  4, output_t, img, ofm, oj, oi, nOfm, ofhp, ofwp) +=
+                                // LIBXSMM_VLA_ACCESS(4,  input_t, img, ifm, ij + kj, ii + ki, nIfm, ifhp, ifwp)
+                                // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
+                                // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
+                                // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
+                                size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
+                                size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+
+                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
@@ -527,10 +587,21 @@ int main (int argc, char** argv) {
     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
 
+
+    naive_conv_fp_original(&naive_param, naive_input, naive_output_save, naive_filter, naive_bias);
+    int error_count = 0;
+
     for (int i = 0; i < outputSize; i++) {
-        cout << naive_output[i] << endl;
+        if (naive_output_save[i] != naive_output[i]) {
+            error_count++;
+        }
     }
-    cout << endl;
+    cout << "Error Count: " << error_count << "/" << outputSize << "\n";
+    
+    // for (int i = 0; i < outputSize; i++) {
+    //     cout << naive_output[i] << endl;
+    // }
+    // cout << endl;
 
     //*/
     /*
