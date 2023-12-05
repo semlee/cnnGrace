@@ -54,10 +54,10 @@ int Q_b = Q/RB_q;
 //Optimized Forward Propagation Loops : Register Blocking
 #pragma omp parallel for
 for (int n = 0; n < N; n++) {
-    for (int k_b = 0; k_b < K; k_b++) {
-        for (int c_b = 0; c_b < C; c_b++) {
-            for (int oj_b = 0; oj_b < P; oj_b++) {
-                for (int oi_b = 0; oi_b < Q; oi_b++) {
+    for (int k_b = 0; k_b < K_b; k_b++) {
+        for (int c_b = 0; c_b < C_b; c_b++) {
+            for (int oj_b = 0; oj_b < P_b; oj_b++) {
+                for (int oi_b = 0; oi_b < Q_b; oi_b++) {
                     int ij = stride * oj * RB_p;
                     int ii = stride * oi * RB_q;
                     int oj = oj_b * RB_p;

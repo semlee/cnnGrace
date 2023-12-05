@@ -40,61 +40,70 @@ typedef struct {
   int kw;
   int stride_h;
   int stride_w;
+  int VLEN;
+  int RB_p;
+  int RB_q;
 } conv_t;
 
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
-    int nImg      = param->nImg;
-    int nIfm      = param->nIfm;
-    int nOfm      = param->nOfm;
+    int N         = param->nImg;
+    int C         = param->nIfm;
+    int K         = param->nOfm;
     int ifhp      = param->ifhp;
     int ifwp      = param->ifwp;
     int ofhp      = param->ofhp;
     int ofwp      = param->ofwp;
     int ifh       = param->ifh;
     int ifw       = param->ifw;
-    int ofh       = param->ofh;
-    int ofw       = param->ofw;
+    int P         = param->ofh;
+    int Q         = param->ofw;
     int pad_h     = param->pad_h;
     int pad_w     = param->pad_w;
     int pad_h_in  = param->pad_h_in;
     int pad_w_in  = param->pad_w_in;
     int pad_h_out = param->pad_h_out;
     int pad_w_out = param->pad_w_out;
-    int kh        = param->kh;
-    int kw        = param->kw;
+    int R         = param->kh;
+    int S         = param->kw;
     int stride_h  = param->stride_h;
     int stride_w  = param->stride_w;
-    /* loop counters */
-    int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int C_b = C/VLEN;
+    int K_b = K/VLEN;
+    int P_b = P/RB_p;
+    int Q_b = Q/RB_q;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int img = 0; img < nImg; ++img) {
-        for (int ofm = 0; ofm < nOfm; ++ofm) {
-            for (int ifm = 0; ifm < nIfm; ++ifm) {
-                for (int oj = 0; oj < ofh; ++oj) {
+    for (int n = 0; n < N; n++) {
+        for (int k_b = 0; k_b < K_b; k_b++) {
+            for (int c_b = 0; c_b < C_b; c_b++) {
+                for (int oj = 0; oj < P_b; oj++) {
                     int ij = oj * stride_h - pad_h;
-                    for (int oi = 0; oi < ofw; ++oi) {
+                    for (int oi = 0; oi < Q_b; oi++) {
                         int ii = oi * stride_w - pad_w;
-                        for (int kj = 0; kj < kh; ++kj) {
+                        for (int kj = 0; kj < R; kj++) {
                             if (ij + kj < 0 || ij + kj >= ifh) continue;
-                            for (int ki = 0; ki < kw; ++ki) {
+                            for (int ki = 0; ki < S; ki++) {
                                 if (ii + ki < 0 || ii + ki >= ifw) continue;
 
-                                for (int k = 0; k < VLEN; k++) {
-                                    for (int c = 0; c < VLEN; c++) {
+                                for (int c = 0; c < VLEN; c++) {
+                                    for (int k = 0; k < VLEN; k++) {
                                         for (int p = 0; p < RB_p; p++) {
                                             for (int q = 0; q < RB_q; q++) {
-                                                int ijo = ij + stride * p;
-                                                int iio = ii + stride * q;
+                                                int ijo = ij + stride_h * p;
+                                                int iio = ii + stride_w * q;
 
                                                 // Check boundary conditions
                                                 if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
-                                                    int inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ijo + kj) * ifw + (iio + ki);
-                                                    int outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
-                                                    int filterIndex = ofm * nIfm * R * S * VLEN * VLEN + ifm * R * S * VLEN * VLEN + kj * S * VLEN * VLEN + ki * VLEN * VLEN + c * VLEN + k;
+                                                    int inputIndex = n * C_b * ifh * ifw + (c_b * VLEN + c) * ifh * ifw + (ijo + kj) * ifw + (iio + ki);
+                                                    int outputIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN + c * VLEN + k;
+                                                    int filterIndex = k_b * C_b * R * S * VLEN * VLEN + c_b * R * S * VLEN * VLEN + kj * S * VLEN * VLEN + ki * VLEN * VLEN + c * VLEN + k;
 
                                                     output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                                 }
@@ -105,54 +114,59 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                             }
                         }
                     }
-                }
-            }
+
 #if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-            // Apply ReLU activation function
-            for (int oj = 0; oj < ofh; ++oj) {
-                for (int oi = 0; oi < ofw; ++oi) {
-                    int reluIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
-                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+                    // Apply ReLU activation function
+                    for (int oj = 0; oj < P_b * RB_p; oj++) {
+                        for (int oi = 0; oi < Q_b * RB_q; oi++) {
+                            int reluIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN;
+                            output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+                        }
+                    }
+#endif
+
                 }
             }
-#endif
         }
     }
+
 }
 
 void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
-    int nImg      = param->nImg;
-    int nIfm      = param->nIfm;
-    int nOfm      = param->nOfm;
+    int N         = param->nImg;
+    int C         = param->nIfm;
+    int K         = param->nOfm;
     int ifhp      = param->ifhp;
     int ifwp      = param->ifwp;
     int ofhp      = param->ofhp;
     int ofwp      = param->ofwp;
     int ifh       = param->ifh;
     int ifw       = param->ifw;
-    int ofh       = param->ofh;
-    int ofw       = param->ofw;
+    int P         = param->ofh;
+    int Q         = param->ofw;
     int pad_h     = param->pad_h;
     int pad_w     = param->pad_w;
     int pad_h_in  = param->pad_h_in;
     int pad_w_in  = param->pad_w_in;
     int pad_h_out = param->pad_h_out;
     int pad_w_out = param->pad_w_out;
-    int kh        = param->kh;
-    int kw        = param->kw;
+    int R         = param->kh;
+    int S         = param->kw;
     int stride_h  = param->stride_h;
     int stride_w  = param->stride_w;
-    /* loop counters */
-    int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
+    int VLEN      = param->VLEN;
+
+    int C_b = C/VLEN;
+    int K_b = K/VLEN;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int img = 0; img < N; img++) {
-        for (int ofm = 0; ofm < K_b; ofm++) {
-            for (int ifm = 0; ifm < C_b; ifm++) {
+    for (int n = 0; n < N; n++) {
+        for (int k_b = 0; k_b < K_b; k_b++) {
+            for (int c_b = 0; c_b < C_b; c_b++) {
                 for (int oj = 0; oj < P; oj++) {
                     int ij = stride_h * oj;
                     int oi = 0;
@@ -160,25 +174,26 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
                     for (int r = 0; r < R; r++) {
                         for (int s = 0; s < S; s++) {
                             // Compute flat indices
-                            size_t inputIndex = img * C_b * ifh * ifw + ifm * ifh * ifw + (ij + r) * ifw + (ii + s);
-                            size_t outputIndex = img * K_b * P * Q + ofm * P * Q + oj * Q + oi;
-                            size_t filterIndex = ifm * K_b * R * S + ofm * R * S + r * S + s;
+                            size_t inputIndex = n * C_b * ifh * ifw + c_b * ifh * ifw + (ij + r) * ifw + (ii + s);
+                            size_t outputIndex = n * K_b * P * Q + k_b * P * Q + oj * Q + oi;
+                            size_t filterIndex = c_b * K_b * R * S + k_b * R * S + r * S + s;
 
                             // Perform the convolution
                             input[inputIndex] += output[outputIndex] * filter[filterIndex];
                         }
                     }
                 }
-            }
+
 #if defined(USE_FUSED_RELU_BWD)
-            for (int ij = 0; ij < ifh; ij++) {
-                for (int ii = 0; ii < ifw; ii++) {
-                    if (naive_input_save[img * nIfm * ifh * ifw + ifm * ifh * ifw + ij * ifw + ii] == 0.0) {
-                        input[img * nIfm * ifh * ifw + ifm * ifh * ifw + ij * ifw + ii] = 0.0;
+                for (int ij = 0; ij < ifh; ij++) {
+                    for (int ii = 0; ii < ifw; ii++) {
+                        if (naive_input_save[n * nIfm * ifh * ifw + c_b * ifh * ifw + ij * ifw + ii] == 0.0) {
+                            input[n * nIfm * ifh * ifw + c_b * ifh * ifw + ij * ifw + ii] = 0.0;
+                        }
                     }
                 }
-            }
 #endif
+            }
         }
     }
 
@@ -187,63 +202,69 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
 void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
 
     // Fetch data from param struct
-    int nImg      = param->nImg;
-    int nIfm      = param->nIfm;
-    int nOfm      = param->nOfm;
+i   nt N         = param->nImg;
+    int C         = param->nIfm;
+    int K         = param->nOfm;
     int ifhp      = param->ifhp;
     int ifwp      = param->ifwp;
     int ofhp      = param->ofhp;
     int ofwp      = param->ofwp;
     int ifh       = param->ifh;
     int ifw       = param->ifw;
-    int ofh       = param->ofh;
-    int ofw       = param->ofw;
+    int P         = param->ofh;
+    int Q         = param->ofw;
     int pad_h     = param->pad_h;
     int pad_w     = param->pad_w;
     int pad_h_in  = param->pad_h_in;
     int pad_w_in  = param->pad_w_in;
     int pad_h_out = param->pad_h_out;
     int pad_w_out = param->pad_w_out;
-    int kh        = param->kh;
-    int kw        = param->kw;
+    int R         = param->kh;
+    int S         = param->kw;
     int stride_h  = param->stride_h;
     int stride_w  = param->stride_w;
-    /* loop counters */
-    int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int C_b = C/VLEN;
+    int K_b = K/VLEN;
+    int P_b = P/RB_p;
+    int Q_b = Q/RB_q;
 
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int img = 0; img < N; img++) {
-        for (int ofm = 0; ofm < K_b; ofm++) {
-            for (int ifm = 0; ifm < C_b; ifm++) {
+    for (int n = 0; n < N; n++) {
+        for (int k_b = 0; k_b < K_b; k_b++) {
+            for (int c_b = 0; c_b < C_b; c_b++) {
                 for (int oj_b = 0; oj_b < P_b; oj_b++) {
-                    int ij = stride_h * oj_b * B_p;
+                    int ij = stride_h * oj_b * RB_p;
                     int ii = 0;  // Reset ii for each oj_b
                     for (int oi_b = 0; oi_b < Q_b; oi_b++) {
-                        int oi = oi_b * B_q;
+                        int oi = oi_b * RB_q;
                         for (int r = 0; r < R; r++) {
                             for (int s = 0; s < S; s++) {
-                                for (int p = 0; p < B_p + 1; p++) {
-                                    for (int q = 0; q < B_q + 1; q++) {
+                                for (int p = 0; p < RB_p + 1; p++) {
+                                    for (int q = 0; q < RB_q + 1; q++) {
                                         for (int k = 0; k < VLEN + 1; k++) {
                                             for (int c = 0; c < VLEN + 1; c++) {
                                                 // Compute flat indices
-                                                size_t inputIndex = img * C_b * ifh * ifw + ifm * ifh * ifw + (ij + r) * ifw + (ii + s);
-                                                size_t outputIndex = img * K_b * P_b * Q_b * VLEN * VLEN * R * S + ofm * P_b * Q_b * VLEN * VLEN * R * S
+                                                size_t inputIndex = n * C_b * ifh * ifw + c_b * ifh * ifw + (ij + r) * ifw + (ii + s);
+                                                size_t outputIndex = n * K_b * P_b * Q_b * VLEN * VLEN * R * S + k_b * P_b * Q_b * VLEN * VLEN * R * S
                                                                     + oj_b * Q_b * VLEN * VLEN * R * S + oi_b * VLEN * VLEN * R * S
-                                                                    + k * VLEN * VLEN * R * S + c * VLEN * R * S + r * S + s;
-                                                size_t filterIndex = ifm * K_b * R * S * VLEN * VLEN + ofm * R * S * VLEN * VLEN + r * S * VLEN * VLEN + s * VLEN * VLEN
+                                                                    + r * VLEN * VLEN * R * S + s * VLEN * R * S + q * VLEN * S + p * VLEN + c;
+                                                size_t filterIndex = c_b * K_b * R * S * VLEN * VLEN + k_b * R * S * VLEN * VLEN + r * S * VLEN * VLEN + s * VLEN * VLEN
                                                                     + c * VLEN + k;
-                                                                    
+
                                                 // Perform the convolution
-                                                dW[filterIndex] += input[inputIndex] * dO[outputIndex];
+                                                filter[filterIndex] += input[inputIndex] * output[outputIndex];
                                             }
                                         }
-                                        ii += stride * q;
+                                        ii += stride_w * q;
                                     }
-                                    ij += stride * p;
+                                    ij += stride_h * p;
                                 }
                             }
                         }
@@ -285,6 +306,7 @@ int main (int argc, char** argv) {
     //float *input_libxsmm, *filter_libxsmm, *output_libxsmm, *dinput_libxsmm, *dfilter_libxsmm, *doutput_libxsmm, *filtertr_libxsmm;
     //float *batchstats_libxsmm;
 
+    conv_t conv_param;
     conv_t naive_param;
 
     int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
@@ -310,6 +332,12 @@ int main (int argc, char** argv) {
     int padding_mode = 0;   /* padding mode */
     char type = 'A';        /* 'A': ALL, 'F': FP, 'B': BP, 'U', WU */
     char format = 'A';      /* 'A': ALL, 'L': LIBXSMM, 'T': Tensorflow, 'M', Mixed */
+
+    // Additional Setting for vectorization
+    /* initially using fixed dataset, will have argv to set VLEN */
+    int VLEN = 4;
+    int RB_p= 1;
+    int RB_q = 1;
 
 #if defined(_OPENMP)
     int nThreads = omp_get_max_threads(); /* number of threads */
@@ -390,6 +418,33 @@ int main (int argc, char** argv) {
     naive_param.kw = kw;
     naive_param.stride_h = stride_h;
     naive_param.stride_w = stride_w;
+
+    /* set struct for register blocked convolution */
+    conv_param.nImg = nImg;
+    conv_param.nIfm = nIfm;
+    conv_param.nOfm = nOfm;
+    conv_param.ifhp = ifhp;
+    conv_param.ifwp = ifwp;
+    conv_param.ofhp = ofhp;
+    conv_param.ofwp = ofwp;
+    conv_param.ifh = ifh;
+    conv_param.ifw = ifw;
+    conv_param.ofh = ofh;
+    conv_param.ofw = ofw;
+    conv_param.pad_h = pad_h;
+    conv_param.pad_w = pad_w;
+    conv_param.pad_h_in = pad_h_in;
+    conv_param.pad_w_in = pad_w_in;
+    conv_param.pad_h_out = pad_h_out;
+    conv_param.pad_w_out = pad_w_out;
+    conv_param.kh = kh;
+    conv_param.kw = kw;
+    conv_param.stride_h = stride_h;
+    conv_param.stride_w = stride_w;
+    conv_param.VLEN = VLEN;
+    conv_param.RB_p = RB_p;
+    conv_param.RB_q = RB_q;
+
     /*
     naive_input           = (float*)libxsmm_aligned_malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
     naive_input_save      = (float*)libxsmm_aligned_malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
@@ -445,21 +500,31 @@ int main (int argc, char** argv) {
     // Allocate memory for the arrays
     float* naive_input = new float[inputSize];
     float* naive_input_save = new float[inputSize];
+
     float* naive_output = new float[outputSize];
     float* naive_output_save = new float[outputSize];
     float* naive_output_bp = new float[outputSize];
     float* naive_output_wu = new float[outputSize];
+
     float* naive_filter = new float[filterSize];
     float* naive_filter_save = new float[filterSize];
     float* naive_filter_wu = new float[filterSize];
+
     float* naive_bias = new float[nOfm];
     float* naive_dbias = new float[nOfm];
 
     fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(naive_input_save, nImg, ifhp, ifwp);
     fill_random(naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_save, nOfm, nIfm, kh, kw);
     fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
+
+    //IMPORTANT MALLOC : copy data to save
+    for (size_t i = 0; i < inputSize; ++i) {
+        naive_input_save[i] = naive_input[i];
+    }
+    for (size_t i = 0; i < filterSize; ++i) {
+        naive_filter_save[i] = naive_filter[i];
+        naive_filter_wu[i] = naive_filter[i];
+    }
 
     /* print some summary */
     printf("##########################################\n");
@@ -495,7 +560,7 @@ int main (int argc, char** argv) {
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     }
-    if (type == 'A' || type == 'F') {
+    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
         cout << "##########################################\n";
         cout << "               BACKWARD PASS              \n";
         cout << "##########################################\n";
@@ -507,7 +572,7 @@ int main (int argc, char** argv) {
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     }
-    if (type == 'A' || type == 'F') {
+    if (type == 'A' || type == 'U') {
         cout << "##########################################\n";
         cout << "               UPDATE WEIGHT              \n";
         cout << "##########################################\n";
