@@ -14,6 +14,7 @@
 
 
 using std::cout;
+using std::endl;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
