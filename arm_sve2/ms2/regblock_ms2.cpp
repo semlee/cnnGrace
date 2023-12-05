@@ -65,13 +65,11 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 int iio = ii + stride_w * q;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
-                                                if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
-                                                    int inputIndex = (n * C_b * P_b * RB_p * Q_b * RB_q * VLEN) + (c_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((ijo + r) * (Q_b + RB_q) * VLEN) + ((iio + s) * VLEN) + c;
-                                                    int outputIndex = (n * K_b * P_b * RB_p * Q_b * RB_q * VLEN) + (k_b * P_b * RB_p * Q_b * RB_q * VLEN) + ((oj + p) * Q_b * RB_q * VLEN) + ((oi + q) * VLEN) + k;
-                                                    int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
+                                                int inputIndex = (n * C_b * P_b * RB_p * Q_b * RB_q * VLEN) + (c_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((ijo + r) * (Q_b + RB_q) * VLEN) + ((iio + s) * VLEN) + c;
+                                                int outputIndex = (n * K_b * P_b * RB_p * Q_b * RB_q * VLEN) + (k_b * P_b * RB_p * Q_b * RB_q * VLEN) + ((oj + p) * Q_b * RB_q * VLEN) + ((oi + q) * VLEN) + k;
+                                                int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
 
-                                                    output[outputIndex] += input[inputIndex] * filter[filterIndex];
-                                                }
+                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
                                         }
                                     }

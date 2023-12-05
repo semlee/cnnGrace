@@ -439,6 +439,7 @@ int main (int argc, char** argv) {
         for (int i = 0; i < outputSize; i++) {
             cout << conv_output[i];
         }
+        cout << endl;
     }
     printf("##########################################\n");
     printf("#           Cleaning Up data...          #\n");

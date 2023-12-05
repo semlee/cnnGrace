@@ -29,7 +29,6 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias);
 
 void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save);
