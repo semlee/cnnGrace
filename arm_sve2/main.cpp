@@ -53,7 +53,7 @@ int main (int argc, char** argv) {
     //float *batchstats_libxsmm;
 
     conv_t conv_param;
-    conv_t naive_param;
+    naive_conv_t naive_param;
 
     int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
     int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
@@ -322,7 +322,7 @@ int main (int argc, char** argv) {
     printf("##########################################\n");
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
-    naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+    naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
 
     printf("##########################################\n");
     printf("#           Performance Analysis         #\n");
@@ -375,7 +375,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         int error_count = 0;
 
-        for (int i = 0; i < outputIndex; i++) {
+        for (int i = 0; i < outputSize; i++) {
             if (conv_output[i] != naive_output[i]) {
                 error_count++;
             }
@@ -388,7 +388,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         int error_count = 0;
 
-        for (int i = 0; i < outputIndex; i++) {
+        for (int i = 0; i < inputSize; i++) {
             if (conv_input[i] != naive_input[i]) {
                 error_count++;
             }
@@ -401,7 +401,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         int error_count = 0;
 
-        for (int i = 0; i < outputIndex; i++) {
+        for (int i = 0; i < filterSize; i++) {
             if (conv_filter_wu[i] != naive_filter_wu[i]) {
                 error_count++;
             }
