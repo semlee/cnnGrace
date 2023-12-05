@@ -4,8 +4,8 @@
 #include <ctime>
 
 //include header files
-#include <naive_ms1.h>
-#include <regblock_ms2.h>
+#include <ms1/naive_ms1.h>
+#include <ms2/regblock_ms2.h>
 
 //used for performance count
 #include <chrono>
@@ -241,12 +241,12 @@ int main (int argc, char** argv) {
 
     float* naive_output = new float[outputSize];
     float* naive_output_save = new float[outputSize];
-    float* naive_output_bp = new float[outputSize];
-    float* naive_output_wu = new float[outputSize];
+    float* naive_output_bp = naive_output;
+    float* naive_output_wu = naive_output;
 
     float* naive_filter = new float[filterSize];
     float* naive_filter_save = new float[filterSize];
-    float* naive_filter_wu = new float[filterSize];
+    float* naive_filter_wu = naive_filter;
 
     float* naive_bias = new float[nOfm];
     float* naive_dbias = new float[nOfm];
@@ -270,8 +270,8 @@ int main (int argc, char** argv) {
 
     float* conv_output = new float[outputSize];
     float* conv_output_save = new float[outputSize];
-    float* conv_output_bp = new float[outputSize];
-    float* conv_output_wu = new float[outputSize];
+    float* conv_output_bp = conv_output;
+    float* conv_output_wu = conv_output;
 
     float* conv_filter = new float[filterSize];
     float* conv_filter_save = new float[filterSize];
@@ -356,6 +356,51 @@ int main (int argc, char** argv) {
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     }
+
+    printf("##########################################\n");
+    printf("#           Correctness Checking         #\n");
+    printf("##########################################\n");
+
+    if (type == 'A' || type == 'F') {
+        cout << "##########################################\n";
+        cout << "               FORWARD PASS               \n";
+        cout << "##########################################\n";
+        int error_count = 0;
+
+        for (int i = 0; i < outputIndex; i++) {
+            if (conv_output[i] != naive_output[i]) {
+                error_count++;
+            }
+        }
+        cout << "Error Count: " << error_count << "\n";
+    }
+    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
+        cout << "##########################################\n";
+        cout << "               BACKWARD PASS              \n";
+        cout << "##########################################\n";
+        int error_count = 0;
+
+        for (int i = 0; i < outputIndex; i++) {
+            if (conv_input[i] != naive_input[i]) {
+                error_count++;
+            }
+        }
+        cout << "Error Count: " << error_count << "\n";
+    }
+    if (type == 'A' || type == 'U') {
+        cout << "##########################################\n";
+        cout << "               UPDATE WEIGHT              \n";
+        cout << "##########################################\n";
+        int error_count = 0;
+
+        for (int i = 0; i < outputIndex; i++) {
+            if (conv_filter_wu[i] != naive_filter_wu[i]) {
+                error_count++;
+            }
+        }
+        cout << "Error Count: " << error_count << "\n";
+    }
+
     printf("##########################################\n");
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");

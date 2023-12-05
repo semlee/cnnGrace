@@ -3,10 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 
-//used for performance count
-#include <chrono>
-#include <ratio>
-#include <cmath>
+#include <regblock_ms2.h>
 
 //additional header for parallelization
 #if defined(_OPENMP)
