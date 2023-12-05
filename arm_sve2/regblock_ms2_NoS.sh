@@ -8,4 +8,4 @@ perf record -g -- ./regblock_layer 1000 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
 
 # Analyze the collected data, focusing on the specific function
 
-perf annotate --symbols=arm_sve_conv_fp
+perf annotate --symbol=arm_sve_conv_fp
