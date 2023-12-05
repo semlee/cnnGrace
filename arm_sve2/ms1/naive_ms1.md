@@ -1,5 +1,8 @@
 ## Single Layer
 
+0.52142ms
+1.29019ms
+
 Grace CPU naive run performance using timer :
 
 Total time consumed: 0.510414ms

@@ -508,8 +508,7 @@ int main (int argc, char** argv) {
     ifwp = ifw + 2 * pad_w_in;
     ofhp = ofh + 2 * pad_h_out;
     ofwp = ofw + 2 * pad_w_out;
-    
-
+ 
     /* set struct for register blocked convolution */
     conv_param.nImg = nImg;
     conv_param.nIfm = nIfm;

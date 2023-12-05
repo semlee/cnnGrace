@@ -158,6 +158,15 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
                                 size_t outputIndex = (img * nOfm * ofh * ofw) + (ofm * ofh * ofw) + (oj * ofw) + oi;
                                 size_t filterIndex = (ofm * nIfm * kh * kw) + (ifm * kh * kw) + (kj * kw) + ki;
 
+                                // size_t inputIndex = img * nIfm * ifhp * ifwp + 
+                                //                     ifm * ifhp * ifwp + 
+                                //                     (ij + kj) * ifwp + 
+                                //                     (ii + ki);
+                                // size_t inputIndex = (img * nIfm * ((ofh * stride_h - pad_h) + kh) * ((ofw * stride_w - pad_w)+ kw)) + 
+                                //                     (ifm * ((ofh * stride_h - pad_h) + kh) * ((ofw * stride_w - pad_w)+ kw)) + 
+                                //                     ((ij + kj) * ((ofw * stride_w - pad_w)+ kw)) + 
+                                //                     (ii + ki);
+                                
                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
 
                             }
@@ -463,7 +472,7 @@ int main (int argc, char** argv) {
     ifwp = ifw + 2 * pad_w_in;
     ofhp = ofh + 2 * pad_h_out;
     ofwp = ofw + 2 * pad_w_out;
-    
+                                
     /* set struct for naive convolution */
     naive_param.nImg = nImg;
     naive_param.nIfm = nIfm;
