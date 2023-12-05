@@ -18,6 +18,7 @@
 // #include <arm_sve.h>
 
 using std::cout;
+using std::endl;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
@@ -299,6 +300,26 @@ int main (int argc, char** argv) {
         conv_filter_wu[i] = naive_filter[i];
     }
 
+    bool debug = true;
+
+    if (debug) {
+        cout << "NAIVE INPUT\n" ;
+        for (int i = 0; i < inputSize; i++) {
+            cout << naive_input << endl;
+        }
+        cout << "CONV INPUT\n" ;
+        for (int i = 0; i < inputSize; i++) {
+            cout << conv_input << endl;
+        }
+        cout << "NAIVE FILTER\n" ;
+        for (int i = 0; i < filterSize; i++) {
+            cout << naive_filter_wu << endl;
+        }
+        cout << "CONV FILTER\n" ;
+        for (int i = 0; i < filterSize; i++) {
+            cout << conv_filter_wu << endl;
+        }
+    }
     /* print some summary */
     printf("##########################################\n");
     printf("#          Setting Up (Common)           #\n");
