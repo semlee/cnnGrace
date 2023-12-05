@@ -10,7 +10,7 @@ g++ -o naive_layer naive_ms1.cpp -std=c++11
 
 ITERS=1000
 MB=1
-TYPE='A'
+TYPE='F'
 FORMAT='L'
 PAD=1
 

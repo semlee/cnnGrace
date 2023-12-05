@@ -16,7 +16,7 @@ kh=3
 padw=1
 padh=1
 stride=1
-type='A'
+type='F'
 format='L'
 padding_mode=0
 
