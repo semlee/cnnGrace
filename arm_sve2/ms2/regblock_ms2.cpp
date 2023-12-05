@@ -52,10 +52,10 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                     int ij = oj * stride_h - pad_h;
                     for (int oi = 0; oi < Q_b; oi++) {
                         int ii = oi * stride_w - pad_w;
-                        for (int kj = 0; kj < R; kj++) {
-                            if (ij + kj < 0 || ij + kj >= ifh) continue;
-                            for (int ki = 0; ki < S; ki++) {
-                                if (ii + ki < 0 || ii + ki >= ifw) continue;
+                        for (int r = 0; r < R; r++) {
+                            if (ij + r < 0 || ij + r >= ifh) continue;
+                            for (int s = 0; s < S; s++) {
+                                if (ii + s < 0 || ii + s >= ifw) continue;
 
                                 for (int c = 0; c < VLEN; c++) {
                                     for (int k = 0; k < VLEN; k++) {
@@ -63,12 +63,12 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                             for (int q = 0; q < RB_q; q++) {
                                                 int ijo = ij + stride_h * p;
                                                 int iio = ii + stride_w * q;
-
+                                                O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
                                                 if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
-                                                    int inputIndex = n * C_b * ifh * ifw + (c_b * VLEN + c) * ifh * ifw + (ijo + kj) * ifw + (iio + ki);
-                                                    int outputIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN + c * VLEN + k;
-                                                    int filterIndex = k_b * C_b * R * S * VLEN * VLEN + c_b * R * S * VLEN * VLEN + kj * S * VLEN * VLEN + ki * VLEN * VLEN + c * VLEN + k;
+                                                    int inputIndex = (n * C_b * ifh * ifw) + ((c_b * VLEN + c) * ofh * ofw) + ((ijo + r) * ofw) + (iio + s);
+                                                    int outputIndex = (n * K_b * P_b * Q_b * VLEN * VLEN) + (k_b * P_b * Q_b * VLEN * VLEN) + (oj * Q_b * VLEN * VLEN) + (oi * VLEN * VLEN) + (c * VLEN) + k;
+                                                    int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
 
                                                     output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                                 }
