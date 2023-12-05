@@ -202,7 +202,7 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
 void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
 
     // Fetch data from param struct
-i   nt N         = param->nImg;
+    int N         = param->nImg;
     int C         = param->nIfm;
     int K         = param->nOfm;
     int ifhp      = param->ifhp;
