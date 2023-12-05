@@ -42,7 +42,7 @@ typedef struct {
   int stride_w;
 } conv_t;
 
-void arm_sve_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -120,7 +120,7 @@ void arm_sve_fp(conv_t* param, const float* input, float* output, const float* f
     }
 }
 
-void arm_sve_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
+void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -513,7 +513,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+        arm_sve_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
