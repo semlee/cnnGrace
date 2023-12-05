@@ -489,7 +489,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+        arm_sve_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
@@ -501,7 +501,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+        arm_sve_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
@@ -513,7 +513,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+        arm_sve_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
