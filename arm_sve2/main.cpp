@@ -12,6 +12,14 @@
 #include <ratio>
 #include <cmath>
 
+#if defined(_OPENMP)
+# include <omp.h>
+#endif
+// #include <arm_sve.h>
+
+using std::cout;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
 
 void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
     // Seed the random number generator

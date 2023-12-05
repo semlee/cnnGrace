@@ -8,12 +8,6 @@
 #include <omp.h>
 // #include <arm_sve.h>
 
-
-using std::cout;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
-
-
 // Algorithm 1: Naive Algorithm using OpenMP
 
 /*
