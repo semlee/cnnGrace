@@ -341,9 +341,15 @@ int main (int argc, char** argv) {
     printf("##########################################\n");
     printf("#            Naive Computation           #\n");
     printf("##########################################\n");
+    if (type == 'A' || type == 'F') { 
     naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    }
+    if (type == 'A' || type == 'B') {
     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+    }
+    if (type == 'A' || type == 'U') {
     naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+    }
 
     printf("##########################################\n");
     printf("#           Performance Analysis         #\n");
@@ -459,6 +465,20 @@ int main (int argc, char** argv) {
     delete[] naive_bias;
     delete[] naive_dbias;
     
+    delete[] conv_input;
+    delete[] conv_input_save;
+
+    delete[] conv_output;
+    delete[] conv_output_save;
+    delete[] conv_output_bp;
+    delete[] conv_output_wu;
+
+    delete[] conv_filter;
+    delete[] conv_filter_save;
+    delete[] conv_filter_wu;
+
+    delete[] conv_bias;
+    delete[] conv_dbias;
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
