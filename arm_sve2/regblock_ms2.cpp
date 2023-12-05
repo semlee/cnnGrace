@@ -483,42 +483,42 @@ int main (int argc, char** argv) {
     printf("#           Performance Analysis         #\n");
     printf("##########################################\n");
 
-    ///*
-    cout << "##########################################\n";
-    cout << "               FORWARD PASS               \n";
-    cout << "##########################################\n";
+    if (type == 'A' || type == 'F') {
+        cout << "##########################################\n";
+        cout << "               FORWARD PASS               \n";
+        cout << "##########################################\n";
 
-    start = high_resolution_clock::now();
-    naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
-    end = high_resolution_clock::now();
+        start = high_resolution_clock::now();
+        naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+        end = high_resolution_clock::now();
 
-    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    //*/
-    /*
-    cout << "##########################################\n";
-    cout << "               BACKWARD PASS              \n";
-    cout << "##########################################\n";
+        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    }
+    if (type == 'A' || type == 'F') {
+        cout << "##########################################\n";
+        cout << "               BACKWARD PASS              \n";
+        cout << "##########################################\n";
 
-    start = high_resolution_clock::now();
-    naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
-    end = high_resolution_clock::now();
+        start = high_resolution_clock::now();
+        naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+        end = high_resolution_clock::now();
 
-    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-     */
-    /*
-    cout << "##########################################\n";
-    cout << "               UPDATE WEIGHT              \n";
-    cout << "##########################################\n";
+        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    }
+    if (type == 'A' || type == 'F') {
+        cout << "##########################################\n";
+        cout << "               UPDATE WEIGHT              \n";
+        cout << "##########################################\n";
 
-    start = high_resolution_clock::now();
-    naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
-    end = high_resolution_clock::now();
+        start = high_resolution_clock::now();
+        naive_conv_wu(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+        end = high_resolution_clock::now();
 
-    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    */
+        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    }
     printf("##########################################\n");
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");
