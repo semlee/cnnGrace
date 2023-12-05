@@ -518,10 +518,10 @@ int main (int argc, char** argv) {
     fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
 
     //IMPORTANT MALLOC : copy data to save
-    for (size_t i = 0; i < inputSize; ++i) {
+    for (size_t i = 0; i < inputSize; i++) {
         naive_input_save[i] = naive_input[i];
     }
-    for (size_t i = 0; i < filterSize; ++i) {
+    for (size_t i = 0; i < filterSize; i++) {
         naive_filter_save[i] = naive_filter[i];
         naive_filter_wu[i] = naive_filter[i];
     }
