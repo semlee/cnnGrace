@@ -308,15 +308,16 @@ int main (int argc, char** argv) {
         int error_count = 0;
         for (int i = 0; i < inputSize; i++) {
             if (naive_input[i] != conv_input[i])
-                cout << "Error Count : " << error_count << endl;
+                error_count++;
         }
-
+        cout << "Error Count : " << error_count << endl;
         cout << "NAIVE vs. CONV FILTER\n" ;
         error_count = 0;
         for (int i = 0; i < filterSize; i++) {
             if (naive_filter_wu[i] != conv_filter_wu[i])
-                cout << "Error Count : " << error_count << endl;
+                error_count++;
         }
+        cout << "Error Count : " << error_count << endl;
     }
 
     /* print some summary */
@@ -400,7 +401,7 @@ int main (int argc, char** argv) {
                 error_count++;
             }
         }
-        cout << "Error Count: " << error_count << "\n";
+        cout << "Error Count: " << error_count << "/" << outputSize << "\n";
     }
     if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
         cout << "##########################################\n";
@@ -413,7 +414,7 @@ int main (int argc, char** argv) {
                 error_count++;
             }
         }
-        cout << "Error Count: " << error_count << "\n";
+        cout << "Error Count: " << error_count << "/" << inputSize << "\n";
     }
     if (type == 'A' || type == 'U') {
         cout << "##########################################\n";
@@ -426,7 +427,7 @@ int main (int argc, char** argv) {
                 error_count++;
             }
         }
-        cout << "Error Count: " << error_count << "\n";
+        cout << "Error Count: " << error_count << "/" << filterSize << "\n";
     }
 
     if (debug) {

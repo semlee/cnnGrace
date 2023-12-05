@@ -64,10 +64,10 @@ for (int n = 0; n < N; n++) {
                     int oi = oi_b * RP_q;
                     for (int r = 0; r < R; r++) {
                         for (int s = 0; s < S; s++) {
-                            for (int k = 0; k < VLEN + 1; k++) {
-                                for (int c = 0; c < VLEN + 1; c++) {
-                                    for (int p = 0; p < RB_p + 1; p++) {
-                                        for (int q = 0; q < RB_q + 1; q++) {
+                            for (int k = 0; k <= VLEN; k++) {
+                                for (int c = 0; c <= VLEN; c++) {
+                                    for (int p = 0; p <= RB_p; p++) {
+                                        for (int q = 0; q <= RB_q; q++) {
                                             int ijo = ij + stride * p;
                                             int iio = ii + stride * q;
                                               O[n][k][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ij0 + r][ii0 + s][c]

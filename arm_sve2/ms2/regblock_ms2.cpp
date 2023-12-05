@@ -57,10 +57,10 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                             for (int s = 0; s < S; s++) {
                                 if (ii + s < 0 || ii + s >= ifw) continue;
 
-                                for (int c = 0; c < VLEN; c++) {
-                                    for (int k = 0; k < VLEN; k++) {
-                                        for (int p = 0; p < RB_p; p++) {
-                                            for (int q = 0; q < RB_q; q++) {
+                                for (int c = 0; c <= VLEN; c++) {
+                                    for (int k = 0; k <= VLEN; k++) {
+                                        for (int p = 0; p <= RB_p; p++) {
+                                            for (int q = 0; q <= RB_q; q++) {
                                                 int ijo = ij + stride_h * p;
                                                 int iio = ii + stride_w * q;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
