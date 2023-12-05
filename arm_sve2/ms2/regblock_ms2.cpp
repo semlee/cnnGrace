@@ -78,15 +78,15 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                         }
                     }
 
-#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-                    // Apply ReLU activation function
-                    for (int oj = 0; oj < P_b * RB_p; oj++) {
-                        for (int oi = 0; oi < Q_b * RB_q; oi++) {
-                            int reluIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN;
-                            output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
-                        }
-                    }
-#endif
+// #if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
+//                     // Apply ReLU activation function
+//                     for (int oj = 0; oj < P_b * RB_p; oj++) {
+//                         for (int oi = 0; oi < Q_b * RB_q; oi++) {
+//                             int reluIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN;
+//                             output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+//                         }
+//                     }
+// #endif
 
                 }
             }
