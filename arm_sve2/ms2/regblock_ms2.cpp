@@ -10,6 +10,11 @@
 #endif
 // #include <arm_sve.h>
 
+int getIndex(int dim1, int dim2, int dim3, int dim4, int size2, int size3, int size4) {
+    return dim1 * (size2 * size3 * size4) + dim2 * (size3 * size4) + dim3 * size4 + dim4;
+}
+
+
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int N         = param->nImg;

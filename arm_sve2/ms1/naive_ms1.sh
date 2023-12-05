@@ -21,7 +21,7 @@ format='L'
 padding_mode=0
 
 # Compile the C++ file
-g++ -o naive_layer -O3 naive_ms1.cpp -std=c++11
+g++ -o naive_layer -O3 run_naive_ms1.cpp -std=c++11
 
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
@@ -31,7 +31,7 @@ if [ $? -eq 0 ]; then
     #./naive_ms1 iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
     srun -N 1 -p cg1-high --exclusive ./naive_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
 
-    # Optionally, you can pass command-line arguments stored in a file
+    # Optionally, pass command-line arguments stored in a file
     # srun -N 1 -p cg1-high --exclusive ./naive_layer $(cat input_args.txt)
 else
     echo "Compilation failed"
