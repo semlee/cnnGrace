@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # g++ -o naive_layer -mavx2 -O3 run_naive_ms1.cpp -std=c++11
-gcc -O3 -march=native -mtune=native -mavx2 -ftree-vectorizer-verbose=5 run_naive_ms1.cpp -o naive_layer
+g++ -O3 -march=native -mtune=native -mavx2 -ftree-vectorizer-verbose=5 run_naive_ms1.cpp -o naive_layer
 
 objdump -D -Mintel naive_layer | grep "vex.v"
 
