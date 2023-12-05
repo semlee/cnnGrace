@@ -525,6 +525,12 @@ int main (int argc, char** argv) {
 
     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+
+    for (int i = 0; i < outputSize; i++) {
+        cout << naive_output[i] << endl;
+    }
+    cout << endl;
+
     //*/
     /*
     cout << "##########################################\n";

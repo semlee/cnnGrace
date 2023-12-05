@@ -1,13 +1,13 @@
 ## Single Layer
 
-Grace CPU naive run using timer performance count:
+Grace CPU naive run performance using timer :
 
-Total time consumed: 0.519328ms
+Total time consumed: 0.510414ms
 
 
-Haswell CPU naive run using timer performance count:
+Haswell CPU naive run performance using timer :
 
-Total time consumed: 0.908845ms
+Total time consumed: 2.39767ms
 
 ### w/o -O3 Compilation
 Grace CPU naive run using timer performance count:
