@@ -2,8 +2,7 @@
 
 Grace CPU naive run using timer performance count:
 
-Total time consumed: 0.519328ms
-
+Total time consumed: 0.000096ms
 
 Haswell CPU naive run using timer performance count:
 
