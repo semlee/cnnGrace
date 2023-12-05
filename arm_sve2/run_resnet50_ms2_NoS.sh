@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Compile the C++ file
-g++ -o naive_layer naive_ms1.cpp -std=c++11
+g++ -o regblock_layer -O3 regblock_ms2.cpp -std=c++11
 
 ITERS=1000
 MB=1
@@ -23,7 +23,7 @@ stride_values=(2 1 1 1 2 2 1 1 1 2 2 1 2 1 1 1 1)
 
 # Iterate over the indices of the arrays
 for i in "${!ifw_values[@]}"; do
-    ./naive_layer \
+    ./regblock_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} ${nImg_values[$i]} ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $TYPE $FORMAT $PAD
