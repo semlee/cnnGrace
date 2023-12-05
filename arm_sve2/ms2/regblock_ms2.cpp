@@ -1,7 +1,6 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 
 #include <regblock_ms2.h>
 
@@ -11,9 +10,6 @@
 #endif
 // #include <arm_sve.h>
 
-using std::cout;
-using std::chrono::high_resolution_clock;
-using std::chrono::duration;
 
 typedef struct {
   int nImg;
