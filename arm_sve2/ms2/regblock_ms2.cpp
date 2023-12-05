@@ -10,11 +10,6 @@
 #endif
 // #include <arm_sve.h>
 
-int getIndex(int dim1, int dim2, int dim3, int dim4, int size2, int size3, int size4) {
-    return dim1 * (size2 * size3 * size4) + dim2 * (size3 * size4) + dim3 * size4 + dim4;
-}
-
-
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int N         = param->nImg;
@@ -70,12 +65,26 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 int iio = ii + stride_w * q;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
-                                                int inputIndex = (n * C_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                (c_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                ((ijo + r) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + ((iio + s) * VLEN) + c;
-                                                int outputIndex = (n * K_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + (k_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((oj + p) * (Q_b + RB_q) * VLEN) + ((oi + q) * VLEN) + k;
-                                                int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
+                                                // int inputIndex = (n * C_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
+                                                // (c_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
+                                                // ((ijo + r) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + ((iio + s) * VLEN) + c;
+                                                // int outputIndex = (n * K_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + (k_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((oj + p) * (Q_b + RB_q) * VLEN) + ((oi + q) * VLEN) + k;
+                                                // int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
+                                                size_t inputIndex = n * C_b * ifhp * ifwp * VLEN +
+                                                                    c_b * ifhp * ifwp * VLEN +
+                                                                    (ijo + r) * ifwp * VLEN +
+                                                                    (iio + s) * VLEN + c;
+                                                
+                                                size_t outputIndex = n * K_b * P_b * Q_b * VLEN +
+                                                                    k_b * P_b * Q_b * VLEN +
+                                                                    (oj + p) * Q_b * VLEN +
+                                                                    (oi + q) * VLEN + k;
 
+                                                size_t filterIndex = k_b * C_b * R * S * VLEN * VLEN +
+                                                                    c_b * R * S * VLEN * VLEN +
+                                                                    r * S * VLEN * VLEN +
+                                                                    s * VLEN * VLEN +
+                                                                    c * VLEN + k;
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
                                         }

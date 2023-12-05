@@ -214,7 +214,11 @@ void naive_conv_fp_original(naive_conv_t* param, const float* input, float* outp
                                 // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
                                 // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
                                 // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
-                                size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                // size_t inputIndex = img * nIfm * ifh * ifw + ifm * ifh * ifw + (ij + kj) * ifw + (ii + ki);
+                                // size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
+                                // size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+
+                                size_t inputIndex = img * nIfm * ifhp * ifwp + ifm * ifhp * ifwp + (ij + kj) * ifwp + (ii + ki);
                                 size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
                                 size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
 

@@ -116,10 +116,32 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
                                 // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
                                 // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
                                 // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
-                                size_t inputIndex = (img * nIfm * (ofh + kh) * (ofw + kw)) + (ifm * (ofh + kh) * (ofw + kw)) + ((ij + kj) * (ofw + kw)) + (ii + ki);
-                                size_t outputIndex = (img * nOfm * ofh * ofw) + (ofm * ofh * ofw) + (oj * ofw) + oi;
-                                size_t filterIndex = (ofm * nIfm * kh * kw) + (ifm * kh * kw) + (kj * kw) + ki;
-                                
+                                /* size_t inputIndex =     (img * nIfm * (ofh + kh) * (ofw + kw)) + 
+                                                        (ifm * (ofh + kh) * (ofw + kw)) + 
+                                                        ((ij + kj) * (ofw + kw)) + 
+                                                        (ii + ki);
+                                size_t outputIndex =    (img * nOfm * ofh * ofw) + 
+                                                        (ofm * ofh * ofw) + 
+                                                        (oj * ofw) + 
+                                                        oi;
+                                size_t filterIndex =    (ofm * nIfm * kh * kw) + 
+                                                        (ifm * kh * kw) + 
+                                                        (kj * kw) + 
+                                                        ki; 
+                                */
+                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                        ifm * ifhp * ifwp + 
+                                                        (ij + kj) * ifwp + 
+                                                        (ii + ki);
+                                size_t outputIndex =    img * nOfm * ofh * ofw + 
+                                                        ofm * ofh * ofw + 
+                                                        oj * ofw + 
+                                                        oi;
+                                size_t filterIndex =    ofm * nIfm * kh * kw + 
+                                                        ifm * kh * kw + 
+                                                        kj * kw + 
+                                                        ki;
+
                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
 
                             }
