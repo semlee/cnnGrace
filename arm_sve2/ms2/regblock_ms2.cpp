@@ -66,7 +66,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
                                                 if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
-                                                    int inputIndex = (n * C_b * ifh * ifw) + ((c_b * VLEN + c) * ofh * ofw) + ((ijo + r) * ofw) + (iio + s);
+                                                    int inputIndex = (n * C_b * ofh * ofw) + ((c_b * VLEN + c) * ofh * ofw) + ((ijo + r) * ofw) + (iio + s);
                                                     int outputIndex = (n * K_b * P_b * Q_b * VLEN * VLEN) + (k_b * P_b * Q_b * VLEN * VLEN) + (oj * Q_b * VLEN * VLEN) + (oi * VLEN * VLEN) + (c * VLEN) + k;
                                                     int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
 
