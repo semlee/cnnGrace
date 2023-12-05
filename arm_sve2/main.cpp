@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 
-//include header files
+//include cumstom header files
 #include "ms1/naive_ms1.h"
 #include "ms2/regblock_ms2.h"
 
