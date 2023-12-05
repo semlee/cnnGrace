@@ -303,23 +303,22 @@ int main (int argc, char** argv) {
     bool debug = true;
 
     if (debug) {
-        cout << "NAIVE INPUT\n" ;
+        cout << " DEBUGGING MODE " << endl;
+        cout << "NAIVE vs. CONV INPUT\n" ;
+        int error_count = 0;
         for (int i = 0; i < inputSize; i++) {
-            cout << naive_input[i] << endl;
+            if (naive_input[i] != conv_input[i])
+                cout << "Error Count : " << error_count << endl;
         }
-        cout << "CONV INPUT\n" ;
-        for (int i = 0; i < inputSize; i++) {
-            cout << conv_input[i] << endl;
-        }
-        cout << "NAIVE FILTER\n" ;
+
+        cout << "NAIVE vs. CONV FILTER\n" ;
+        error_count = 0;
         for (int i = 0; i < filterSize; i++) {
-            cout << naive_filter_wu[i] << endl;
-        }
-        cout << "CONV FILTER\n" ;
-        for (int i = 0; i < filterSize; i++) {
-            cout << conv_filter_wu[i] << endl;
+            if (naive_filter_wu[i] != conv_filter_wu[i])
+                cout << "Error Count : " << error_count << endl;
         }
     }
+
     /* print some summary */
     printf("##########################################\n");
     printf("#          Setting Up (Common)           #\n");
@@ -430,6 +429,17 @@ int main (int argc, char** argv) {
         cout << "Error Count: " << error_count << "\n";
     }
 
+    if (debug) {
+        cout << "DEBUGGING MODE" << endl;
+        cout << "NAIVE vs. CONV OUTPUT" << endl;
+        for (int i = 0; i < outputSize; i++) {
+            cout << naive_output[i];
+        }
+        cout << endl;
+        for (int i = 0; i < outputSize; i++) {
+            cout << conv_output[i];
+        }
+    }
     printf("##########################################\n");
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");
