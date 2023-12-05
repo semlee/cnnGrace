@@ -66,7 +66,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
                                                 if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
-                                                    int inputIndex = (n * C_b * P_b * RB_p * Q_b * RB_q * VLEN) + (c_b * (P_b * RB_p) * (Q_b * RB_q) * VLEN) + ((ijo + r) * (Q_b * RB_q) * VLEN) + ((iio + s) * VLEN) + c;
+                                                    int inputIndex = (n * C_b * P_b * RB_p * Q_b * RB_q * VLEN) + (c_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((ijo + r) * (Q_b + RB_q) * VLEN) + ((iio + s) * VLEN) + c;
                                                     int outputIndex = (n * K_b * P_b * RB_p * Q_b * RB_q * VLEN) + (k_b * P_b * RB_p * Q_b * RB_q * VLEN) + ((oj + p) * Q_b * RB_q * VLEN) + ((oi + q) * VLEN) + k;
                                                     int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
 
@@ -139,7 +139,7 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
                         for (int r = 0; r < R; r++) {
                             for (int s = 0; s < S; s++) {
                                 // Compute flat indices
-                                size_t inputIndex = (n * C_b *(P * R) * (Q * S)) + (c_b * (P * R) * (Q * S)) + ((ij + r) * (Q * S)) + (ii + s);
+                                size_t inputIndex = (n * C_b *(P + R) * (Q + S)) + (c_b * (P + R) * (Q + S)) + ((ij + r) * (Q + S)) + (ii + s);
                                 size_t outputIndex = (n * K_b * P * Q) + (k_b * P * Q) + (oj * Q) + oi;
                                 size_t filterIndex = (c_b * K_b * R * S) + (k_b * R * S) + (R - 1 - r) * S + (S - 1 - s);
                                 // GEMM(&W[c_b][k_b][R - 1 - r][S - 1 -s][0][0], &dO[n][k_b][oj][oi][0], &dI[n][c_b][ij+r][ii+s][0]);
@@ -221,8 +221,8 @@ void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, flo
                                                 ii += stride_w * q;
                                                 
                                                 // Compute flat indices
-                                                size_t inputIndex = (n * C_b * (P_b * RB_p * R) * (Q_b * RB_q * S) * VLEN) + (c_b * (P_b * RB_p  * R) * (Q_b * RB_q * S) * VLEN) + ((ij + r) * (Q_b * RB_q * S) * VLEN) + ((ii + s) * VLEN) + c;
-                                                size_t outputIndex = (n * K_b * (P_b * RB_p) * (Q_b * RB_q) * VLEN) + (k_b * (P_b * RB_p) * (Q_b * RB_q) * VLEN) + ((oj + p) * (Q_b * RB_q) * VLEN) + ((oi + q) * VLEN) + k;
+                                                size_t inputIndex = (n * C_b * (P_b * RB_p + R) * (Q_b * RB_q + S) * VLEN) + (c_b * (P_b * RB_p + R) * (Q_b * RB_q + S) * VLEN) + ((ij + r) * (Q_b * RB_q + S) * VLEN) + ((ii + s) * VLEN) + c;
+                                                size_t outputIndex = (n * K_b * (P_b * RB_p + RB_p) * (Q_b * RB_q + RB_q) * VLEN) + (k_b * (P_b * RB_p + RB_p) * (Q_b * RB_q + RB_q) * VLEN) + ((oj + p) * (Q_b * RB_q + RB_q) * VLEN) + ((oi + q) * VLEN) + k;
                                                 size_t filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
                                                 //dW[k_b][c_b][r][s][c][k] += I[n][c_b][ij+r][ii+s][c] * dO[n][k_b][oj+p][oi+q][k];
                                                 // Perform the convolution
