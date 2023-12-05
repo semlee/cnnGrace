@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <regblock_ms2.h>
+#include "regblock_ms2.h"
 
 //additional header for parallelization
 #if defined(_OPENMP)

@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <naive_ms1.h>
+#include "naive_ms1.h"
 
 //additional header for parallelization
 #include <omp.h>
