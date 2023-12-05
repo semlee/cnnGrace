@@ -40,9 +40,9 @@ typedef struct {
   int kw;
   int stride_h;
   int stride_w;
-} naive_conv_t;
+} conv_t;
 
-void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -120,7 +120,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
+void arm_sve_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -184,7 +184,7 @@ void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const
 
 }
 
-void naive_conv_uw(naive_conv_t* param, const float* input, const float* output, float* filter) {
+void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -285,7 +285,7 @@ int main (int argc, char** argv) {
     //float *input_libxsmm, *filter_libxsmm, *output_libxsmm, *dinput_libxsmm, *dfilter_libxsmm, *doutput_libxsmm, *filtertr_libxsmm;
     //float *batchstats_libxsmm;
 
-    naive_conv_t naive_param;
+    conv_t naive_param;
 
     int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
     int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
