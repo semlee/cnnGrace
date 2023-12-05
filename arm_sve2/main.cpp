@@ -305,19 +305,19 @@ int main (int argc, char** argv) {
     if (debug) {
         cout << "NAIVE INPUT\n" ;
         for (int i = 0; i < inputSize; i++) {
-            cout << naive_input << endl;
+            cout << naive_input[i] << endl;
         }
         cout << "CONV INPUT\n" ;
         for (int i = 0; i < inputSize; i++) {
-            cout << conv_input << endl;
+            cout << conv_input[i] << endl;
         }
         cout << "NAIVE FILTER\n" ;
         for (int i = 0; i < filterSize; i++) {
-            cout << naive_filter_wu << endl;
+            cout << naive_filter_wu[i] << endl;
         }
         cout << "CONV FILTER\n" ;
         for (int i = 0; i < filterSize; i++) {
-            cout << conv_filter_wu << endl;
+            cout << conv_filter_wu[i] << endl;
         }
     }
     /* print some summary */
