@@ -63,7 +63,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                             for (int q = 0; q < RB_q; q++) {
                                                 int ijo = ij + stride_h * p;
                                                 int iio = ii + stride_w * q;
-                                                O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
+                                                //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
                                                 if (ijo >= 0 && ijo < ifh && iio >= 0 && iio < ifw) {
                                                     int inputIndex = (n * C_b * ifh * ifw) + ((c_b * VLEN + c) * ofh * ofw) + ((ijo + r) * ofw) + (iio + s);
