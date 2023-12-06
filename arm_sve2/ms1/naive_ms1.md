@@ -2,6 +2,7 @@
 
 0.52142ms
 1.29019ms
+2.55818ms
 
 Grace CPU naive run performance using timer :
 
@@ -22,7 +23,7 @@ Haswell CPU naive run using timer performance count:
 
 Total time consumed: 4.50424ms
 
-
+12.3087ms
 
 ## run_resnet50
 
