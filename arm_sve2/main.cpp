@@ -365,7 +365,20 @@ int main (int argc, char** argv) {
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        l_total = duration_sec.count();
+        
+
+        flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+
+        printf("Total Time = %.5g\n", (double)l_total);
+        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+        printf("fp time = %.5g\n", ((double)(l_total/iters)));
+        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
+
+        // printf("PERFDUMP,FP,%s,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%f,%f,%f,%f,%f,%f,%f\n", LIBXSMM_VERSION, nThreads, nImg, nIfm, nOfm,
+        //     ifw, ifh, kw, kh, stride, padw, padh, ((double)(l_total/iters)), (flops*1e-9)/l_total, norms_fwd.l1_ref, norms_fwd.l1_tst,
+        //     norms_fwd.l2_abs, norms_fwd.l2_rel, norms_fwd.linf_abs, norms_fwd.linf_rel, norms_fwd.normf_rel);
     }
     if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
         cout << "##########################################\n";
@@ -377,7 +390,16 @@ int main (int argc, char** argv) {
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        l_total = duration_sec.count();
+        
+
+        flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+
+        printf("Total Time = %.5g\n", (double)l_total);
+        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+        printf("fp time = %.5g\n", ((double)(l_total/iters)));
+        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
     }
     if (type == 'A' || type == 'U') {
         cout << "##########################################\n";
@@ -389,7 +411,16 @@ int main (int argc, char** argv) {
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+        l_total = duration_sec.count();
+        
+
+        flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+
+        printf("Total Time = %.5g\n", (double)l_total);
+        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+        printf("fp time = %.5g\n", ((double)(l_total/iters)));
+        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
     }
 
     printf("##########################################\n");

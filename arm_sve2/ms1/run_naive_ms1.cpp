@@ -598,7 +598,16 @@ int main (int argc, char** argv) {
     end = high_resolution_clock::now();
 
     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-    cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    l_total = duration_sec.count();
+    
+
+    flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+
+    printf("Total Time = %.5g\n", (double)l_total);
+    printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+    printf("fp time = %.5g\n", ((double)(l_total/iters)));
+    printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
 
     naive_conv_fp(&naive_param, naive_input, naive_output_save, naive_filter, naive_bias);
