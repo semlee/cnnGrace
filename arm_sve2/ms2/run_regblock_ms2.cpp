@@ -702,7 +702,7 @@ int main (int argc, char** argv) {
         //         error_count++;
         //     }
         // }
-        cout << "Error Count: " << error_count << "/" << outputSize << "\n";
+        // cout << "Error Count: " << error_count << "/" << outputSize << "\n";
 
     }
     if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
