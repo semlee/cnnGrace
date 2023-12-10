@@ -9,7 +9,9 @@ g++ -c ms2/regblock_ms2.cpp -o regblock_ms2.o -std=c++11
 g++ main.o naive_ms1.o regblock_ms2.o -o conv_layer -O3 -std=c++11
 
 # Run with perf, focusing on a specific function
-perf record -g -- ./conv_layer 1000 16 16 32 32 64 3 3 0 0 1 'F' 'L' 0
+# perf record -g -- 
+
+./conv_layer 1000 16 16 32 32 64 3 3 0 0 1 'F' 'L' 0
 
 rm naive_ms1.o 
 rm regblock_ms2.o
