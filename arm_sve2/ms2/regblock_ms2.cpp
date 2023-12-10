@@ -86,7 +86,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                     s * VLEN * VLEN +
                                                                     c * VLEN + k;
                                                 
-                                                std::cout << inputIndex << " ";
+                                                std::cout << outputIndex << " ";
 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
