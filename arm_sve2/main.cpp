@@ -300,7 +300,7 @@ int main (int argc, char** argv) {
         conv_filter_wu[i] = naive_filter[i];
     }
 
-    bool debug = true;
+    bool debug = false;
 
     if (debug) {
         cout << " DEBUGGING MODE " << endl;
