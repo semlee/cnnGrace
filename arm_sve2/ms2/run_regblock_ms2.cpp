@@ -200,8 +200,8 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                                                     c_b * ifhp * ifwp * VLEN +
                                                                     (ijo + r) * ifwp * VLEN +
                                                                     (iio + s) * VLEN + c;
-                                                cout << inputIndex;
-                                                
+                                                // cout << inputIndex << " ";
+
                                                 size_t outputIndex = n * K_b * P_b * Q_b * VLEN +
                                                                     k_b * P_b * Q_b * VLEN +
                                                                     (oj + p) * Q_b * VLEN +
