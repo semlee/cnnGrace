@@ -91,40 +91,34 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                             if (ij + r < 0 || ij + r >= ifh) continue;
                             for (int s = 0; s < S; s++) {
                                 if (ii + s < 0 || ii + s >= ifw) continue;
+                                for (int p = 0; p <= RB_p; p++) {
+                                    for (int q = 0; q <= RB_q; q++) {
+                                        int ijo = ij + stride_h * p;
+                                        int iio = ii + stride_w * q;
 
-                                for (int c = 0; c <= VLEN; c++) {
-                                    for (int k = 0; k <= VLEN; k++) {
-                                        for (int p = 0; p <= RB_p; p++) {
-                                            for (int q = 0; q <= RB_q; q++) {
-                                                int ijo = ij + stride_h * p;
-                                                int iio = ii + stride_w * q;
+                                        // Load vectors using SVE intrinsics
+                                        svfloat32_t inputVector = svld1_f32(input + n * C_b * ifhp * ifwp * VLEN +
+                                                                            c_b * ifhp * ifwp * VLEN +
+                                                                            (ijo + r) * ifwp * VLEN +
+                                                                            (iio + s) * VLEN);
 
-                                                 // Load vectors using SVE intrinsics
-                                                svfloat32_t inputVector = svld1_f32(input + n * C_b * ifhp * ifwp * VLEN +
-                                                                                    c_b * ifhp * ifwp * VLEN +
-                                                                                    (ijo + r) * ifwp * VLEN +
-                                                                                    (iio + s) * VLEN + c);
+                                        svfloat32_t filterVector = svld1_f32(filter + k_b * C_b * R * S * VLEN * VLEN +
+                                                                            c_b * R * S * VLEN * VLEN +
+                                                                            r * S * VLEN * VLEN +
+                                                                            s * VLEN * VLEN);
 
-                                                svfloat32_t filterVector = svld1_f32(filter + k_b * C_b * R * S * VLEN * VLEN +
-                                                                                    c_b * R * S * VLEN * VLEN +
-                                                                                    r * S * VLEN * VLEN +
-                                                                                    s * VLEN * VLEN +
-                                                                                    c * VLEN + k);
+                                        svfloat32_t outputVector = svld1_f32(output + n * K_b * P_b * Q_b * VLEN +
+                                                                            k_b * P_b * Q_b * VLEN +
+                                                                            (oj + p) * Q_b * VLEN +
+                                                                            (oi + q) * VLEN);
 
-                                                svfloat32_t outputVector = svld1_f32(output + n * K_b * P_b * Q_b * VLEN +
-                                                                                    k_b * P_b * Q_b * VLEN +
-                                                                                    (oj + p) * Q_b * VLEN +
-                                                                                    (oi + q) * VLEN + k);
+                                        outputVector = svmad_f32_m(outputVector, inputVector, filterVector);
 
-                                                outputVector = svmad_f32_m(outputVector, inputVector, filterVector);
-
-                                                // Store result back
-                                                svst1_f32(output + n * K_b * P_b * Q_b * VLEN +
-                                                        k_b * P_b * Q_b * VLEN +
-                                                        (oj + p) * Q_b * VLEN +
-                                                        (oi + q) * VLEN + k, outputVector);
-                                            }
-                                        }
+                                        // Store result back
+                                        svst1_f32(output + n * K_b * P_b * Q_b * VLEN +
+                                                k_b * P_b * Q_b * VLEN +
+                                                (oj + p) * Q_b * VLEN +
+                                                (oi + q) * VLEN, outputVector);
                                     }
                                 }
                             }
