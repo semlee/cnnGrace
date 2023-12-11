@@ -21,8 +21,8 @@ format='L'
 padding_mode=0
 
 # Compile the C++ file
-g++ -o svereg_layer -O3 run_svereg_ms3.cpp -std=c++11
-
+g++ -o svereg_layer -O3 -march=native run_svereg_ms3.cpp -std=c++11
+# -march=armv9.3-a+sve
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
     echo "Compilation successful"
