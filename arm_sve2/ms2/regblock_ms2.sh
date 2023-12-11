@@ -37,6 +37,7 @@ else
     echo "Compilation failed"
 fi
 
+rm regblock_layer
 # Single CG1 node run
 # srun -N 1 -p cg1-high  --exclusive --pty /bin/bash
 
