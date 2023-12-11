@@ -112,15 +112,15 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                                             (oi + q)) * VLEN;
 
                                         // Load vectors using SVE intrinsics
-                                        svfloat32_t inputVector = svld1_f32(input + inputIndex);
-                                        svfloat32_t filterVector = svld1_f32(filter + filterIndex);
-                                        svfloat32_t outputVector = svld1_f32(output + outputIndex);
-                                        
+                                        svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
+                                        svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
+                                        svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
+
                                         // run Vector MAC Unit
-                                        outputVector = svmad_f32_m(outputVector, inputVector, filterVector);
+                                        outputVector = svmad_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
                                         // Store result back
-                                        svst1_f32(output + outputIndex, outputVector);
+                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
                                     }
                                 }
                             }
