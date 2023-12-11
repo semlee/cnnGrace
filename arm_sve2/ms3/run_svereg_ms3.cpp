@@ -117,7 +117,7 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                         svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
 
                                         // run Vector MAC Unit
-                                        outputVector = svmad_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
+                                        outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
                                         // Store result back
                                         svst1_f32(svptrue_b32(), output + outputIndex, outputVector);

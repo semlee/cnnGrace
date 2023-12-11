@@ -21,7 +21,7 @@ format='L'
 padding_mode=0
 
 # Compile the C++ file
-g++ -o regblock_layer -O3 regblock_ms2.cpp -std=c++11
+g++ -o regblock_layer -O3 run_regblock_ms2.cpp -std=c++11
 
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
