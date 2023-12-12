@@ -80,49 +80,43 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int n = 0; n < N; n++) {
-        for (int k_b = 0; k_b < K_b; k_b++) {
-            for (int c_b = 0; c_b < C_b; c_b++) {
-                for (int oj = 0; oj < P_b; oj++) {
-                    int ij = oj * stride_h - pad_h;
-                    for (int oi = 0; oi < Q_b; oi++) {
-                        int ii = oi * stride_w - pad_w;
-                        for (int r = 0; r < R; r++) {
+    for (n = 0; n < N; n++) {
+        for (k_b = 0; k_b < K_b; k_b++) {
+            for (c_b = 0; c_b < C_b; c_b++) {
+                for (oj_b = 0; oj < P_b; oj++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi < Q_b; oi++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_h;
+                        for (r = 0; r < R; r++) {
                             if (ij + r < 0 || ij + r >= ifh) continue;
-                            for (int s = 0; s < S; s++) {
+                            for (s = 0; s < S; s++) {
                                 if (ii + s < 0 || ii + s >= ifw) continue;
-
-                                for (int c = 0; c <= VLEN; c++) {
-                                    for (int k = 0; k <= VLEN; k++) {
-                                        for (int p = 0; p <= RB_p; p++) {
-                                            for (int q = 0; q <= RB_q; q++) {
-                                                int ijo = ij + stride_h * p;
-                                                int iio = ii + stride_w * q;
-                                                //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
-                                                // Check boundary conditions
-                                                size_t inputIndex =     (n * C_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                                        (c_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                                        ((ijo + r) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                                        ((iio + s) * VLEN) + c;
-                                                size_t outputIndex =    (n * K_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + 
-                                                                        (k_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + (
-                                                                        (oj + p) * (Q_b + RB_q) * VLEN) + 
-                                                                        ((oi + q) * VLEN) + k;
-                                                size_t filterIndex =    (k_b * C_b * R * S * VLEN * VLEN) + 
-                                                                        (c_b * R * S * VLEN * VLEN) + 
-                                                                        (r * S * VLEN * VLEN) + 
-                                                                        (s * VLEN * VLEN) + 
-                                                                        (c * VLEN) + 
-                                                                        k;
-
-                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+                                for (c = 0; c <= VLEN; c++) {
+                                    for (k = 0; k <= VLEN; k++) {
+                                        for (p = 0; p <= RB_p; p++) {
+                                            for (q = 0; q <= RB_q; q++) {
+                                                ijo = ij + stride_h * p - pad_h;
+                                                iio = ii + stride_w * q - pad_q;
+                                                size_t inputIndex =     n * C * ifhp * ifwp + 
+                                                                        (c_b * VLEN + c) * ifhp * ifwp + 
+                                                                        (ijo + r) * ifwp + 
+                                                                        (iio + s);
+                                                size_t outputIndex =    n * K * ofhp * ofwp + 
+                                                                        (k_b * VLEN + k) * ofhp * ofwp + 
+                                                                        oj * ofwp + 
+                                                                        oi;
+                                                size_t filterIndex =    (k_b * VLEN + k) * C * kh * kw + 
+                                                                        (c_b * VLEN + c) * kh * kw + 
+                                                                        r * kw + 
+                                                                        s;
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
 #if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
                     // Apply ReLU activation function
@@ -172,28 +166,30 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
     int K_b = K/VLEN;
     int P_b = P/RB_p;
     int Q_b = Q/RB_q;
+    int n, k_b, c_b, oj, ij, oi, ii, r, s, c, k, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int n = 0; n < N; n++) {
-        for (int k_b = 0; k_b < K_b; k_b++) {
-            for (int c_b = 0; c_b < C_b; c_b++) {
-                for (int oj = 0; oj < P_b; oj++) {
-                    int ij = oj * stride_h - pad_h;
-                    for (int oi = 0; oi < Q_b; oi++) {
-                        int ii = oi * stride_w - pad_w;
-                        for (int r = 0; r < R; r++) {
+    for (n = 0; n < N; n++) {
+        for (k_b = 0; k_b < K_b; k_b++) {
+            for (c_b = 0; c_b < C_b; c_b++) {
+                for (oj_b = 0; oj < P_b; oj++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi < Q_b; oi++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_h;
+                        for (r = 0; r < R; r++) {
                             if (ij + r < 0 || ij + r >= ifh) continue;
-                            for (int s = 0; s < S; s++) {
+                            for (s = 0; s < S; s++) {
                                 if (ii + s < 0 || ii + s >= ifw) continue;
-
-                                for (int c = 0; c <= VLEN; c++) {
-                                    for (int k = 0; k <= VLEN; k++) {
-                                        for (int p = 0; p <= RB_p; p++) {
-                                            for (int q = 0; q <= RB_q; q++) {
-                                                int ijo = ij + stride_h * p;
-                                                int iio = ii + stride_w * q;
+                                for (c = 0; c <= VLEN; c++) {
+                                    for (k = 0; k <= VLEN; k++) {
+                                        for (p = 0; p <= RB_p; p++) {
+                                            for (q = 0; q <= RB_q; q++) {
+                                                ijo = ij + stride_h * p;
+                                                iio = ii + stride_w * q;
 
                                                 // Linear indices
                                                 size_t inputIndex = n * C_b * ifhp * ifwp * VLEN +

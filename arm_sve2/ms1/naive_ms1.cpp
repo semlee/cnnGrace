@@ -121,9 +121,9 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
                                                         ifm * ifhp * ifwp + 
                                                         (ij + kj) * ifwp + 
                                                         (ii + ki);
-                                size_t outputIndex =    img * nOfm * ofh * ofw + 
-                                                        ofm * ofh * ofw + 
-                                                        oj * ofw + 
+                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                        ofm * ofhp * ofwp + 
+                                                        oj * ofwp + 
                                                         oi;
                                 size_t filterIndex =    ofm * nIfm * kh * kw + 
                                                         ifm * kh * kw + 

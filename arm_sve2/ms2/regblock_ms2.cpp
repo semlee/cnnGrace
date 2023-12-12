@@ -49,9 +49,9 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
         for (int k_b = 0; k_b < K_b; k_b++) {
             for (int c_b = 0; c_b < C_b; c_b++) {
                 for (int oj = 0; oj < P_b; oj++) {
-                    int ij = oj * stride_h - pad_h;
+                    int ij = oj * stride_h * RB_p;
                     for (int oi = 0; oi < Q_b; oi++) {
-                        int ii = oi * stride_w - pad_w;
+                        int ii = oi * stride_w * RB_q;
                         for (int r = 0; r < R; r++) {
                             if (ij + r < 0 || ij + r >= ifh) continue;
                             for (int s = 0; s < S; s++) {

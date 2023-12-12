@@ -227,9 +227,18 @@ void naive_conv_fp_original(naive_conv_t* param, const float* input, float* outp
                                 // size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
                                 // size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
 
-                                size_t inputIndex = img * nIfm * ifhp * ifwp + ifm * ifhp * ifwp + (ij + kj) * ifwp + (ii + ki);
-                                size_t outputIndex = img * nOfm * ofh * ofw + ofm * ofh * ofw + oj * ofw + oi;
-                                size_t filterIndex = ofm * nIfm * kh * kw + ifm * kh * kw + kj * kw + ki;
+                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                        ifm * ifhp * ifwp + 
+                                                        (ij + kj) * ifwp + 
+                                                        (ii + ki);
+                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                        ofm * ofhp * ofwp + 
+                                                        oj * ofwp + 
+                                                        oi;
+                                size_t filterIndex =    ofm * nIfm * kh * kw + 
+                                                        ifm * kh * kw + 
+                                                        kj * kw + 
+                                                        ki;
 
                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
 
