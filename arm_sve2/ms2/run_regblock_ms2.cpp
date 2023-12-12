@@ -102,17 +102,33 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 ijo = ij + stride_h * p - pad_h;
                                                 iio = ii + stride_w * q - pad_w;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                        (ifm_b * VLEN + ifm) * ifhp * ifwp + 
-                                                                        (ij + kj) * ifwp + 
-                                                                        (ii + ki);
+                                                                        ifm_b * ifhp * ifwp * VLEN+ 
+                                                                        (ij + kj) * ifwp * VLEN + 
+                                                                        (ii + ki) * VLEN +
+                                                                        ifm;
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                        (ofm_b * VLEN + ofm) * ofhp * ofwp + 
-                                                                        oj * ofwp + 
-                                                                        oi;
-                                                size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw + 
-                                                                        (ifm_b * VLEN + ifm) * kh * kw + 
-                                                                        kj * kw + 
-                                                                        ki;
+                                                                        ofm_b * ofhp * ofwp * VLEN + 
+                                                                        oj * ofwp * VLEN + 
+                                                                        oi * VLEN +
+                                                                        ofm;
+                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                                        ifm_b * kh * kw * VLEN * VLEN + 
+                                                                        kj * kw * VLEN * VLEN + 
+                                                                        ki * VLEN * VLEN + 
+                                                                        ofm * VLEN + 
+                                                                        ifm;
+                                                // size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                //                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
+                                                //                         (ij + kj) * ifwp + 
+                                                //                         (ii + ki);
+                                                // size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                //                         (ofm_b * VLEN + ofm) * ofhp * ofwp + 
+                                                //                         oj * ofwp + 
+                                                //                         oi;
+                                                // size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw + 
+                                                //                         (ifm_b * VLEN + ifm) * kh * kw + 
+                                                //                         kj * kw + 
+                                                //                         ki;
                                             }
                                         }
                                     }
