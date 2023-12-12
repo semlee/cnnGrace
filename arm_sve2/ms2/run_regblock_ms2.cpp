@@ -129,6 +129,8 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                 //                         (ifm_b * VLEN + ifm) * kh * kw + 
                                                 //                         kj * kw + 
                                                 //                         ki;
+                                                
+                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
                                         }
                                     }
@@ -653,6 +655,15 @@ int main (int argc, char** argv) {
     fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
     fill_random(conv_filter, nOfm, nIfm, kh, kw);
     
+    if (!conv_input || !conv_output || !conv_filter || !conv_bias) {
+        // Handle memory allocation failure
+        // You may want to throw an exception, log an error, or exit the program
+        delete[] conv_input;
+        delete[] conv_output;
+        delete[] conv_filter;
+        delete[] conv_bias;
+        throw std::bad_alloc();
+    }
 
     bool debug = true;
 
