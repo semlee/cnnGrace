@@ -338,7 +338,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp_mod1(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);

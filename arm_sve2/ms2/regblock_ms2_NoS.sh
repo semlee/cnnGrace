@@ -38,3 +38,6 @@ echo "-march=native -mtune=native"
 # rm reg_layer_naive
 rm reg_layer_avx2
 # rm reg_layer_native
+
+g++ -O3 temp.cpp -o reg_layer_naive -std=c++11
+./reg_layer_naive 1000 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
