@@ -8,13 +8,13 @@
 iters=1000
 ifw=16
 ifh=16
-nImg=1
-nIfm=3
+nImg=3
+nIfm=64
 nOfm=64
 kw=3
 kh=3
-padw=0
-padh=0
+padw=1
+padh=1
 stride=1
 type='F'
 format='L'
