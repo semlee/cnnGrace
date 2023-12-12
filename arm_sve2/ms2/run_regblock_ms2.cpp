@@ -811,19 +811,19 @@ int main (int argc, char** argv) {
     // delete[] naive_dbias;
     
     delete[] conv_input;
-    delete[] conv_input_save;
+    // delete[] conv_input_save;
 
     delete[] conv_output;
-    delete[] conv_output_save;
-    delete[] conv_output_bp;
-    delete[] conv_output_wu;
+    // delete[] conv_output_save;
+    // delete[] conv_output_bp;
+    // delete[] conv_output_wu;
 
     delete[] conv_filter;
-    delete[] conv_filter_save;
-    delete[] conv_filter_wu;
+    // delete[] conv_filter_save;
+    // delete[] conv_filter_wu;
 
     delete[] conv_bias;
-    delete[] conv_dbias;
+    // delete[] conv_dbias;
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
