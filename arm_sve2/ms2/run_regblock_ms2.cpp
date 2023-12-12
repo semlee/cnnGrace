@@ -102,11 +102,12 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                     for (ifm = 0; ifm <= VLEN; ifm++) {
                                         for (p = 0; p <= RB_p; p++) {
                                             for (q = 0; q <= RB_q; q++) {
+                                                iio = ii + stride_h * p - pad_h;
                                                 ijo = ij + stride_h * p - pad_h;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
-                                                                        (ij + kj) * ifwp * VLEN + 
-                                                                        (ii + ki) * VLEN +
+                                                                        (ijo + kj) * ifwp * VLEN + 
+                                                                        (iio + ki) * VLEN +
                                                                         ifm;
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                         ofm_b * ofhp * ofwp * VLEN + 
@@ -145,6 +146,87 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
         }
     }
 }
+
+void arm_sve_conv_fp_mod1(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh        = param->kh;
+    int kw        = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int nIfm_b = nIfm/VLEN;
+    int nOfm_b = nOfm/VLEN;
+    int ofh_b = ofh/RB_p;
+    int ofw_b = ofw/RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+
+#if defined (_OPENMP)
+    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+#endif
+
+    for (img = 0; img < nImg; img++) {
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (oj = 0; oj < ofh; ++oj) {
+                    ij = oj * stride_h - pad_h;
+                    for (oi = 0; oi < ofw; ++oi) {
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; kj++) {
+                            if (ij + kj < 0 || ij + kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ki++) {
+                                if (ii + ki < 0 || ii + ki >= ifw) continue;
+                                for (ofm = 0; ofm <= VLEN; ofm++) {
+                                    for (ifm = 0; ifm <= VLEN; ifm++) {
+                                        size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                ifm_b * ifhp * ifwp * VLEN+ 
+                                                                (ij + kj) * ifwp * VLEN + 
+                                                                (ii + ki) * VLEN +
+                                                                ifm;
+                                        size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                ofm_b * ofhp * ofwp * VLEN + 
+                                                                oj * ofwp * VLEN + 
+                                                                oi * VLEN +
+                                                                ofm;
+                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN + 
+                                                                ofm * VLEN + 
+                                                                ifm;
+                                        
+                                        output[outputIndex] += input[inputIndex] * filter[filterIndex];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
 
 void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
