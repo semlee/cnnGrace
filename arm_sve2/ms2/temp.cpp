@@ -1,3 +1,151 @@
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+
+//used for data generation (random)
+#include <random>
+
+//used for performance count
+#include <chrono>
+#include <ratio>
+#include <cmath>
+
+#if defined(_OPENMP)
+# include <omp.h>
+#endif
+// #include <arm_sve.h>
+
+using std::cout;
+using std::endl;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration;
+
+typedef struct {
+  int nImg;
+  int nIfm;
+  int nOfm;
+  int ifhp;
+  int ifwp;
+  int ifh;
+  int ifw;
+  int ofhp;
+  int ofwp;
+  int ofh;
+  int ofw;
+  int pad_h;
+  int pad_w;
+  int pad_h_in;
+  int pad_w_in;
+  int pad_h_out;
+  int pad_w_out;
+  int kh;
+  int kw;
+  int stride_h;
+  int stride_w;
+  int VLEN;
+  int RB_p;
+  int RB_q;
+} conv_t;
+
+void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh        = param->kh;
+    int kw        = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int nIfm_b = nIfm/VLEN;
+    int nOfm_b = nOfm/VLEN;
+    int ofh_b = ofh/RB_p;
+    int ofw_b = ofw/RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+
+#if defined (_OPENMP)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm, p, q)
+#endif
+
+    for (img = 0; img < nImg; img++) {
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_h;
+                        for (kj = 0; kj < kh; kj++) {
+                            if (ij + kj < 0 || ij + kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ki++) {
+                                if (ii + ki < 0 || ii + ki >= ifw) continue;
+                                for (ofm = 0; ofm < VLEN; ofm++) {
+                                    for (ifm = 0; ifm < VLEN; ifm++) {
+                                        for (p = 0; p < RB_p; p++) {
+                                            for (q = 0; q < RB_q; q++) {
+                                                ijo = ij + stride_h * p - pad_h;
+                                                iio = ii + stride_w * p - pad_w;
+                                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                        ifm_b * ifhp * ifwp * VLEN+ 
+                                                                        (ijo + kj) * ifwp * VLEN + 
+                                                                        (iio + ki) * VLEN +
+                                                                        ifm;
+                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                        ofm_b * ofhp * ofwp * VLEN + 
+                                                                        oj * ofwp * VLEN + 
+                                                                        oi * VLEN +
+                                                                        ofm;
+                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                                        ifm_b * kh * kw * VLEN * VLEN + 
+                                                                        kj * kw * VLEN * VLEN + 
+                                                                        ki * VLEN * VLEN + 
+                                                                        ofm * VLEN + 
+                                                                        ifm;
+                                                // size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                //                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
+                                                //                         (ij + kj) * ifwp + 
+                                                //                         (ii + ki);
+                                                // size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                //                         (ofm_b * VLEN + ofm) * ofhp * ofwp + 
+                                                //                         oj * ofwp + 
+                                                //                         oi;
+                                                // size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw + 
+                                                //                         (ifm_b * VLEN + ifm) * kh * kw + 
+                                                //                         kj * kw + 
+                                                //                         ki;
+                                                
+                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
     // Seed the random number generator
