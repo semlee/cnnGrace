@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <ctime>
 
+//used for data generation (random)
+#include <random>
+
 //used for performance count
 #include <chrono>
 #include <ratio>
@@ -396,8 +399,9 @@ void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, flo
 
 void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
     // Seed the random number generator
-    time_t t;
-    srand(static_cast<unsigned int>(time(&t)));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
 
     for (size_t i = 0; i < A; i++) {
         for (size_t j = 0; j < B; j++) {
@@ -405,10 +409,8 @@ void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, s
                 for (size_t l = 0; l < D; l++) {
                     // Convert multi-dimensional indices to a flat index
                     size_t flatIndex = i * B * C * D + j * C * D + k * D + l;
-                    // Generate a random float value between 0 and 1
-                    float random_value = static_cast<float>(rand()) / RAND_MAX;
-                    // Round to the thousandth place
-                    input_array[flatIndex] = round(random_value * 1000) / 1000.0f;
+                    // Generate a random float value between -1 and 1
+                    input_array[flatIndex] = dis(gen);
                 }
             }
         }
