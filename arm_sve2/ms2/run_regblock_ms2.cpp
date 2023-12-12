@@ -100,7 +100,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                         for (p = 0; p <= RB_p; p++) {
                                             for (q = 0; q <= RB_q; q++) {
                                                 ijo = ij + stride_h * p - pad_h;
-                                                iio = ii + stride_w * q - pad_q;
+                                                iio = ii + stride_w * q - pad_w;
                                                 size_t inputIndex =     n * C * ifhp * ifwp + 
                                                                         (c_b * VLEN + c) * ifhp * ifwp + 
                                                                         (ijo + r) * ifwp + 
@@ -158,7 +158,7 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
     int K_b = K/VLEN;
     int P_b = P/RB_p;
     int Q_b = Q/RB_q;
-    int n, k_b, c_b, oj, ij, oi, ii, r, s, c, k, p, q, ijo, iio;
+    int n, k_b, c_b, oj, oj_b, ij, oi, oi_b, ii, r, s, c, k, p, q, ijo, iio;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
