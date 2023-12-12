@@ -98,12 +98,12 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                             if (ij + kj < 0 || ij + kj >= ifh) continue;
                             for (ki = 0; ki < kw; ki++) {
                                 if (ii + ki < 0 || ii + ki >= ifw) continue;
-                                for (ofm = 0; ofm <= VLEN; ofm++) {
-                                    for (ifm = 0; ifm <= VLEN; ifm++) {
-                                        for (p = 0; p <= RB_p; p++) {
-                                            for (q = 0; q <= RB_q; q++) {
-                                                iio = ii + stride_h * p - pad_h;
+                                for (ofm = 0; ofm < VLEN; ofm++) {
+                                    for (ifm = 0; ifm < VLEN; ifm++) {
+                                        for (p = 0; p < RB_p; p++) {
+                                            for (q = 0; q < RB_q; q++) {
                                                 ijo = ij + stride_h * p - pad_h;
+                                                iio = ii + stride_w * p - pad_w;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
                                                                         (ijo + kj) * ifwp * VLEN + 
@@ -776,7 +776,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp_mod1(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
