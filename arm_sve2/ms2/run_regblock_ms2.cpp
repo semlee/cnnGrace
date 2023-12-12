@@ -302,16 +302,6 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
                         }
                     }
                 }
-
-#if defined(USE_FUSED_RELU_BWD)
-                for (int ij = 0; ij < ifh; ij++) {
-                    for (int ii = 0; ii < ifw; ii++) {
-                        if (naive_input_save[n * nIfm * ifh * ifw + c_b * ifh * ifw + ij * ifw + ii] == 0.0) {
-                            input[n * nIfm * ifh * ifw + c_b * ifh * ifw + ij * ifw + ii] = 0.0;
-                        }
-                    }
-                }
-#endif
             }
         }
     }
