@@ -124,7 +124,6 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
             }
         }
     }
-
 }
 
 void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
