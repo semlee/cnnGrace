@@ -8,8 +8,8 @@
 iters=1000
 ifw=16
 ifh=16
-nImg=5
-nIfm=5
+nImg=1
+nIfm=3
 nOfm=64
 kw=3
 kh=3
