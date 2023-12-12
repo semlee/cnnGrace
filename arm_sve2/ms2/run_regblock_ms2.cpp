@@ -804,10 +804,11 @@ int main (int argc, char** argv) {
         cout << endl;
 
         cout << "Output" << endl;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < outputSize; i++) {
             cout << conv_output[i] << " ";
         }
         cout << endl;
+
         // arm_sve_conv_fp_original(&conv_param, conv_input, conv_output_save, conv_filter, conv_bias);
         // for (int i = 0; i < outputSize; i++) {
         //     if (conv_output[i] != conv_output_save[i]) {
