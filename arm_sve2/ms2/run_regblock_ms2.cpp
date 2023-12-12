@@ -48,7 +48,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void b(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -103,7 +103,6 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                         for (p = 0; p <= RB_p; p++) {
                                             for (q = 0; q <= RB_q; q++) {
                                                 ijo = ij + stride_h * p - pad_h;
-                                                iio = ii + stride_w * q - pad_w;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
                                                                         (ij + kj) * ifwp * VLEN + 
