@@ -118,6 +118,7 @@
     int nOfm = nOfm/VLEN;
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
     for (img = 0; img < nImg; img++) {
         for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
@@ -137,7 +138,7 @@
                                         for (p = 0; p <= RB_p; p++) {
                                             for (q = 0; q <= RB_q; q++) {
                                                 ijo = ij + stride_h * p - pad_h;
-                                                iio = ii + stride_w * q - pad_q;
+                                                iio = ii + stride_w * q - pad_w;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
                                                                         (ij + kj) * ifwp + 
@@ -153,6 +154,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////
 //type 2
+    int n, k_b, c_b, oj_b, oj, ij, oi_b, oi, ii, r, s, c, k, p, q, ijo, iio;
 
     for (n = 0; n < N; n++) {
         for (k_b = 0; k_b < K_b; k_b++) {
@@ -172,7 +174,7 @@
                                         for (p = 0; p <= RB_p; p++) {
                                             for (q = 0; q <= RB_q; q++) {
                                                 ijo = ij + stride_h * p - pad_h;
-                                                iio = ii + stride_w * q - pad_q;
+                                                iio = ii + stride_w * q - pad_w;
                                                 size_t inputIndex =     n * C * ifhp * ifwp + 
                                                                         (c_b * VLEN + c) * ifhp * ifwp + 
                                                                         (ijo + r) * ifwp + 
