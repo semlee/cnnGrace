@@ -647,19 +647,9 @@ int main (int argc, char** argv) {
     // }
 
     float* conv_input = new float[inputSize];
-    float* conv_input_save = new float[inputSize];
-
     float* conv_output = new float[outputSize];
-    float* conv_output_save = new float[outputSize];
-    float* conv_output_bp = conv_output;
-    float* conv_output_wu = conv_output;
-
     float* conv_filter = new float[filterSize];
-    float* conv_filter_save = new float[filterSize];
-    float* conv_filter_wu = new float[filterSize];
-
     float* conv_bias = new float[nOfm];
-    float* conv_dbias = new float[nOfm];
     fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
     fill_random(conv_filter, nOfm, nIfm, kh, kw);
     
@@ -730,30 +720,30 @@ int main (int argc, char** argv) {
         // cout << "Error Count: " << error_count << "/" << outputSize << "\n";
 
     }
-    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
-        cout << "##########################################\n";
-        cout << "               BACKWARD PASS              \n";
-        cout << "##########################################\n";
+    // if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
+    //     cout << "##########################################\n";
+    //     cout << "               BACKWARD PASS              \n";
+    //     cout << "##########################################\n";
 
-        start = high_resolution_clock::now();
-        arm_sve_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
-        end = high_resolution_clock::now();
+    //     start = high_resolution_clock::now();
+    //     arm_sve_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
+    //     end = high_resolution_clock::now();
 
-        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    }
-    if (type == 'A' || type == 'U') {
-        cout << "##########################################\n";
-        cout << "               UPDATE WEIGHT              \n";
-        cout << "##########################################\n";
+    //     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    //     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     cout << "##########################################\n";
+    //     cout << "               UPDATE WEIGHT              \n";
+    //     cout << "##########################################\n";
 
-        start = high_resolution_clock::now();
-        arm_sve_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
-        end = high_resolution_clock::now();
+    //     start = high_resolution_clock::now();
+    //     arm_sve_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
+    //     end = high_resolution_clock::now();
 
-        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    }
+    //     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    //     cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    // }
 
     // printf("##########################################\n");
     // printf("#           Correctness Checking         #\n");
