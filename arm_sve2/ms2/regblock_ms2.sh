@@ -4,7 +4,6 @@
 #SBATCH -J regblock_run
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 1
-#SBATCH --debug
 
 iters=1000
 ifw=16
