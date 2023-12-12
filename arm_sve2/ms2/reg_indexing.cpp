@@ -154,6 +154,35 @@
 
 /////////////////////////////////////////////////////////////////////////////////////
 //type 2
+    int N         = param->nImg;
+    int C         = param->nIfm;
+    int K         = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int P         = param->ofh;
+    int Q         = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int R         = param->kh;
+    int S         = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int C_b = C/VLEN;
+    int K_b = K/VLEN;
+    int P_b = P/RB_p;
+    int Q_b = Q/RB_q;
     int n, k_b, c_b, oj_b, oj, ij, oi_b, oi, ii, r, s, c, k, p, q, ijo, iio;
 
     for (n = 0; n < N; n++) {

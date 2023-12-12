@@ -206,9 +206,9 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                                                     c;
                                                 // cout << inputIndex << " ";
 
-                                                size_t outputIndex = n * K_b * P_b * Q_b * VLEN +
-                                                                    k_b * P_b * Q_b * VLEN +
-                                                                    (oj + p) * Q_b * VLEN +
+                                                size_t outputIndex = n * K_b * ofhp * ofwp * VLEN +
+                                                                    k_b * ofhp * ofwp * VLEN +
+                                                                    (oj + p) * ofwp * VLEN +
                                                                     (oi + q) * VLEN + 
                                                                     k;
 
@@ -591,35 +591,61 @@ int main (int argc, char** argv) {
     size_t filterSize = nOfm * nIfm * kh * kw;
 
     /* Allocate memory for naive arrays */
-    float* naive_input = new float[inputSize];
-    float* naive_input_save = new float[inputSize];
+    // float* naive_input = new float[inputSize];
+    // float* naive_input_save = new float[inputSize];
 
-    float* naive_output = new float[outputSize];
-    float* naive_output_save = new float[outputSize];
-    float* naive_output_bp = naive_output;
-    float* naive_output_wu = naive_output;
+    // float* naive_output = new float[outputSize];
+    // float* naive_output_save = new float[outputSize];
+    // float* naive_output_bp = naive_output;
+    // float* naive_output_wu = naive_output;
 
-    float* naive_filter = new float[filterSize];
-    float* naive_filter_save = new float[filterSize];
-    float* naive_filter_wu = naive_filter;
+    // float* naive_filter = new float[filterSize];
+    // float* naive_filter_save = new float[filterSize];
+    // float* naive_filter_wu = naive_filter;
 
-    float* naive_bias = new float[nOfm];
-    float* naive_dbias = new float[nOfm];
+    // float* naive_bias = new float[nOfm];
+    // float* naive_dbias = new float[nOfm];
 
-    fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
+    // fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
+    // fill_random(naive_filter, nOfm, nIfm, kh, kw);
+    // fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
 
-    //IMPORTANT MALLOC : copy data to save
-    for (size_t i = 0; i < inputSize; i++) {
-        naive_input_save[i] = naive_input[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        naive_filter_save[i] = naive_filter[i];
-        naive_filter_wu[i] = naive_filter[i];
-    }
+    // //IMPORTANT MALLOC : copy data to save
+    // for (size_t i = 0; i < inputSize; i++) {
+    //     naive_input_save[i] = naive_input[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     naive_filter_save[i] = naive_filter[i];
+    //     naive_filter_wu[i] = naive_filter[i];
+    // }
 
-    /* Allocate memory for real convolutional arrays */
+    // /* Allocate memory for real convolutional arrays */
+    // float* conv_input = new float[inputSize];
+    // float* conv_input_save = new float[inputSize];
+
+    // float* conv_output = new float[outputSize];
+    // float* conv_output_save = new float[outputSize];
+    // float* conv_output_bp = conv_output;
+    // float* conv_output_wu = conv_output;
+
+    // float* conv_filter = new float[filterSize];
+    // float* conv_filter_save = new float[filterSize];
+    // float* conv_filter_wu = new float[filterSize];
+
+    // float* conv_bias = new float[nOfm];
+    // float* conv_dbias = new float[nOfm];
+
+    // //IMPORTANT MALLOC : copy data to save
+    // for (size_t i = 0; i < inputSize; i++) {
+    //     conv_input[i] = naive_input[i];
+    //     conv_input_save[i] = naive_input[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     conv_filter[i] = naive_filter[i];
+    //     conv_filter_save[i] = naive_filter[i];
+    //     conv_filter_wu[i] = naive_filter[i];
+    // }
+
     float* conv_input = new float[inputSize];
     float* conv_input_save = new float[inputSize];
 
@@ -634,17 +660,9 @@ int main (int argc, char** argv) {
 
     float* conv_bias = new float[nOfm];
     float* conv_dbias = new float[nOfm];
-
-    //IMPORTANT MALLOC : copy data to save
-    for (size_t i = 0; i < inputSize; i++) {
-        conv_input[i] = naive_input[i];
-        conv_input_save[i] = naive_input[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        conv_filter[i] = naive_filter[i];
-        conv_filter_save[i] = naive_filter[i];
-        conv_filter_wu[i] = naive_filter[i];
-    }
+    fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
+    fill_random(conv_filter, nOfm, nIfm, kh, kw);
+    
 
     bool debug = true;
 
@@ -684,7 +702,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp_original(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);

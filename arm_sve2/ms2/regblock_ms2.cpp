@@ -12,82 +12,80 @@
 
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
-    int N         = param->nImg;
-    int C         = param->nIfm;
-    int K         = param->nOfm;
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
     int ifhp      = param->ifhp;
     int ifwp      = param->ifwp;
     int ofhp      = param->ofhp;
     int ofwp      = param->ofwp;
     int ifh       = param->ifh;
     int ifw       = param->ifw;
-    int P         = param->ofh;
-    int Q         = param->ofw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
     int pad_h     = param->pad_h;
     int pad_w     = param->pad_w;
     int pad_h_in  = param->pad_h_in;
     int pad_w_in  = param->pad_w_in;
     int pad_h_out = param->pad_h_out;
     int pad_w_out = param->pad_w_out;
-    int R         = param->kh;
-    int S         = param->kw;
+    int kh        = param->kh;
+    int kw        = param->kw;
     int stride_h  = param->stride_h;
     int stride_w  = param->stride_w;
     int VLEN      = param->VLEN;
     int RB_p      = param->RB_p;
     int RB_q      = param->RB_q;
 
-    int C_b = C/VLEN;
-    int K_b = K/VLEN;
-    int P_b = P/RB_p;
-    int Q_b = Q/RB_q;
+    int nIfm_b = nIfm/VLEN;
+    int nOfm_b = nOfm/VLEN;
+    int ofh_b = ofh/RB_p;
+    int ofw_b = ofw/RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-    for (int n = 0; n < N; n++) {
-        for (int k_b = 0; k_b < K_b; k_b++) {
-            for (int c_b = 0; c_b < C_b; c_b++) {
-                for (int oj = 0; oj < P_b; oj++) {
-                    int ij = oj * stride_h * RB_p;
-                    for (int oi = 0; oi < Q_b; oi++) {
-                        int ii = oi * stride_w * RB_q;
-                        for (int r = 0; r < R; r++) {
-                            if (ij + r < 0 || ij + r >= ifh) continue;
-                            for (int s = 0; s < S; s++) {
-                                if (ii + s < 0 || ii + s >= ifw) continue;
-
-                                for (int c = 0; c <= VLEN; c++) {
-                                    for (int k = 0; k <= VLEN; k++) {
-                                        for (int p = 0; p <= RB_p; p++) {
-                                            for (int q = 0; q <= RB_q; q++) {
-                                                int ijo = ij + stride_h * p;
-                                                int iio = ii + stride_w * q;
+    for (img = 0; img < nImg; img++) {
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_h;
+                        for (kj = 0; kj < kh; kj++) {
+                            if (ij + kj < 0 || ij + kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ki++) {
+                                if (ii + ki < 0 || ii + ki >= ifw) continue;
+                                for (ofm = 0; ofm <= VLEN; ofm++) {
+                                    for (ifm = 0; ifm <= VLEN; ifm++) {
+                                        for (p = 0; p <= RB_p; p++) {
+                                            for (q = 0; q <= RB_q; q++) {
+                                                ijo = ij + stride_h * p - pad_h;
+                                                iio = ii + stride_w * q - pad_w;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
-                                                // int inputIndex = (n * C_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                // (c_b * ((P_b * stride_h - pad_h) + stride_h * RB_p + R) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + 
-                                                // ((ijo + r) * ((Q_b * stride_w - pad_h) + stride_h * RB_q + S) * VLEN) + ((iio + s) * VLEN) + c;
-                                                // int outputIndex = (n * K_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + (k_b * (P_b + RB_p) * (Q_b + RB_q) * VLEN) + ((oj + p) * (Q_b + RB_q) * VLEN) + ((oi + q) * VLEN) + k;
-                                                // int filterIndex = (k_b * C_b * R * S * VLEN * VLEN) + (c_b * R * S * VLEN * VLEN) + (r * S * VLEN * VLEN) + (s * VLEN * VLEN) + (c * VLEN) + k;
-                                                size_t inputIndex = n * C_b * ifhp * ifwp * VLEN +
-                                                                    c_b * ifhp * ifwp * VLEN +
-                                                                    (ijo + r) * ifwp * VLEN +
-                                                                    (iio + s) * VLEN + c;
                                                 
-                                                size_t outputIndex = n * K_b * P_b * Q_b * VLEN +
-                                                                    k_b * P_b * Q_b * VLEN +
-                                                                    (oj + p) * Q_b * VLEN +
-                                                                    (oi + q) * VLEN + k;
 
-                                                size_t filterIndex = k_b * C_b * R * S * VLEN * VLEN +
-                                                                    c_b * R * S * VLEN * VLEN +
-                                                                    r * S * VLEN * VLEN +
-                                                                    s * VLEN * VLEN +
-                                                                    c * VLEN + k;
+                                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                        ifm_b * ifhp * ifwp * VLEN+ 
+                                                                        (ij + kj) * ifwp * VLEN + 
+                                                                        (ii + ki) * VLEN +
+                                                                        ifm;
+                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                        ofm_b * ofhp * ofwp * VLEN + 
+                                                                        oj * ofwp * VLEN + 
+                                                                        oi * VLEN +
+                                                                        ofm;
+                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                                        ifm_b * kh * kw * VLEN * VLEN + 
+                                                                        kj * kw * VLEN * VLEN + 
+                                                                        ki * VLEN * VLEN + 
+                                                                        ofm * VLEN + 
+                                                                        ifm;
                                                 
-                                                std::cout << outputIndex << " ";
-
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
                                         }
@@ -96,18 +94,19 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                             }
                         }
                     }
-
-#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-                    // Apply ReLU activation function
-                    for (int oj = 0; oj < P_b * RB_p; oj++) {
-                        for (int oi = 0; oi < Q_b * RB_q; oi++) {
-                            int reluIndex = n * K_b * P_b * Q_b * VLEN * VLEN + k_b * P_b * Q_b * VLEN * VLEN + oj * Q_b * VLEN * VLEN + oi * VLEN * VLEN;
-                            output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
-                        }
-                    }
-#endif
-
                 }
+#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
+            // Apply ReLU activation function
+            for (int oj = 0; oj < ofh; oj++) {
+                for (int oi = 0; oi < ofw; oi++) {
+                    int reluIndex = img * nOfm_b * ofhp * ofwp +
+                                    ofm_b * nOfm_b * ofhp * ofwp +
+                                    oj * ofwp +
+                                    oi;
+                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+                }
+            }
+#endif
             }
         }
     }
