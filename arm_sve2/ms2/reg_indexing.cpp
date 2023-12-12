@@ -151,6 +151,27 @@
                                                                         (ifm_b * VLEN + ifm) * kh * kw + 
                                                                         kj * kw + 
                                                                         ki;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
+            // Apply ReLU activation function
+            for (int oj = 0; oj < ofh; oj++) {
+                for (int oi = 0; oi < ofw; oi++) {
+                    int reluIndex = img * nOfm_b * ofhp * ofwp +
+                                    ofm_b * nOfm_b * ofhp * ofwp +
+                                    oj * ofwp +
+                                    oi;
+                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+                }
+            }
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////////
 //type 2
@@ -183,6 +204,7 @@
     int K_b = K/VLEN;
     int P_b = P/RB_p;
     int Q_b = Q/RB_q;
+
     int n, k_b, c_b, oj_b, oj, ij, oi_b, oi, ii, r, s, c, k, p, q, ijo, iio;
 
     for (n = 0; n < N; n++) {
