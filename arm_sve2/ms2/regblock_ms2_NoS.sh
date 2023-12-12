@@ -20,9 +20,11 @@
 
 # perf record -e cycles -c 1 -ag -- ./regblock_layer 1000 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
 
+
+g++ -O3 run_regblock_ms2.cpp -o reg_layer_naive -std=c++11
 g++ -mavx2 -O3 run_regblock_ms2.cpp -o reg_layer_avx2 -std=c++11
 g++ -o reg_layer_native -march=native -mtune=native -O3 run_regblock_ms2.cpp -std=c++11
-g++ -O3 run_regblock_ms2.cpp -o reg_layer_naive -std=c++11
+
 
 # objdump -D -Mintel naive_layer | grep "vex.v"
 
