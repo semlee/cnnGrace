@@ -80,7 +80,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
 #endif
-ssh ssh.axisapps.io  -l 5281d26e0f68418b8173f7ffcf2d0da9
+
     for (n = 0; n < N; n++) {
         for (k_b = 0; k_b < K_b; k_b++) {
             for (c_b = 0; c_b < C_b; c_b++) {
