@@ -277,10 +277,10 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                             if (ij + r < 0 || ij + r >= ifh) continue;
                             for (s = 0; s < S; s++) {
                                 if (ii + s < 0 || ii + s >= ifw) continue;
-                                for (c = 0; c <= VLEN; c++) {
-                                    for (k = 0; k <= VLEN; k++) {
-                                        for (p = 0; p <= RB_p; p++) {
-                                            for (q = 0; q <= RB_q; q++) {
+                                for (c = 0; c < VLEN; c++) {
+                                    for (k = 0; k < VLEN; k++) {
+                                        for (p = 0; p < RB_p; p++) {
+                                            for (q = 0; q < RB_q; q++) {
                                                 ijo = ij + stride_h * p;
                                                 iio = ii + stride_w * q;
 
@@ -776,7 +776,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp_original(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
