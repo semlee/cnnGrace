@@ -202,19 +202,22 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                                 size_t inputIndex = n * C_b * ifhp * ifwp * VLEN +
                                                                     c_b * ifhp * ifwp * VLEN +
                                                                     (ijo + r) * ifwp * VLEN +
-                                                                    (iio + s) * VLEN + c;
+                                                                    (iio + s) * VLEN + 
+                                                                    c;
                                                 // cout << inputIndex << " ";
 
                                                 size_t outputIndex = n * K_b * P_b * Q_b * VLEN +
                                                                     k_b * P_b * Q_b * VLEN +
                                                                     (oj + p) * Q_b * VLEN +
-                                                                    (oi + q) * VLEN + k;
+                                                                    (oi + q) * VLEN + 
+                                                                    k;
 
                                                 size_t filterIndex = k_b * C_b * R * S * VLEN * VLEN +
                                                                     c_b * R * S * VLEN * VLEN +
                                                                     r * S * VLEN * VLEN +
                                                                     s * VLEN * VLEN +
-                                                                    c * VLEN + k;
+                                                                    c * VLEN + 
+                                                                    k;
 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
@@ -681,7 +684,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp_original(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
