@@ -82,7 +82,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm, p, q)
 #endif
 
     for (img = 0; img < nImg; img++) {
@@ -181,7 +181,7 @@ void arm_sve_conv_fp_mod1(conv_t* param, const float* input, float* output, cons
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj, oi, ij, ii, kj, ki, ofm, ifm)
 #endif
 
     for (img = 0; img < nImg; img++) {
@@ -776,7 +776,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp_mod1(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
