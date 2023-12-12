@@ -590,9 +590,9 @@ int main (int argc, char** argv) {
     */
 
     // Calculate the total sizes
-    size_t inputSize = nImg * nIfm * ifhp * ifwp;
-    size_t outputSize = nImg * nOfm * ofhp * ofwp;
-    size_t filterSize = nOfm * nIfm * kh * kw;
+    size_t inputSize = nImg * nIfm * ifhp * ifwp * VLEN;
+    size_t outputSize = nImg * nOfm * ofhp * ofwp * VLEN;
+    size_t filterSize = nOfm * nIfm * kh * kw * VLEN * VLEN;
 
     /* Allocate memory for naive arrays */
     // float* naive_input = new float[inputSize];
