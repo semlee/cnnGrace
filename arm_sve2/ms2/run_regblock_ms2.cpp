@@ -428,8 +428,8 @@ int main (int argc, char** argv) {
 
     conv_t conv_param;
 
-    int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
-    int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
+    volatile int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
+    volatile int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
     
     //void* scratch;
     //size_t scratch_size = 0;
@@ -437,26 +437,26 @@ int main (int argc, char** argv) {
     // Data fetched from original layer_example_f32
     /* some parameters we can overwrite via cli,
         default is some inner layer of overfeat */
-    int iters = 10;         /* repetitions of benchmark */
-    int ifw = 14;           /* input width, "W" */
-    int ifh = 20;           /* input height, "H" */
-    int nImg = 32;          /* mini-batch size, "N" */
-    int nIfm = 256;         /* number of input feature maps, "C" */
-    int nOfm = 512;         /* number of output feature maps, "K" */
-    int kh = 3;             /* filter height, "R" */
-    int kw = 3;             /* filter width, "S" */
-    int padh = 0;           /* padding in input, height */
-    int padw = 0;           /* padding in input, width */
-    int stride = 1;         /* stride when accessing inputs */
-    int padding_mode = 0;   /* padding mode */
-    char type = 'A';        /* 'A': ALL, 'F': FP, 'B': BP, 'U', WU */
-    char format = 'A';      /* 'A': ALL, 'L': LIBXSMM, 'T': Tensorflow, 'M', Mixed */
+    volatile int iters = 10;         /* repetitions of benchmark */
+    volatile int ifw = 14;           /* input width, "W" */
+    volatile int ifh = 20;           /* input height, "H" */
+    volatile int nImg = 32;          /* mini-batch size, "N" */
+    volatile int nIfm = 256;         /* number of input feature maps, "C" */
+    volatile int nOfm = 512;         /* number of output feature maps, "K" */
+    volatile int kh = 3;             /* filter height, "R" */
+    volatile int kw = 3;             /* filter width, "S" */
+    volatile int padh = 0;           /* padding in input, height */
+    volatile int padw = 0;           /* padding in input, width */
+    volatile int stride = 1;         /* stride when accessing inputs */
+    volatile int padding_mode = 0;   /* padding mode */
+    volatile char type = 'A';        /* 'A': ALL, 'F': FP, 'B': BP, 'U', WU */
+    volatile char format = 'A';      /* 'A': ALL, 'L': LIBXSMM, 'T': Tensorflow, 'M', Mixed */
 
     // Additional Setting for vectorization
     /* initially using fixed dataset, will have argv to set VLEN */
-    int VLEN = 4;
-    int RB_p= 4;
-    int RB_q = 4;
+    volatile int VLEN = 4;
+    volatile int RB_p= 4;
+    volatile int RB_q = 4;
 
 #if defined(_OPENMP)
     int nThreads = omp_get_max_threads(); /* number of threads */
