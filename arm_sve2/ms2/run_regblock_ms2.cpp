@@ -76,7 +76,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
     int nOfm = nOfm/VLEN;
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    int n, k_b, c_b, oj_b, oj, ij, oi_b, oi, ii, r, s, c, k, p, q, ijo, iio;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
