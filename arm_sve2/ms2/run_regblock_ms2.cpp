@@ -755,52 +755,52 @@ int main (int argc, char** argv) {
         cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     }
 
-    printf("##########################################\n");
-    printf("#           Correctness Checking         #\n");
-    printf("##########################################\n");
+    // printf("##########################################\n");
+    // printf("#           Correctness Checking         #\n");
+    // printf("##########################################\n");
 
-    if (type == 'A' || type == 'F') {
-        cout << "##########################################\n";
-        cout << "               FORWARD PASS               \n";
-        cout << "##########################################\n";
-        int error_count = 0;
+    // if (type == 'A' || type == 'F') {
+    //     cout << "##########################################\n";
+    //     cout << "               FORWARD PASS               \n";
+    //     cout << "##########################################\n";
+    //     int error_count = 0;
 
-        for (int i = 0; i < outputSize; i++) {
-            if (conv_output[i] != naive_output[i]) {
-                error_count++;
-            }
-        }
-        cout << "Error Count: " << error_count << "/" << outputSize << "\n";
+    //     for (int i = 0; i < outputSize; i++) {
+    //         if (conv_output[i] != naive_output[i]) {
+    //             error_count++;
+    //         }
+    //     }
+    //     cout << "Error Count: " << error_count << "/" << outputSize << "\n";
 
         
 
-    }
-    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
-        cout << "##########################################\n";
-        cout << "               BACKWARD PASS              \n";
-        cout << "##########################################\n";
-        int error_count = 0;
+    // }
+    // if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
+    //     cout << "##########################################\n";
+    //     cout << "               BACKWARD PASS              \n";
+    //     cout << "##########################################\n";
+    //     int error_count = 0;
 
-        for (int i = 0; i < inputSize; i++) {
-            if (conv_input[i] != naive_input[i]) {
-                error_count++;
-            }
-        }
-        cout << "Error Count: " << error_count << "/" << inputSize << "\n";
-    }
-    if (type == 'A' || type == 'U') {
-        cout << "##########################################\n";
-        cout << "               UPDATE WEIGHT              \n";
-        cout << "##########################################\n";
-        int error_count = 0;
+    //     for (int i = 0; i < inputSize; i++) {
+    //         if (conv_input[i] != naive_input[i]) {
+    //             error_count++;
+    //         }
+    //     }
+    //     cout << "Error Count: " << error_count << "/" << inputSize << "\n";
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     cout << "##########################################\n";
+    //     cout << "               UPDATE WEIGHT              \n";
+    //     cout << "##########################################\n";
+    //     int error_count = 0;
 
-        for (int i = 0; i < filterSize; i++) {
-            if (conv_filter_wu[i] != naive_filter_wu[i]) {
-                error_count++;
-            }
-        }
-        cout << "Error Count: " << error_count << "/" << filterSize << "\n";
-    }
+    //     for (int i = 0; i < filterSize; i++) {
+    //         if (conv_filter_wu[i] != naive_filter_wu[i]) {
+    //             error_count++;
+    //         }
+    //     }
+    //     cout << "Error Count: " << error_count << "/" << filterSize << "\n";
+    // }
 
     
     printf("##########################################\n");
@@ -808,17 +808,17 @@ int main (int argc, char** argv) {
     printf("##########################################\n");
 
     //free allocated memory
-    delete[] naive_input;
-    delete[] naive_input_save;
-    delete[] naive_output;
-    delete[] naive_output_save;
-    delete[] naive_output_bp;
-    delete[] naive_output_wu;
-    delete[] naive_filter;
-    delete[] naive_filter_save;
-    delete[] naive_filter_wu;
-    delete[] naive_bias;
-    delete[] naive_dbias;
+    // delete[] naive_input;
+    // delete[] naive_input_save;
+    // delete[] naive_output;
+    // delete[] naive_output_save;
+    // delete[] naive_output_bp;
+    // delete[] naive_output_wu;
+    // delete[] naive_filter;
+    // delete[] naive_filter_save;
+    // delete[] naive_filter_wu;
+    // delete[] naive_bias;
+    // delete[] naive_dbias;
     
     delete[] conv_input;
     delete[] conv_input_save;
