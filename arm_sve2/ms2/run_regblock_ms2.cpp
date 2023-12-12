@@ -720,7 +720,20 @@ int main (int argc, char** argv) {
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
         printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
-        for (int i = 0; i < outputSize; i++) {
+        cout << "Input" << endl;
+        for (int i = 0; i < 10; i++) {
+            cout << conv_input[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Filter" << endl;
+        for (int i = 0; i < 10; i++) {
+            cout << conv_filter[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Output" << endl;
+        for (int i = 0; i < 10; i++) {
             cout << conv_output[i] << " ";
         }
         cout << endl;
