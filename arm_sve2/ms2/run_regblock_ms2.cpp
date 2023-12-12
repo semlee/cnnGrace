@@ -456,8 +456,8 @@ int main (int argc, char** argv) {
     // Additional Setting for vectorization
     /* initially using fixed dataset, will have argv to set VLEN */
     int VLEN = 4;
-    int RB_p= 1;
-    int RB_q = 1;
+    int RB_p= 4;
+    int RB_q = 4;
 
 #if defined(_OPENMP)
     int nThreads = omp_get_max_threads(); /* number of threads */
