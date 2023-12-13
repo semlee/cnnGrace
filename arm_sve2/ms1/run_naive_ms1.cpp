@@ -627,7 +627,7 @@ int main (int argc, char** argv) {
     //         error_count++;
     //     }
     // }
-    cout << "Error Count: " << error_count << "/" << outputSize << "\n";
+    // cout << "Error Count: " << error_count << "/" << outputSize << "\n";
     /*
     for (int i = 0; i < outputSize; i++) {
         cout << naive_output[i] << endl;
