@@ -201,7 +201,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                                     if (iio + ki < 0 || iio + ki >= ifw) continue;      
                                         const svbool_t pred_ofm = svwhilelt_b32(ofm, nOfm);
                                         const svbool_t pred_ifm = svwhilelt_b32(ifm, nIfm); 
-                                        const svbool_t pred_all = svand(pred_ofm, pred_ifm); // Combined predicate for filter
+                                        const svbool_t pred_all = svand_b_z(svptrue_b32(), pred_ofm, pred_ifm); // Combined predicate for filter
 
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                 ifm * ifhp * ifwp + 
@@ -227,7 +227,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                                         outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
                                         // Store result back
-                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
+                                        svst1_f32(pred_ofm, output + outputIndex, outputVector);
                                     }
                                 }
                             }
