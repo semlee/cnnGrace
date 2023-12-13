@@ -670,16 +670,9 @@ int main (int argc, char** argv) {
 
     //free allocated memory
     delete[] naive_input;
-    delete[] naive_input_save;
     delete[] naive_output;
-    delete[] naive_output_save;
-    delete[] naive_output_bp;
-    delete[] naive_output_wu;
     delete[] naive_filter;
-    delete[] naive_filter_save;
-    delete[] naive_filter_wu;
     delete[] naive_bias;
-    delete[] naive_dbias;
     
     printf("##########################################\n");
     printf("#                Complete.               #\n");
