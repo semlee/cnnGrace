@@ -737,7 +737,7 @@ int main (int argc, char** argv) {
     float* conv_filter = new float[filterSize];
     float* conv_bias = new float[nOfm];
     fill_random_array(conv_input, inputSize);
-    fill_random_array(conv_filter, filter_size);
+    fill_random_array(conv_filter, filterSize);
     
     if (!conv_input || !conv_output || !conv_filter || !conv_bias) {
         // Handle memory allocation failure
