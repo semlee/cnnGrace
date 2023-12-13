@@ -48,7 +48,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-
+__attribute__((optimize("O0")))
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
