@@ -19,33 +19,6 @@ using std::endl;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
-typedef struct {
-  int nImg;
-  int nIfm;
-  int nOfm;
-  int ifhp;
-  int ifwp;
-  int ifh;
-  int ifw;
-  int ofhp;
-  int ofwp;
-  int ofh;
-  int ofw;
-  int pad_h;
-  int pad_w;
-  int pad_h_in;
-  int pad_w_in;
-  int pad_h_out;
-  int pad_w_out;
-  int kh;
-  int kw;
-  int stride_h;
-  int stride_w;
-  int VLEN;
-  int RB_p;
-  int RB_q;
-} conv_t;
-
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;

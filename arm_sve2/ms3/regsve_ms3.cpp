@@ -2,15 +2,17 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "regblock_ms2.h"
+#include "regsve_ms3.h"
 
-//additional header for parallelization
 #if defined(_OPENMP)
 # include <omp.h>
 #endif
-// #include <arm_sve.h>
+#include <arm_sve.h>
 
-void reg_block_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+using std::cout;
+using std::endl;
+
+void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -44,57 +46,59 @@ void reg_block_conv_fp(conv_t* param, const float* input, float* output, const f
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
-#endif
-    for (img = 0; img < nImg; img++) {
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
-                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
+#endif                                              
+    for (img = 0; img < nImg; img++) { //N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //C_b
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {  //K_b
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h;
-                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
                         oi = oi_b * RB_p;
-                        ii = oi * stride_h;
-                        for (kj = 0; kj < kh; kj++) {
-                            for (ki = 0; ki < kw; ki++) {
-                                for (ofm = 0; ofm < VLEN; ofm++) {
-                                    for (ifm = 0; ifm < VLEN; ifm++) {
-                                        for (p = 0; p < RB_p; p++) {
-                                            ijo = ij + stride_h * p - pad_h;
-                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                            for (q = 0; q < RB_q; q++) {
-                                                iio = ii + stride_w * q - pad_w;
-                                                if (iio + ki < 0 || iio + ki >= ifw) continue;
-                                                //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
-                                                // Check boundary conditions
-                                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                        ifm_b * ifhp * ifwp * VLEN+ 
-                                                                        (ijo + kj) * ifwp * VLEN + 
-                                                                        (iio + ki) * VLEN +
-                                                                        ifm;
-                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                        ofm_b * ofhp * ofwp * VLEN + 
-                                                                        oj * ofwp * VLEN + 
-                                                                        oi * VLEN +
-                                                                        ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
-                                                                        ifm_b * kh * kw * VLEN * VLEN + 
-                                                                        kj * kw * VLEN * VLEN + 
-                                                                        ki * VLEN * VLEN + 
-                                                                        ofm * VLEN + 
-                                                                        ifm;
-                                                
-                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
-                                            }
-                                        }
+                        ii = oi * stride_w;
+                        for (kj = 0; kj < kh; kj++) { //R
+                            for (ki = 0; ki < kw; ki++) { //S
+                                for (p = 0; p < RB_p; p++) { //P
+                                ijo = ij + stride_h * p - pad_h;
+                                if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                for (q = 0; q < RB_q; q++) { //Q
+                                    iio = ii + stride_w * q - pad_w;
+                                    if (iio + ki < 0 || iio + ki >= ifw) continue;      
+                                        size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                ifm_b * ifhp * ifwp * VLEN+ 
+                                                                (ijo + kj) * ifwp * VLEN + 
+                                                                (iio + ki) * VLEN;
+                                                                
+                                        size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                ofm_b * ofhp * ofwp * VLEN + 
+                                                                (oj + p) * ofwp * VLEN + 
+                                                                (oi + q) * VLEN;
+
+                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
+                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN;
+
+                                        // Load vectors using SVE intrinsics
+                                        svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
+                                        svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
+                                        svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
+
+                                        // run Vector MAC Unit
+                                        outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
+
+                                        // Store result back
+                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
                                     }
                                 }
                             }
                         }
                     }
                 }
+            }
 #if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-            // Apply ReLU activation function
+        // Apply ReLU activation function
             for (int oj = 0; oj < ofh; oj++) {
                 for (int oi = 0; oi < ofw; oi++) {
                     int reluIndex = img * nOfm_b * ofhp * ofwp +
@@ -105,13 +109,13 @@ void reg_block_conv_fp(conv_t* param, const float* input, float* output, const f
                 }
             }
 #endif
-            }
         }
     }
 
 }
 
-void reg_block_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
+
+void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
     int N         = param->nImg;
@@ -179,7 +183,7 @@ void reg_block_conv_bp(conv_t* param, float* input, const float* output, const f
 
 }
 
-void reg_block_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
+void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
 
     // Fetch data from param struct
     int N         = param->nImg;

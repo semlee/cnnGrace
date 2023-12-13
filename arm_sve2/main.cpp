@@ -4,8 +4,10 @@
 #include <ctime>
 
 //include cumstom header files
+#include "main.h"
 #include "ms1/naive_ms1.h"
 #include "ms2/regblock_ms2.h"
+#include "ms3/regsve_ms3.h"
 
 //used for performance count
 #include <chrono>
