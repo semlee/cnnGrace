@@ -118,8 +118,8 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                         ifm_b * kh * kw * VLEN * VLEN + 
                                                                         kj * kw * VLEN * VLEN + 
                                                                         ki * VLEN * VLEN + 
-                                                                        ofm * VLEN + 
-                                                                        ifm;
+                                                                        ifm * VLEN + 
+                                                                        ofm;
                                                 // size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                 //                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
                                                 //                         (ij + kj) * ifwp + 
