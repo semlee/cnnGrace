@@ -24,27 +24,16 @@ using std::endl;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
-void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
+void fill_random_array(float* input_array, size_t indexSize) {
     // Seed the random number generator
-    time_t t;
-    srand(static_cast<unsigned int>(time(&t)));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
 
-    for (size_t i = 0; i < A; i++) {
-        for (size_t j = 0; j < B; j++) {
-            for (size_t k = 0; k < C; k++) {
-                for (size_t l = 0; l < D; l++) {
-                    // Convert multi-dimensional indices to a flat index
-                    size_t flatIndex = i * B * C * D + j * C * D + k * D + l;
-                    // Generate a random float value between 0 and 1
-                    float random_value = static_cast<float>(rand()) / RAND_MAX;
-                    // Round to the thousandth place
-                    input_array[flatIndex] = round(random_value * 1000) / 1000.0f;
-                }
-            }
-        }
+    for (size_t i = 0; i < indexSize; i++) {
+        input_array[i] = dis(gen);
     }
 }
-
 
 int main (int argc, char** argv) {
 
@@ -107,6 +96,9 @@ int main (int argc, char** argv) {
     if (argc > i) padw       = atoi(argv[i++]);
     if (argc > i) padh       = atoi(argv[i++]);
     if (argc > i) stride     = atoi(argv[i++]);
+    if (argc > i) VLEN       = atoi(argv[i++]);
+    if (argc > i) RB_p       = atoi(argv[i++]);
+    if (argc > i) RB_q       = atoi(argv[i++]);
     if (argc > i) type       = *(argv[i++]);
     if (argc > i) format     = *(argv[i++]);
     if (argc > i) padding_mode = atoi(argv[i++]);
@@ -262,9 +254,8 @@ int main (int argc, char** argv) {
     float* naive_bias = new float[nOfm];
     float* naive_dbias = new float[nOfm];
 
-    fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
+    fill_random_array(naive_input, inputIndex);
+    fill_random_array(naive_filter, filterIndex);
 
     //IMPORTANT MALLOC : copy data to save
     for (size_t i = 0; i < inputSize; i++) {

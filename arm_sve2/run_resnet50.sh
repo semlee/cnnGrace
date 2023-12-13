@@ -10,15 +10,18 @@
 g++ -c main.cpp -o main.o -std=c++11
 g++ -c ms1/naive_ms1.cpp -o naive_ms1.o -std=c++11
 g++ -c ms2/regblock_ms2.cpp -o regblock_ms2.o -std=c++11
-g++ -c ms3/regblock_ms2.cpp -o regblock_ms2.o -std=c++11
+g++ -c ms3/regsve_ms3.cpp -o regsve_ms3.o -std=c++11
 # Link object files to create the executable
-g++ main.o naive_ms1.o regblock_ms2.o -o conv_layer -O3 -std=c++11
+g++ main.o naive_ms1.o regblock_ms2.o regsve_ms3.o -o conv_layer -O3 -std=c++11
 
 ITERS=1000
 MB=1
 TYPE='F'
 FORMAT='L'
 PAD=1
+VLEN=4
+RB_p=1
+RB_q=1
 
 # Define arrays for each parameter
 ifw_values=(224 56 56 56 56 56 28 28 28 28 28 14 14 14 14 14 7)
@@ -37,5 +40,5 @@ for i in "${!ifw_values[@]}"; do
     srun -N 1 -p cg1-high --exclusive ./conv_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} ${nImg_values[$i]} ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
-        $TYPE $FORMAT $PAD
+        $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD
 done

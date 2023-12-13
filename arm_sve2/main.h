@@ -54,6 +54,6 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1);
+void fill_random_array(float* input_array, size_t indexSize);
 
 #endif
