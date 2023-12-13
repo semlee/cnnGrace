@@ -290,7 +290,6 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
                                                                     (ijo + r) * ifwp * VLEN +
                                                                     (iio + s) * VLEN + 
                                                                     c;
-                                                // cout << inputIndex << " ";
 
                                                 size_t outputIndex = n * K_b * ofhp * ofwp * VLEN +
                                                                     k_b * ofhp * ofwp * VLEN +
@@ -466,9 +465,9 @@ void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, flo
         }
     }
 
-} 
+}
 
-void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
+void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1, size_t E = 1, size_t F = 1) {
     // Seed the random number generator
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -478,10 +477,20 @@ void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, s
         for (size_t j = 0; j < B; j++) {
             for (size_t k = 0; k < C; k++) {
                 for (size_t l = 0; l < D; l++) {
-                    // Convert multi-dimensional indices to a flat index
-                    size_t flatIndex = i * B * C * D + j * C * D + k * D + l;
-                    // Generate a random float value between -1 and 1
-                    input_array[flatIndex] = dis(gen);
+                    for (size_t m = 0; m < E; m++) {
+                        for (size_t n = 0; n < F; n++) {
+                            // Convert multi-dimensional indices to a flat index
+                            size_t flatIndex = i * B * C * D * E * F +
+                                               j * C * D * E * F + 
+                                               k * D * E * F + 
+                                               l * E * F +
+                                               m * F + 
+                                               n;
+                            // Generate a random float value between -1 and 1
+                            input_array[flatIndex] = dis(gen);
+                        }
+                    }
+                    
                 }
             }
         }
@@ -672,9 +681,9 @@ int main (int argc, char** argv) {
     */
 
     // Calculate the total sizes
-    size_t inputSize = nImg * nIfm * ifhp * ifwp * VLEN;
-    size_t outputSize = nImg * nOfm * ofhp * ofwp * VLEN;
-    size_t filterSize = nOfm * nIfm * kh * kw * VLEN * VLEN;
+    size_t inputSize = nImg * nIfm * ifhp * ifwp;
+    size_t outputSize = nImg * nOfm * ofhp * ofwp;
+    size_t filterSize = nOfm * nIfm * kh * kw;
 
     /* Allocate memory for naive arrays */
     // float* naive_input = new float[inputSize];
@@ -801,7 +810,7 @@ int main (int argc, char** argv) {
         printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
         printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
-        
+
         cout << "Input" << endl;
         for (int i = 0; i < 10; i++) {
             cout << conv_input[i] << " ";
