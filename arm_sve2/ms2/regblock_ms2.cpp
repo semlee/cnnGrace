@@ -52,19 +52,19 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
             for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
                 for (oj_b = 0; oj_b < ofh_b; oj_b++) {
                     oj = oj_b * RB_p;
-                    ij = oj * stride_h;
+                    ij = oj * stride_h - pad_h;
                     for (oi_b = 0; oi_b < ofw_b; oi_b++) {
                         oi = oi_b * RB_p;
-                        ii = oi * stride_h;
+                        ii = oi * stride_w - pad_w;
                         for (kj = 0; kj < kh; kj++) {
                             for (ki = 0; ki < kw; ki++) {
                                 for (ofm = 0; ofm < VLEN; ofm++) {
                                     for (ifm = 0; ifm < VLEN; ifm++) {
                                         for (p = 0; p < RB_p; p++) {
-                                            ijo = ij + stride_h * p - pad_h;
+                                            ijo = ij + stride_h * p;
                                             if (ijo + kj < 0 || ijo + kj >= ifh) continue;
                                             for (q = 0; q < RB_q; q++) {
-                                                iio = ii + stride_w * q - pad_w;
+                                                iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions

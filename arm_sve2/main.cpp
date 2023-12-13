@@ -310,7 +310,7 @@ int main (int argc, char** argv) {
     std::vector<float> naive_input(inputSize);
     std::vector<float> naive_input_save(inputSize);
 
-    std::vector<float> naive_output(outputSize);
+    std::vector<float> naive_output(outputSize 0.0f);
     std::vector<float> naive_output_bp = naive_output;
     std::vector<float> naive_output_wu = naive_output;
 
@@ -330,7 +330,7 @@ int main (int argc, char** argv) {
     std::vector<float> conv_input(inputSize);
     std::vector<float> conv_input_save(inputSize);
 
-    std::vector<float> conv_output(outputSize);
+    std::vector<float> conv_output(outputSize,  0.0f);
     std::vector<float> conv_output_bp = conv_output;
     std::vector<float> conv_output_wu = conv_output;
 
