@@ -14,9 +14,9 @@ MB=1
 TYPE='F'
 FORMAT='L'
 PAD=1
-VLEN=4
-RB_p=1
-RB_q=1
+VLEN=4 #128bit = 32bit * 4
+RB_p=7
+RB_q=7
 
 # Define arrays for each parameter
 ifw_values=(224 56 56 56 56 56 28 28 28 28 28 14 14 14 14 14 7)
