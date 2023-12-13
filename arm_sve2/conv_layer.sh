@@ -55,6 +55,6 @@ fi
 
 rm main.o
 rm naive_ms1.o
-rm regblock_ms2.o
+# rm regblock_ms2.o
 rm regsve_ms3.o
-# rm conv_layer
+rm conv_layer
