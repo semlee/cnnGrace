@@ -3,7 +3,7 @@
 #SBATCH -t 0-00:30:00
 #SBATCH -J conv_layer
 #SBATCH -o output-%j.out -e output-%j.err
-#SBATCH -c 1
+#SBATCH -c 72
 
 iters=1000
 ifw=56
