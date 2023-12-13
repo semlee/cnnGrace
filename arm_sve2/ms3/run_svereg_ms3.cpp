@@ -526,7 +526,7 @@ int main (int argc, char** argv) {
     float* conv_filter = new float[filterSize];
     float* conv_bias = new float[nOfm];
     fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(conv_filter, nOfm, nIfm, kh, kw, VLEN, VLEN);
+    fill_random(conv_filter, nOfm, nIfm, kh, kw);
     bool debug = true;
 
 
