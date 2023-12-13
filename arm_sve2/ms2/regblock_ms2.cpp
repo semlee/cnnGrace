@@ -56,23 +56,21 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                         oi = oi_b * RB_p;
                         ii = oi * stride_h;
                         for (kj = 0; kj < kh; kj++) {
-                            if (ij + kj < 0 || ij + kj >= ifh) continue;
                             for (ki = 0; ki < kw; ki++) {
-                                if (ii + ki < 0 || ii + ki >= ifw) continue;
-                                for (ofm = 0; ofm <= VLEN; ofm++) {
-                                    for (ifm = 0; ifm <= VLEN; ifm++) {
-                                        for (p = 0; p <= RB_p; p++) {
-                                            for (q = 0; q <= RB_q; q++) {
-                                                ijo = ij + stride_h * p - pad_h;
+                                for (ofm = 0; ofm < VLEN; ofm++) {
+                                    for (ifm = 0; ifm < VLEN; ifm++) {
+                                        for (p = 0; p < RB_p; p++) {
+                                            ijo = ij + stride_h * p - pad_h;
+                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                            for (q = 0; q < RB_q; q++) {
                                                 iio = ii + stride_w * q - pad_w;
+                                                if (iio + ki < 0 || iio + ki >= ifw) continue;
                                                 //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
                                                 // Check boundary conditions
-                                                
-
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
-                                                                        (ij + kj) * ifwp * VLEN + 
-                                                                        (ii + ki) * VLEN +
+                                                                        (ijo + kj) * ifwp * VLEN + 
+                                                                        (iio + ki) * VLEN +
                                                                         ifm;
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                         ofm_b * ofhp * ofwp * VLEN + 
