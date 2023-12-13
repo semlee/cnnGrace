@@ -204,17 +204,17 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                                         const svbool_t pred_all = svand_b_z(svptrue_b32(), pred_ofm, pred_ifm); // Combined predicate for filter
                                         int VLEN = svcntw();
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                ifm_b * ifhp * ifwp * VLEN+ 
+                                                                ifm * ifhp * ifwp * VLEN+ 
                                                                 (ijo + kj) * ifwp * VLEN + 
                                                                 (iio + ki) * VLEN;
                                                                 
                                         size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                ofm_b * ofhp * ofwp * VLEN + 
+                                                                ofm * ofhp * ofwp * VLEN + 
                                                                 (oj + p) * ofwp * VLEN + 
                                                                 (oi + q) * VLEN;
 
-                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
-                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                        size_t filterIndex =    ofm * nIfm * kh * kw * VLEN + 
+                                                                ifm * kh * kw * VLEN * VLEN + 
                                                                 kj * kw * VLEN * VLEN + 
                                                                 ki * VLEN * VLEN;
 
