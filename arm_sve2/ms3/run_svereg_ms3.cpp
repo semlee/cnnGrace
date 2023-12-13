@@ -331,7 +331,7 @@ void fill_random_array(float* input_array, size_t indexSize) {
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
 
-    for (size_t = 0; i < indexSize; i++) {
+    for (size_t i = 0; i < indexSize; i++) {
         input_array[i] = dis(gen);
     }
 }
@@ -597,7 +597,7 @@ int main (int argc, char** argv) {
             cout << conv_output[i] << " ";
         }
         cout << endl;
-        
+
         // arm_sve_conv_fp_original(&conv_param, conv_input, conv_output_save, conv_filter, conv_bias);
         // for (int i = 0; i < outputSize; i++) {
         //     if (conv_output[i] != conv_output_save[i]) {
@@ -607,7 +607,7 @@ int main (int argc, char** argv) {
         // cout << "Error Count: " << error_count << "/" << outputSize << "\n";
 
     }
-
+    /*
     if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
         cout << "##########################################\n";
         cout << "               BACKWARD PASS              \n";
@@ -632,6 +632,8 @@ int main (int argc, char** argv) {
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         cout << "Total time consumed: " << duration_sec.count() << "ms\n";
     }
+    */
+
     /*
     printf("##########################################\n");
     printf("#           Correctness Checking         #\n");
