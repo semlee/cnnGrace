@@ -238,72 +238,114 @@ int main (int argc, char** argv) {
     size_t outputSize = nImg * nOfm * ofhp * ofwp;
     size_t filterSize = nOfm * nIfm * kh * kw;
 
+    // /* Allocate memory for naive arrays */
+    // /* NAIVE MEMORY */
+    // // Forward Pass (Output += Input * Filter)
+    // float* naive_input = new float[inputSize];
+    // float* naive_output = new float[outputSize];
+    // float* naive_filter = new float[filterSize];
+    // float* naive_bias = new float[nOfm];
+    // fill_random_array(naive_input, inputSize);
+    // fill_random_array(naive_filter, filterSize);
+
+    // // Backward Pass (Input += Output * Filter)
+    // if (type == 'A' || type == 'B' || type == 'U') {
+    //     float* naive_input_save = new float[inputSize];
+    //     float* naive_output_bp = naive_output;
+    //     for (int i = 0; i < inputSize; i++) {
+    //         naive_input_save[i] = naive_input[i];
+    //     }
+    // }
+
+    // // Update Weight (Filter += Input * Output)
+    // if (type == 'A' || type == 'U') {
+    //     float* naive_filter_wu = new float[filterSize];
+    //     float* naive_output_wu = naive_output;
+    // }
+
+    // // Miscellaneous
+    // /*
+    // float* naive_output_save = new float[outputSize]
+    // float* naive_filter_save = new float[filterSize];
+    // float* naive_dbias = new float[nOfm]
+    // for (size_t i = 0; i < outputSize; i++) {
+    //     naive_output_save[i] = naive_output[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     naive_filter_save[i] = naive_filter[i];
+    // }
+    // */
+
+    // /* CONV MEMORY */
+    // // Forward Pass
+    // float* conv_input = new float[inputSize];
+    // float* conv_filter = new float[filterSize];
+    // float* conv_output = new float[outputSize];
+    // float* conv_bias = new float[nOfm];
+    // for (size_t i = 0; i < inputSize; i++) {
+    //     conv_input[i] = naive_input[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     conv_filter[i] = naive_filter[i];
+    // }
+
+    // // Backward Pass
+    // if (type == 'A' || type == 'B' || type == 'U') {
+    //     float* conv_output_bp = conv_output;
+    //     float* conv_input_save = new float[inputSize];
+    //     for (size_t i = 0; i < inputSize; i++) {
+    //         conv_input_save[i] = naive_input[i];
+    //     }
+    // }
+
+    // // Update Weight
+    // if (type == 'A' || type == 'U') {
+    //     float* conv_filter_wu = new float[filterSize];
+    //     float* conv_output_wu = conv_output;
+    // }
+    
     /* Allocate memory for naive arrays */
-    /* NAIVE MEMORY */
-    // Forward Pass (Output += Input * Filter)
     float* naive_input = new float[inputSize];
+    float* naive_input_save = new float[inputSize];
+
     float* naive_output = new float[outputSize];
+    float* naive_output_bp = naive_output;
+    float* naive_output_wu = naive_output;
+
     float* naive_filter = new float[filterSize];
+    float* naive_filter_wu = new float[filterSize];
+
     float* naive_bias = new float[nOfm];
+
     fill_random_array(naive_input, inputSize);
     fill_random_array(naive_filter, filterSize);
 
-    // Backward Pass (Input += Output * Filter)
-    if (type == 'A' || type == 'B' || type == 'U') {
-        float* naive_input_save = new float[inputSize];
-        float* naive_output_bp = naive_output;
-        for (int i = 0; i < inputSize; i++) {
-            naive_input_save[i] = naive_input[i];
-        }
+    //IMPORTANT MALLOC : copy data to save
+    for (size_t i = 0; i < inputSize; i++) {
+        naive_input_save[i] = naive_input[i];
     }
 
-    // Update Weight (Filter += Input * Output)
-    if (type == 'A' || type == 'U') {
-        float* naive_filter_wu = new float[filterSize];
-        float* naive_output_wu = naive_output;
-    }
-
-    // Miscellaneous
-    /*
-    float* naive_output_save = new float[outputSize]
-    float* naive_filter_save = new float[filterSize];
-    float* naive_dbias = new float[nOfm]
-    for (size_t i = 0; i < outputSize; i++) {
-        naive_output_save[i] = naive_output[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        naive_filter_save[i] = naive_filter[i];
-    }
-    */
-
-    /* CONV MEMORY */
-    // Forward Pass
+    /* Allocate memory for real convolutional arrays */
     float* conv_input = new float[inputSize];
-    float* conv_filter = new float[filterSize];
+    float* conv_input_save = new float[inputSize];
+
     float* conv_output = new float[outputSize];
+    float* conv_output_bp = conv_output;
+    float* conv_output_wu = conv_output;
+
+    float* conv_filter = new float[filterSize];
+    float* conv_filter_wu = new float[filterSize];
+
     float* conv_bias = new float[nOfm];
+
+    //IMPORTANT MALLOC : copy data to save
     for (size_t i = 0; i < inputSize; i++) {
         conv_input[i] = naive_input[i];
+        conv_input_save[i] = naive_input[i];
     }
     for (size_t i = 0; i < filterSize; i++) {
         conv_filter[i] = naive_filter[i];
     }
-
-    // Backward Pass
-    if (type == 'A' || type == 'B' || type == 'U') {
-        float* conv_output_bp = conv_output;
-        float* conv_input_save = new float[inputSize];
-        for (size_t i = 0; i < inputSize; i++) {
-            conv_input_save[i] = naive_input[i];
-        }
-    }
-
-    // Update Weight
-    if (type == 'A' || type == 'U') {
-        float* conv_filter_wu = new float[filterSize];
-        float* conv_output_wu = conv_output;
-    }
-    
     bool debug = false;
 
     if (debug) {
@@ -487,43 +529,43 @@ int main (int argc, char** argv) {
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");
     
-    //free allocated memory
-    /* NAIVE MEMORY*/
-    delete[] naive_input;
-    delete[] naive_output;
-    delete[] naive_filter;
-    delete[] naive_bias;
-    if (type == 'A' || type == 'B' || type = 'U') {
-        delete[] naive_input_save;
-    }
-    if (type == 'A' || type == 'U') {
-        delete[] naive_filter_wu;
-    }
-    //Miscellaneous
-    /*
-    delete[] naive_output_save;
-    delete[] naive_filter_save;
-    delete[] naive_dbias;
-    */
+    // //free allocated memory
+    // /* NAIVE MEMORY*/
+    // delete[] naive_input;
+    // delete[] naive_output;
+    // delete[] naive_filter;
+    // delete[] naive_bias;
+    // if (type == 'A' || type == 'B' || type = 'U') {
+    //     delete[] naive_input_save;
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     delete[] naive_filter_wu;
+    // }
+    // //Miscellaneous
+    // /*
+    // delete[] naive_output_save;
+    // delete[] naive_filter_save;
+    // delete[] naive_dbias;
+    // */
     
-    /* CONV MEMORY */
-    delete[] conv_input;
-    delete[] conv_output;
-    delete[] conv_filter;
-    delete[] conv_bias;
-    if (type == 'A' || type == 'B' || type = 'U') {
-        delete[] conv_input_save;
-    }
-    if (type == 'A' || type == 'U') {
-        delete[] conv_filter_wu;
-    }
-    //Miscellaneous
-    /*
-        delete[] conv_output_save;
-        delete[] conv_filter_save;
-        delete[] conv_dbias;
-    */
-    
+    // /* CONV MEMORY */
+    // delete[] conv_input;
+    // delete[] conv_output;
+    // delete[] conv_filter;
+    // delete[] conv_bias;
+    // if (type == 'A' || type == 'B' || type = 'U') {
+    //     delete[] conv_input_save;
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     delete[] conv_filter_wu;
+    // }
+    // //Miscellaneous
+    // /*
+    //     delete[] conv_output_save;
+    //     delete[] conv_filter_save;
+    //     delete[] conv_dbias;
+    // */
+
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
