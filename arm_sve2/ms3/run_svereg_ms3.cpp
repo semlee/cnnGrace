@@ -673,7 +673,7 @@ int main (int argc, char** argv) {
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = (double)duration_sec.count();
+        double l_total = (double)duration_sec.count() * 1e-3;
         
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
@@ -683,22 +683,22 @@ int main (int argc, char** argv) {
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
         printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
-        cout << "Input" << endl;
-        for (int i = 0; i < 10; i++) {
-            cout << conv_input[i] << " ";
-        }
-        cout << endl;
+        // cout << "Input" << endl;
+        // for (int i = 0; i < 10; i++) {
+        //     cout << conv_input[i] << " ";
+        // }
+        // cout << endl;
 
-        cout << "Filter" << endl;
-        for (int i = 0; i < 10; i++) {
-            cout << conv_filter[i] << " ";
-        }
-        cout << endl;
+        // cout << "Filter" << endl;
+        // for (int i = 0; i < 10; i++) {
+        //     cout << conv_filter[i] << " ";
+        // }
+        // cout << endl;
 
-        cout << "Output" << endl;
-        for (int i = 0; i < outputSize; i++) {
-            cout << conv_output[i] << " ";
-        }
+        // cout << "Output" << endl;
+        // for (int i = 0; i < outputSize; i++) {
+        //     cout << conv_output[i] << " ";
+        // }
         
         // arm_sve_conv_fp_original(&conv_param, conv_input, conv_output_save, conv_filter, conv_bias);
         // for (int i = 0; i < outputSize; i++) {
