@@ -91,18 +91,39 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                         oi = oi_b * RB_p;
                         ii = oi * stride_h;
                         for (kj = 0; kj < kh; kj++) {
-                            if (ij + kj < 0 || ij + kj >= ifh) continue;
                             for (ki = 0; ki < kw; ki++) {
-                                if (ii + ki < 0 || ii + ki >= ifw) continue;
-                                for (p = 0; p <= RB_p; p++) {
-                                    for (q = 0; q <= RB_q; q++) {
-                                        ijo = ij + stride_h * p - pad_h;
-                                        iio = ii + stride_w * q - pad_w;
+                                for (ofm = 0; ofm < VLEN; ofm++) {
+                                    for (ifm = 0; ifm < VLEN; ifm++) {
+                                        for (p = 0; p < RB_p; p++) {
+                                            ijo = ij + stride_h * p - pad_h;
+                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                            for (q = 0; q < RB_q; q++) {
+                                                iio = ii + stride_w * q - pad_w;
+                                                if (iio + ki < 0 || iio + ki >= ifw) continue;
+                                                
+
+    for (img = 0; img < nImg; img++) {
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_h;
+                        for (kj = 0; kj < kh; kj++) {
+                            for (ki = 0; ki < kw; ki++) {
+                                for (p = 0; p < RB_p; p++) {
+                                ijo = ij + stride_h * p - pad_h;
+                                if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                for (q = 0; q < RB_q; q++) {
+                                    iio = ii + stride_w * q - pad_w;
+                                    if (iio + ki < 0 || iio + ki >= ifw) continue;      
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                 ifm_b * ifhp * ifwp * VLEN+ 
-                                                                (ij + kj) * ifwp * VLEN + 
-                                                                (ii + ki) * VLEN;
-
+                                                                (ijo + kj) * ifwp * VLEN + 
+                                                                (iio + ki) * VLEN;
+                                                                
                                         size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                 ofm_b * ofhp * ofwp * VLEN + 
                                                                 oj * ofwp * VLEN + 
