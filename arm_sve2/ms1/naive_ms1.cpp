@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 #include "naive_ms1.h"
 
@@ -71,7 +72,7 @@ kj = r
 ki = s
 */
 
-void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void naive_conv_fp(naive_conv_t* param, const std::vector<float>& input, std::vector<float>& output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -141,7 +142,7 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
     }
 }
 
-void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
+void naive_conv_bp(naive_conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -201,7 +202,7 @@ void naive_conv_bp(naive_conv_t* param, float* input, const float* output, const
     }
 }
 
-void naive_conv_uw(naive_conv_t* param, const float* input, const float* output, float* filter) {
+void naive_conv_uw(naive_conv_t* param, const std::vector<float>& input, const std::vector<float>& output, std::vector<float>& filter) {
 
     // Fetch data from param struct
     int nImg      = param->nImg;

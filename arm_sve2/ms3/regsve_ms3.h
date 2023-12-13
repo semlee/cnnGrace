@@ -29,11 +29,11 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias);
+void arm_sve_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias);
 
-void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save);
+void arm_sve_conv_bp(conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save);
 
-void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, float* filter);
+void arm_sve_conv_uw(conv_t* param, const std::vector<float>& input, const std::vector<float>& output, std::vector<float>& filter);
 
 
 

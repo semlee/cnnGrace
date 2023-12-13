@@ -4,6 +4,7 @@
 #include <ctime>
 #include <random>
 #include <algorithm>
+#include <vector>
 
 //include cumstom header files
 #include "ms1/naive_ms1.h"
@@ -25,7 +26,7 @@ using std::endl;
 using std::chrono::high_resolution_clock;
 using std::chrono::duration;
 
-void fill_random_array(float* input_array, size_t indexSize) {
+void fill_random_array(std::vector<float>& input_array, size_t indexSize) {
     // Seed the random number generator
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -306,39 +307,42 @@ int main (int argc, char** argv) {
     // }
     
     /* Allocate memory for naive arrays */
-    float* naive_input = new float[inputSize];
-    float* naive_input_save = new float[inputSize];
-    
-    float* naive_output = new float[outputSize];
-    float* naive_output_bp = naive_output;
-    float* naive_output_wu = naive_output;
+    std::vector<float> naive_input(inputSize);
+    std::vector<float> naive_input_save(inputSize);
 
-    float* naive_filter = new float[filterSize];
-    float* naive_filter_wu = new float[filterSize];
+    std::vector<float> naive_output(outputSize);
+    std::vector<float> naive_output_bp = naive_output;
+    std::vector<float> naive_output_wu = naive_output;
 
-    float* naive_bias = new float[nOfm];
+    std::vector<float> naive_filter(filterSize);
+    std::vector<float> naive_filter_wu(filterSize);
 
+    std::vector<float> naive_bias(nOfm);
+
+    // Fill arrays with random values
     fill_random_array(naive_input, inputSize);
     fill_random_array(naive_filter, filterSize);
 
-    std::copy(naive_input, naive_input + inputSize, naive_input_save);
+    // Copy values
+    std::copy(naive_input.begin(), naive_input.end(), naive_input_save.begin());
 
-    /* Allocate memory for real convolutional arrays */
-    float* conv_input = new float[inputSize];
-    float* conv_input_save = new float[inputSize];
+    // Allocate memory for real convolutional arrays
+    std::vector<float> conv_input(inputSize);
+    std::vector<float> conv_input_save(inputSize);
 
-    float* conv_output = new float[outputSize];
-    float* conv_output_bp = conv_output;
-    float* conv_output_wu = conv_output;
+    std::vector<float> conv_output(outputSize);
+    std::vector<float> conv_output_bp = conv_output;
+    std::vector<float> conv_output_wu = conv_output;
 
-    float* conv_filter = new float[filterSize];
-    float* conv_filter_wu = new float[filterSize];
+    std::vector<float> conv_filter(filterSize);
+    std::vector<float> conv_filter_wu(filterSize);
 
-    float* conv_bias = new float[nOfm];
+    std::vector<float> conv_bias(nOfm);
 
-    std::copy(naive_input, naive_input + inputSize, conv_input);
-    std::copy(naive_input, naive_input + inputSize, conv_input_save);
-    std::copy(naive_filter, naive_filter + filterSize, conv_filter);
+    // Copy values
+    std::copy(naive_input.begin(), naive_input.end(), conv_input.begin());
+    std::copy(naive_input.begin(), naive_input.end(), conv_input_save.begin());
+    std::copy(naive_filter.begin(), naive_filter.end(), conv_filter.begin());
  
     bool debug = false;
 
@@ -560,20 +564,6 @@ int main (int argc, char** argv) {
     //     delete[] conv_dbias;
     // */
 
-    //free allocated memory
-    delete[] naive_input;
-    delete[] naive_input_save;
-    delete[] naive_output;
-    delete[] naive_filter;
-    delete[] naive_filter_wu;
-    delete[] naive_bias;
-    
-    delete[] conv_input;
-    delete[] conv_input_save;
-    delete[] conv_output;
-    delete[] conv_filter;
-    delete[] conv_filter_wu;
-    delete[] conv_bias;
 
     printf("##########################################\n");
     printf("#                Complete.               #\n");

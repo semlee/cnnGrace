@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <vector>
 
 #include "regblock_ms2.h"
 
@@ -10,7 +11,7 @@
 #endif
 // #include <arm_sve.h>
 
-void reg_block_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -111,7 +112,7 @@ void reg_block_conv_fp(conv_t* param, const float* input, float* output, const f
 
 }
 
-void reg_block_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
+void reg_block_conv_bp(conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save) {
 
     // Fetch data from param struct
     int N         = param->nImg;
@@ -179,7 +180,7 @@ void reg_block_conv_bp(conv_t* param, float* input, const float* output, const f
 
 }
 
-void reg_block_conv_uw(conv_t* param, const float* input, const float* output, float* filter) {
+void reg_block_conv_uw(conv_t* param, const std::vector<float>& input, const std::vector<float>& output, std::vector<float>& filter) {
 
     // Fetch data from param struct
     int N         = param->nImg;

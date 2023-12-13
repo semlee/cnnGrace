@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <vector> 
 
 #include "regsve_ms3.h"
 
@@ -12,7 +13,7 @@
 using std::cout;
 using std::endl;
 
-void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
