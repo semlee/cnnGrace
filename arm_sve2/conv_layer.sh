@@ -23,7 +23,7 @@ type='F'
 format='L'
 padding_mode=1
 
-export OMP_NUM_THREADS = 72
+export OMP_NUM_THREADS=72
 # Compile individual source files
 g++ -c main.cpp -o main.o -fopenmp -std=c++11
 g++ -c ms1/naive_ms1.cpp -o naive_ms1.o -fopenmp -std=c++11
