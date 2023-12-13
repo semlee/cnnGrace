@@ -6,8 +6,8 @@
 
 //include cumstom header files
 #include "ms1/naive_ms1.h"
-#include "ms2/regblock_ms2.h"
-// #include "ms3/regsve_ms3.h"
+// #include "ms2/regblock_ms2.h"
+#include "ms3/regsve_ms3.h"
 
 //used for performance count
 #include <chrono>
@@ -17,7 +17,7 @@
 #if defined(_OPENMP)
 # include <omp.h>
 #endif
-// #include <arm_sve.h>
+#include <arm_sve.h>
 
 using std::cout;
 using std::endl;
@@ -407,7 +407,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        reg_block_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
@@ -432,7 +432,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        reg_block_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
+        arm_sve_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
@@ -453,7 +453,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        reg_block_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
+        arm_sve_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
