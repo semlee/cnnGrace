@@ -74,15 +74,15 @@ void reg_block_conv_fp(conv_t* param, const float* input, float* output, const f
                                                                         ifm;
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                         ofm_b * ofhp * ofwp * VLEN + 
-                                                                        oj * ofwp * VLEN + 
-                                                                        oi * VLEN +
+                                                                        (oj + p) * ofwp * VLEN + 
+                                                                        (oi + q) * VLEN +
                                                                         ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
                                                                         ifm_b * kh * kw * VLEN * VLEN + 
                                                                         kj * kw * VLEN * VLEN + 
                                                                         ki * VLEN * VLEN + 
-                                                                        ofm * VLEN + 
-                                                                        ifm;
+                                                                        ifm * VLEN + 
+                                                                        ofm;
                                                 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
