@@ -392,7 +392,7 @@ int main (int argc, char** argv) {
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
         //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = (double)duration_sec.count();
+        double l_total = (double)duration_sec.count() * 1e-3;
         
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
