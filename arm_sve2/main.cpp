@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <algorithm>
 
 //include cumstom header files
 #include "ms1/naive_ms1.h"
@@ -307,7 +308,7 @@ int main (int argc, char** argv) {
     /* Allocate memory for naive arrays */
     float* naive_input = new float[inputSize];
     float* naive_input_save = new float[inputSize];
-
+    
     float* naive_output = new float[outputSize];
     float* naive_output_bp = naive_output;
     float* naive_output_wu = naive_output;
@@ -320,9 +321,7 @@ int main (int argc, char** argv) {
     fill_random_array(naive_input, inputSize);
     fill_random_array(naive_filter, filterSize);
 
-    for (size_t i = 0; i < inputSize; i++) {
-        naive_input_save[i] = naive_input[i];
-    }
+    std::copy(naive_input, naive_input + inputSize, naive_input_save);
 
     /* Allocate memory for real convolutional arrays */
     float* conv_input = new float[inputSize];
@@ -337,13 +336,10 @@ int main (int argc, char** argv) {
 
     float* conv_bias = new float[nOfm];
 
-    for (size_t i = 0; i < inputSize; i++) {
-        conv_input[i] = naive_input[i];
-        conv_input_save[i] = naive_input[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        conv_filter[i] = naive_filter[i];
-    }
+    std::copy(naive_input, naive_input + inputSize, conv_input);
+    std::copy(naive_input, naive_input + inputSize, conv_input_save);
+    std::copy(naive_filter, naive_filter + filterSize, conv_filter);
+ 
     bool debug = false;
 
     if (debug) {
