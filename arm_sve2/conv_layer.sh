@@ -6,22 +6,22 @@
 #SBATCH -c 1
 
 iters=1000
-ifw=16
-ifh=16
-nImg=5
-nIfm=5
-nOfm=64
-kw=3
-kh=3
-padw=1
-padh=1
+ifw=56
+ifh=56
+nImg=1
+nIfm=64
+nOfm=256
+kw=1
+kh=1
+padw=0
+padh=0
 stride=1
 VLEN=4 #128bit = 32bit * 4
-RB_p=1
-RB_q=1
+RB_p=7
+RB_q=7
 type='F'
 format='L'
-padding_mode=0
+padding_mode=1
 
 # Compile individual source files
 g++ -c main.cpp -o main.o -std=c++11
