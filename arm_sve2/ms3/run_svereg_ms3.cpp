@@ -82,21 +82,21 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
 #if defined (_OPENMP)
     #pragma omp parallel for private(img, ofm_b, ifm_b, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
 #endif                                              
-    for (img = 0; img < nImg; img++) {
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
-                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+    for (img = 0; img < nImg; img++) { //N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //C_b
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {  //K_b
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h;
-                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
                         oi = oi_b * RB_p;
-                        ii = oi * stride_h;
-                        for (kj = 0; kj < kh; kj++) {
-                            for (ki = 0; ki < kw; ki++) {
-                                for (p = 0; p < RB_p; p++) {
+                        ii = oi * stride_w;
+                        for (kj = 0; kj < kh; kj++) { //R
+                            for (ki = 0; ki < kw; ki++) { //S
+                                for (p = 0; p < RB_p; p++) { //P
                                 ijo = ij + stride_h * p - pad_h;
                                 if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                for (q = 0; q < RB_q; q++) {
+                                for (q = 0; q < RB_q; q++) { //Q
                                     iio = ii + stride_w * q - pad_w;
                                     if (iio + ki < 0 || iio + ki >= ifw) continue;      
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
@@ -106,8 +106,8 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                 
                                         size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                 ofm_b * ofhp * ofwp * VLEN + 
-                                                                oj * ofwp * VLEN + 
-                                                                oi * VLEN;
+                                                                (oj + p) * ofwp * VLEN + 
+                                                                (oi + q) * VLEN;
 
                                         size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
                                                                 ifm_b * kh * kw * VLEN * VLEN + 
