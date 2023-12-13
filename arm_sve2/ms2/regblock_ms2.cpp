@@ -140,19 +140,20 @@ void reg_block_conv_bp(conv_t* param, std::vector<float>& input, const std::vect
 
     int C_b = C/VLEN;
     int K_b = K/VLEN;
-    
+    int n, k_b, c_b, oj, oi, ii, ij, r, s;
+
 #if defined (_OPENMP)
     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
 #endif
-    for (int n = 0; n < N; n++) {
-        for (int k_b = 0; k_b < K_b; k_b++) {
-            for (int c_b = 0; c_b < C_b; c_b++) {
-                for (int oj = 0; oj < P; oj++) {
-                    for (int oi = 0; oi < Q; oi++) {
-                        int ij = stride_h * oj;
-                        int ii = stride_w * oi;
-                        for (int r = 0; r < R; r++) {
-                            for (int s = 0; s < S; s++) {
+    for (n = 0; n < N; n++) {
+        for (k_b = 0; k_b < K_b; k_b++) {
+            for (c_b = 0; c_b < C_b; c_b++) {
+                for (oj = 0; oj < P; oj++) {
+                    for (oi = 0; oi < Q; oi++) {
+                        ij = stride_h * oj;
+                        ii = stride_w * oi;
+                        for (r = 0; r < R; r++) {
+                            for (s = 0; s < S; s++) {
                                 // Compute flat indices
                                 size_t inputIndex = (n * C_b *(P + R) * (Q + S)) + (c_b * (P + R) * (Q + S)) + ((ij + r) * (Q + S)) + (ii + s);
                                 size_t outputIndex = (n * K_b * P * Q) + (k_b * P * Q) + (oj * Q) + oi;
@@ -212,26 +213,26 @@ void reg_block_conv_uw(conv_t* param, const std::vector<float>& input, const std
     int K_b = K/VLEN;
     int P_b = P/RB_p;
     int Q_b = Q/RB_q;
-
+    int n, k_b, c_b, oj_b, oi_b, r, s, p, q, k, c, oj, oi, ij, ii;
 
 #if defined (_OPENMP)
     #pragma omp parallel for private(n, k_b, c_b, oj_b, oi_b, r, s, p, q, k, c, oj, oi, ij, ii)
 #endif
-    for (int n = 0; n < N; n++) {
-        for (int k_b = 0; k_b < K_b; k_b++) {
-            for (int c_b = 0; c_b < C_b; c_b++) {
-                for (int oj_b = 0; oj_b < P_b; oj_b++) {
-                    for (int oi_b = 0; oi_b < Q_b; oi_b++) {
-                        int oj = oj_b * RB_p;
-                        int oi = oi_b * RB_q;
-                        int ij = stride_h * oj;
-                        int ii = stride_w * oi;
-                        for (int r = 0; r < R; r++) {
-                            for (int s = 0; s < S; s++) {
-                                for (int p = 0; p < RB_p + 1; p++) {
-                                    for (int q = 0; q < RB_q + 1; q++) {
-                                        for (int k = 0; k < VLEN + 1; k++) {
-                                            for (int c = 0; c < VLEN + 1; c++) {
+    for (n = 0; n < N; n++) {
+        for (k_b = 0; k_b < K_b; k_b++) {
+            for (c_b = 0; c_b < C_b; c_b++) {
+                for (oj_b = 0; oj_b < P_b; oj_b++) {
+                    for (oi_b = 0; oi_b < Q_b; oi_b++) {
+                        oj = oj_b * RB_p;
+                        oi = oi_b * RB_q;
+                        ij = stride_h * oj;
+                        ii = stride_w * oi;
+                        for (r = 0; r < R; r++) {
+                            for (s = 0; s < S; s++) {
+                                for (p = 0; p < RB_p + 1; p++) {
+                                    for (q = 0; q < RB_q + 1; q++) {
+                                        for (k = 0; k < VLEN + 1; k++) {
+                                            for (c = 0; c < VLEN + 1; c++) {
                                                 ij += stride_h * p;
                                                 ii += stride_w * q;
                                                 
