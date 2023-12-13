@@ -488,6 +488,17 @@ void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, s
     }
 }
 
+void fill_random_array(float* input_array, size_t indexSize) {
+    // Seed the random number generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
+
+    for (size_t = 0; i < indexSize; i++) {
+        input_array[i] = dis(gen);
+    }
+}
+
 
 int main (int argc, char** argv) {
 
@@ -725,8 +736,8 @@ int main (int argc, char** argv) {
     float* conv_output = new float[outputSize];
     float* conv_filter = new float[filterSize];
     float* conv_bias = new float[nOfm];
-    fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(conv_filter, nOfm, nIfm, kh, kw);
+    fill_random_array(conv_input, inputSize);
+    fill_random_array(conv_filter, filter_size);
     
     if (!conv_input || !conv_output || !conv_filter || !conv_bias) {
         // Handle memory allocation failure

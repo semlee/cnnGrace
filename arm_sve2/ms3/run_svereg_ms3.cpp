@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 //used for performance count
 #include <chrono>
@@ -294,27 +295,46 @@ void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, flo
 
 } 
 
-void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1) {
+void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, size_t D = 1, size_t E = 1, size_t F = 1) {
     // Seed the random number generator
-    time_t t;
-    srand(static_cast<unsigned int>(time(&t)));
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
 
     for (size_t i = 0; i < A; i++) {
         for (size_t j = 0; j < B; j++) {
             for (size_t k = 0; k < C; k++) {
                 for (size_t l = 0; l < D; l++) {
-                    // Convert multi-dimensional indices to a flat index
-                    size_t flatIndex = i * B * C * D + j * C * D + k * D + l;
-                    // Generate a random float value between 0 and 1
-                    float random_value = static_cast<float>(rand()) / RAND_MAX;
-                    // Round to the thousandth place
-                    input_array[flatIndex] = round(random_value * 1000) / 1000.0f;
+                    for (size_t m = 0; m < E; m++) {
+                        for (size_t n = 0; n < F; n++) {
+                            // Convert multi-dimensional indices to a flat index
+                            size_t flatIndex = i * B * C * D * E * F +
+                                               j * C * D * E * F + 
+                                               k * D * E * F + 
+                                               l * E * F +
+                                               m * F + 
+                                               n;
+                            // Generate a random float value between -1 and 1
+                            input_array[flatIndex] = dis(gen);
+                        }
+                    }
+                    
                 }
             }
         }
     }
 }
 
+void fill_random_array(float* input_array, size_t indexSize) {
+    // Seed the random number generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
+
+    for (size_t = 0; i < indexSize; i++) {
+        input_array[i] = dis(gen);
+    }
+}
 
 int main (int argc, char** argv) {
 
@@ -440,114 +460,73 @@ int main (int argc, char** argv) {
     conv_param.RB_p = RB_p;
     conv_param.RB_q = RB_q;
 
-    /*
-    naive_input           = (float*)libxsmm_aligned_malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_input_save      = (float*)libxsmm_aligned_malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_output          = (float*)libxsmm_aligned_malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_save     = (float*)libxsmm_aligned_malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_bp       = (float*)libxsmm_aligned_malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_wu       = (float*)libxsmm_aligned_malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_libxsmm_output  = (float*)libxsmm_aligned_malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_libxsmm_input   = (float*)libxsmm_aligned_malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_filter          = (float*)libxsmm_aligned_malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_save     = (float*)libxsmm_aligned_malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_wu       = (float*)libxsmm_aligned_malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_kcrs     = (float*)libxsmm_aligned_malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_libxsmm_filter  = (float*)libxsmm_aligned_malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_bias            = (float*)libxsmm_aligned_malloc( nOfm*               sizeof(float), 2097152);
-    naive_dbias           = (float*)libxsmm_aligned_malloc( nOfm*               sizeof(float), 2097152);
-    
-    svuint32_t naive_input           [nImg][nIfm][ifhp][ifwp];
-    svuint32_t naive_input_save      [nImg][nIfm][ifhp][ifwp];
-    svuint32_t naive_output          [nImg][nOfm][ofhp][ofwp];
-    svuint32_t naive_output_save     [nImg][nOfm][ofhp][ofwp];
-    svuint32_t naive_output_bp       [nImg][nOfm][ofhp][ofwp];
-    svuint32_t naive_output_wu       [nImg][nOfm][ofhp][ofwp];
-    svuint32_t naive_filter          [nOfm][nIfm][kh][kw];
-    svuint32_t naive_filter_save     [nOfm][nIfm][kh][kw];
-    svuint32_t naive_filter_wu       [nOfm][nIfm][kh][kw];
-    svuint32_t naive_bias            [nOfm];
-    svuint32_t naive_dbias           [nOfm];
-
-    naive_input           = (float*)malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_input_save      = (float*)malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_output          = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_save     = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_bp       = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_output_wu       = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_libxsmm_output  = (float*)malloc( nImg*nOfm*ofhp*ofwp*sizeof(float), 2097152);
-    naive_libxsmm_input   = (float*)malloc( nImg*nIfm*ifhp*ifwp*sizeof(float), 2097152);
-    naive_filter          = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_save     = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_wu       = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_filter_kcrs     = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_libxsmm_filter  = (float*)malloc( nOfm*nIfm*kh*kw*    sizeof(float), 2097152);
-    naive_bias            = (float*)malloc( nOfm*               sizeof(float), 2097152);
-    naive_dbias           = (float*)malloc( nOfm*               sizeof(float), 2097152);
-
-    */
-
     // Calculate the total sizes
     size_t inputSize = nImg * nIfm * ifhp * ifwp;
     size_t outputSize = nImg * nOfm * ofhp * ofwp;
-    size_t filterSize = nOfm * nIfm * kh * kw;
+    size_t filterSize = nOfm * nIfm * kh * kw * VLEN * VLEN;
 
-    /* Allocate memory for naive arrays */
-    float* naive_input = new float[inputSize];
-    float* naive_input_save = new float[inputSize];
+    
+    // /* Allocate memory for naive arrays */
+    // float* naive_input = new float[inputSize];
+    // float* naive_input_save = new float[inputSize];
 
-    float* naive_output = new float[outputSize];
-    float* naive_output_save = new float[outputSize];
-    float* naive_output_bp = naive_output;
-    float* naive_output_wu = naive_output;
+    // float* naive_output = new float[outputSize];
+    // float* naive_output_save = new float[outputSize];
+    // float* naive_output_bp = naive_output;
+    // float* naive_output_wu = naive_output;
 
-    float* naive_filter = new float[filterSize];
-    float* naive_filter_save = new float[filterSize];
-    float* naive_filter_wu = naive_filter;
+    // float* naive_filter = new float[filterSize];
+    // float* naive_filter_save = new float[filterSize];
+    // float* naive_filter_wu = naive_filter;
 
-    float* naive_bias = new float[nOfm];
-    float* naive_dbias = new float[nOfm];
+    // float* naive_bias = new float[nOfm];
+    // float* naive_dbias = new float[nOfm];
 
-    fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
+    // fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
+    // fill_random(naive_filter, nOfm, nIfm, kh, kw);
 
-    //IMPORTANT MALLOC : copy data to save
-    for (size_t i = 0; i < inputSize; i++) {
-        naive_input_save[i] = naive_input[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        naive_filter_save[i] = naive_filter[i];
-        naive_filter_wu[i] = naive_filter[i];
-    }
+    // //IMPORTANT MALLOC : copy data to save
+    // for (size_t i = 0; i < inputSize; i++) {
+    //     naive_input_save[i] = naive_input[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     naive_filter_save[i] = naive_filter[i];
+    //     naive_filter_wu[i] = naive_filter[i];
+    // }
 
-    /* Allocate memory for real convolutional arrays */
+    // /* Allocate memory for real convolutional arrays */
+    // float* conv_input = new float[inputSize];
+    // float* conv_input_save = new float[inputSize];
+
+    // float* conv_output = new float[outputSize];
+    // float* conv_output_save = new float[outputSize];
+    // float* conv_output_bp = conv_output;
+    // float* conv_output_wu = conv_output;
+
+    // float* conv_filter = new float[filterSize];
+    // float* conv_filter_save = new float[filterSize];
+    // float* conv_filter_wu = new float[filterSize];
+
+    // float* conv_bias = new float[nOfm];
+    // float* conv_dbias = new float[nOfm];
+
+    // //IMPORTANT MALLOC : copy data to save
+    // for (size_t i = 0; i < inputSize; i++) {
+    //     conv_input[i] = naive_input[i];
+    //     conv_input_save[i] = naive_input[i];
+    // }
+    // for (size_t i = 0; i < filterSize; i++) {
+    //     conv_filter[i] = naive_filter[i];
+    //     conv_filter_save[i] = naive_filter[i];
+    //     conv_filter_wu[i] = naive_filter[i];
+    // }
+    
     float* conv_input = new float[inputSize];
-    float* conv_input_save = new float[inputSize];
-
     float* conv_output = new float[outputSize];
-    float* conv_output_save = new float[outputSize];
-    float* conv_output_bp = conv_output;
-    float* conv_output_wu = conv_output;
-
     float* conv_filter = new float[filterSize];
-    float* conv_filter_save = new float[filterSize];
-    float* conv_filter_wu = new float[filterSize];
-
     float* conv_bias = new float[nOfm];
-    float* conv_dbias = new float[nOfm];
-
-    //IMPORTANT MALLOC : copy data to save
-    for (size_t i = 0; i < inputSize; i++) {
-        conv_input[i] = naive_input[i];
-        conv_input_save[i] = naive_input[i];
-    }
-    for (size_t i = 0; i < filterSize; i++) {
-        conv_filter[i] = naive_filter[i];
-        conv_filter_save[i] = naive_filter[i];
-        conv_filter_wu[i] = naive_filter[i];
-    }
-
+    fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
+    fill_random(conv_filter, nOfm, nIfm, kh, kw, VLEN, VLEN);
     bool debug = true;
 
 
@@ -586,7 +565,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp_original(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
@@ -691,19 +670,24 @@ int main (int argc, char** argv) {
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");
 
-    //free allocated memory
-    delete[] naive_input;
-    delete[] naive_input_save;
-    delete[] naive_output;
-    delete[] naive_output_save;
-    delete[] naive_output_bp;
-    delete[] naive_output_wu;
-    delete[] naive_filter;
-    delete[] naive_filter_save;
-    delete[] naive_filter_wu;
-    delete[] naive_bias;
-    delete[] naive_dbias;
-    
+    // //free allocated memory
+    // delete[] naive_input;
+    // delete[] naive_input_save;
+    // delete[] naive_output;
+    // delete[] naive_output_save;
+    // delete[] naive_output_bp;
+    // delete[] naive_output_wu;
+    // delete[] naive_filter;
+    // delete[] naive_filter_save;
+    // delete[] naive_filter_wu;
+    // delete[] naive_bias;
+    // delete[] naive_dbias;
+
+    delete[] conv_input;
+    delete[] conv_output;
+    delete[] conv_filter;
+    delete[] conv_bias;
+
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
