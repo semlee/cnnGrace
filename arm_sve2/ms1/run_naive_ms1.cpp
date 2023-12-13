@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-
+#include <random>
 //used for performance count
 #include <chrono>
 #include <ratio>
