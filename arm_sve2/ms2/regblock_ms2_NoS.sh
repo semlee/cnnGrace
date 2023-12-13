@@ -22,19 +22,19 @@
 
 
 g++ -g -O2 run_regblock_ms2.cpp -o reg_layer_naive -std=c++11
-g++ -mavx2 -O2 run_regblock_ms2.cpp -o reg_layer_avx2 -std=c++11
-g++ -o reg_layer_native -march=native -mtune=native -O2 run_regblock_ms2.cpp -std=c++11
+# g++ -mavx2 -O2 run_regblock_ms2.cpp -o reg_layer_avx2 -std=c++11
+# g++ -o reg_layer_native -march=native -mtune=native -O2 run_regblock_ms2.cpp -std=c++11
 
 
 # objdump -D -Mintel naive_layer | grep "vex.v"
 
 echo "-O3"
-./reg_layer_naive 10 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
-echo "-mavx2 -O3"
-./reg_layer_avx2 10 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
-echo "-march=native -mtune=native"
-./reg_layer_native 10 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
+./reg_layer_naive 1000 16 16 1 5 5 3 3 1 1 1 'F' 'L' 0
+# echo "-mavx2 -O3"
+# ./reg_layer_avx2 10 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
+# echo "-march=native -mtune=native"
+# ./reg_layer_native 10 16 16 1 3 64 3 3 1 1 1 'F' 'L' 0
 
 rm reg_layer_naive
-rm reg_layer_avx2
-rm reg_layer_native
+# rm reg_layer_avx2
+# rm reg_layer_native
