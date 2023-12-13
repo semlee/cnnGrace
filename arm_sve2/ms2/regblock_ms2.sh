@@ -8,8 +8,8 @@
 iters=1000
 ifw=16
 ifh=16
-nImg=3
-nIfm=64
+nImg=5
+nIfm=5
 nOfm=64
 kw=3
 kh=3
@@ -21,7 +21,7 @@ format='L'
 padding_mode=0
 
 # Compile the C++ file
-g++ -o regblock_layer -O1 run_regblock_ms2.cpp -std=c++11
+g++ -o regblock_layer -O3 run_regblock_ms2.cpp -std=c++11
 
 # Check if compilation was successful
 if [ $? -eq 0 ]; then
