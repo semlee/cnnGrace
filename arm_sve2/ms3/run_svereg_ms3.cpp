@@ -79,7 +79,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
 #endif                                              
     for (img = 0; img < nImg; img++) {
         for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
