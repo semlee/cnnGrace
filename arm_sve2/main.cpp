@@ -566,6 +566,45 @@ int main (int argc, char** argv) {
     //     delete[] conv_dbias;
     // */
 
+    /* Allocate memory for naive arrays */
+    float* naive_input = new float[inputSize];
+    float* naive_input_save = new float[inputSize];
+
+    float* naive_output = new float[outputSize];
+
+
+    float* naive_filter = new float[filterSize];
+    float* naive_filter_wu = new float[filterSize];
+
+    float* naive_bias = new float[nOfm];
+
+    /* Allocate memory for real convolutional arrays */
+    float* conv_input = new float[inputSize];
+    float* conv_input_save = new float[inputSize];
+
+    float* conv_output = new float[outputSize];
+
+
+    float* conv_filter = new float[filterSize];
+    float* conv_filter_wu = new float[filterSize];
+
+    float* conv_bias = new float[nOfm];
+
+    //free allocated memory
+    delete[] naive_input;
+    delete[] naive_input_save;
+    delete[] naive_output;
+    delete[] naive_filter;
+    delete[] naive_filter_wu;
+    delete[] naive_bias;
+    
+    delete[] conv_input;
+    delete[] conv_input_save;
+    delete[] conv_output;
+    delete[] conv_filter;
+    delete[] conv_filter_wu;
+    delete[] conv_bias;
+
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
