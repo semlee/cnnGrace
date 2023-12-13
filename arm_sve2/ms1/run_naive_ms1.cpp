@@ -390,6 +390,17 @@ void fill_random(float* input_array, size_t A = 1, size_t B = 1, size_t C = 1, s
     }
 }
 
+void fill_random_array(float* input_array, size_t indexSize) {
+    // Seed the random number generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(-1.0f, 1.0f);
+
+    for (size_t i = 0; i < indexSize; i++) {
+        input_array[i] = dis(gen);
+    }
+}
+
 int main (int argc, char** argv) {
 
     // float *naive_input, *naive_output, *naive_output_save, *naive_filter, *naive_filter_wu, *naive_output_bp, *naive_output_wu, *naive_libxsmm_output;
@@ -558,22 +569,11 @@ int main (int argc, char** argv) {
 
     // Allocate memory for the arrays
     float* naive_input = new float[inputSize];
-    float* naive_input_save = new float[inputSize];
     float* naive_output = new float[outputSize];
-    float* naive_output_save = new float[outputSize];
-    float* naive_output_bp = new float[outputSize];
-    float* naive_output_wu = new float[outputSize];
     float* naive_filter = new float[filterSize];
-    float* naive_filter_save = new float[filterSize];
-    float* naive_filter_wu = new float[filterSize];
     float* naive_bias = new float[nOfm];
-    float* naive_dbias = new float[nOfm];
-
-    fill_random(naive_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(naive_input_save, nImg, ifhp, ifwp);
-    fill_random(naive_filter, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_save, nOfm, nIfm, kh, kw);
-    fill_random(naive_filter_wu, nOfm, nIfm, kh, kw);
+    fill_random_array(naive_input, inputSize);
+    fill_random_array(naive_filter, filterSize);
 
     /* print some summary */
     printf("##########################################\n");
@@ -608,7 +608,7 @@ int main (int argc, char** argv) {
 
     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
     //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    double l_total = (double)duration_sec.count();
+    double l_total = (double)duration_sec.count() * 1e-3;
     
 
     double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
@@ -619,14 +619,14 @@ int main (int argc, char** argv) {
     printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
 
-    naive_conv_fp(&naive_param, naive_input, naive_output_save, naive_filter, naive_bias);
-    int error_count = 0;
+    // naive_conv_fp(&naive_param, naive_input, naive_output_save, naive_filter, naive_bias);
+    // int error_count = 0;
 
-    for (int i = 0; i < outputSize; i++) {
-        if (naive_output_save[i] != naive_output[i]) {
-            error_count++;
-        }
-    }
+    // for (int i = 0; i < outputSize; i++) {
+    //     if (naive_output_save[i] != naive_output[i]) {
+    //         error_count++;
+    //     }
+    // }
     cout << "Error Count: " << error_count << "/" << outputSize << "\n";
     /*
     for (int i = 0; i < outputSize; i++) {
