@@ -320,7 +320,6 @@ int main (int argc, char** argv) {
     fill_random_array(naive_input, inputSize);
     fill_random_array(naive_filter, filterSize);
 
-    //IMPORTANT MALLOC : copy data to save
     for (size_t i = 0; i < inputSize; i++) {
         naive_input_save[i] = naive_input[i];
     }
@@ -338,7 +337,6 @@ int main (int argc, char** argv) {
 
     float* conv_bias = new float[nOfm];
 
-    //IMPORTANT MALLOC : copy data to save
     for (size_t i = 0; i < inputSize; i++) {
         conv_input[i] = naive_input[i];
         conv_input_save[i] = naive_input[i];
