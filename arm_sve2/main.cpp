@@ -2,9 +2,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 //include cumstom header files
-#include "main.h"
 #include "ms1/naive_ms1.h"
 #include "ms2/regblock_ms2.h"
 #include "ms3/regsve_ms3.h"
@@ -254,8 +254,8 @@ int main (int argc, char** argv) {
     float* naive_bias = new float[nOfm];
     float* naive_dbias = new float[nOfm];
 
-    fill_random_array(naive_input, inputIndex);
-    fill_random_array(naive_filter, filterIndex);
+    fill_random_array(naive_input, inputSize);
+    fill_random_array(naive_filter, filterSize);
 
     //IMPORTANT MALLOC : copy data to save
     for (size_t i = 0; i < inputSize; i++) {
