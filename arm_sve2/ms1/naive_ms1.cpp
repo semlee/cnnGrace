@@ -130,8 +130,6 @@ void naive_conv_fp(naive_conv_t* param, const float* input, float* output, const
                                                         kj * kw + 
                                                         ki;
 
-                                std::cout << outputIndex << " ";
-
                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
 
                             }
