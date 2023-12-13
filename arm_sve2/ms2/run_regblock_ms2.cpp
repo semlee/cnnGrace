@@ -114,7 +114,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                         oj * ofwp * VLEN + 
                                                                         oi * VLEN +
                                                                         ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
                                                                         ifm_b * kh * kw * VLEN * VLEN + 
                                                                         kj * kw * VLEN * VLEN + 
                                                                         ki * VLEN * VLEN + 
