@@ -7,7 +7,7 @@
 
 # Compile the C++ file
 # Compile individual source files
-g++ -o conv_layer -O3 run_regblock_ms2.cpp -std=c++11
+g++ -o conv_layer -O0 run_regblock_ms2.cpp -std=c++11
 
 ITERS=1000
 MB=1
