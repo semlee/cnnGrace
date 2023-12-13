@@ -42,3 +42,9 @@ for i in "${!ifw_values[@]}"; do
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD
 done
+
+rm main.o
+rm naive_ms1.o
+rm regblock_ms2.o
+# rm regsve_ms3.o
+rm conv_layer

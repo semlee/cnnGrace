@@ -39,7 +39,7 @@ if [ $? -eq 0 ]; then
 
     # Run the compiled program with command-line arguments using srun
     #./naive_ms1 iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
-    srun -N 1 -p -high --exclusive ./conv_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $VLEN $RB_p $RB_q $stride $type $format $padding_mode
+    srun -N 1 -p cg1-high --exclusive ./conv_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $VLEN $RB_p $RB_q $stride $type $format $padding_mode
 
     # Optionally, you can pass command-line arguments stored in a file
     # srun -N 1 -p cg1-high --exclusive ./naive_layer $(cat input_args.txt)
