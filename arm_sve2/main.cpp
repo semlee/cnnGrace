@@ -17,7 +17,7 @@
 #if defined(_OPENMP)
 # include <omp.h>
 #endif
-// #include <arm_sve.h>
+ #include <arm_sve.h>
 
 using std::cout;
 using std::endl;
