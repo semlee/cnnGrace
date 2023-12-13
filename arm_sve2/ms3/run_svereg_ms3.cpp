@@ -122,6 +122,109 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
 }
 
 
+void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh        = param->kh;
+    int kw        = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int ofh_b = ofh/RB_p;
+    int ofw_b = ofw/RB_q;
+    int img, ofm, ifm, oj_b, oj, ij, oi_b, oi, ii, kj, ki, p, q, ijo, iio;
+
+#if defined (_OPENMP)
+    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
+#endif                                              
+    for (img = 0; img < nImg; img++) { //N
+        for (ofm = 0; ofm < nOfm; ofm+= svcntw()) { //C_b
+            for (ifm = 0; ifm < nIfm; ifm+= svcntw()) {  //K_b
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h;
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_w;
+                        for (kj = 0; kj < kh; kj++) { //R
+                            for (ki = 0; ki < kw; ki++) { //S
+                                for (p = 0; p < RB_p; p++) { //P
+                                ijo = ij + stride_h * p - pad_h;
+                                if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                for (q = 0; q < RB_q; q++) { //Q
+                                    iio = ii + stride_w * q - pad_w;
+                                    if (iio + ki < 0 || iio + ki >= ifw) continue;      
+                                        const svbool_t pred_ofm = svwhilelt_b32(ofm, nOfm);
+                                        const svbool_t pred_ifm = svwhilelt_b32(ifm, nIfm); 
+                                        const svbool_t pred_all = svand(pred_ofm, pred_ifm); // Combined predicate for filter
+
+                                        size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                ifm * ifhp * ifwp + 
+                                                                (ijo + kj) * ifwp + 
+                                                                (iio + ki);
+                                                                
+                                        size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                ofm * ofhp * ofwp + 
+                                                                (oj + p) * ofwp + 
+                                                                (oi + q);
+
+                                        size_t filterIndex =    ofm * nIfm * kh * kw  + 
+                                                                ifm * kh * kw  + 
+                                                                kj * kw * + 
+                                                                ki;
+
+                                        // Load vectors using SVE intrinsics
+                                        svfloat32_t inputVector = svld1_f32(pred_ifm, input + inputIndex);
+                                        svfloat32_t filterVector = svld1_f32(pred_all, filter + filterIndex);
+                                        svfloat32_t outputVector = svld1_f32(pred_ofm, output + outputIndex);
+
+                                        // run Vector MAC Unit
+                                        outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
+
+                                        // Store result back
+                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
+        // Apply ReLU activation function
+            for (int oj = 0; oj < ofh; oj++) {
+                for (int oi = 0; oi < ofw; oi++) {
+                    int reluIndex = img * nOfm_b * ofhp * ofwp +
+                                    ofm_b * nOfm_b * ofhp * ofwp +
+                                    oj * ofwp +
+                                    oi;
+                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
+                }
+            }
+#endif
+        }
+    }
+
+}
+
 void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
 
     // Fetch data from param struct
@@ -538,7 +641,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+        arm_sve_conv_fp_mod(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);

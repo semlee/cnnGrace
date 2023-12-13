@@ -67,7 +67,7 @@ void arm_sve_conv_fp(conv_t* param, const std::vector<float>& input, std::vector
                                     iio = ii + stride_w * q - pad_w;
                                     if (iio + ki < 0 || iio + ki >= ifw) continue;      
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                ifm_b * ifhp * ifwp * VLEN+ 
+                                                                ifm_b * ifhp * ifwp * VLEN + 
                                                                 (ijo + kj) * ifwp * VLEN + 
                                                                 (iio + ki) * VLEN;
                                                                 
@@ -82,15 +82,15 @@ void arm_sve_conv_fp(conv_t* param, const std::vector<float>& input, std::vector
                                                                 ki * VLEN * VLEN;
 
                                         // Load vectors using SVE intrinsics
-                                        svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
-                                        svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
-                                        svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
+                                        svfloat32_t inputVector = svld1_f32(svptrue_b32(), input.data() + inputIndex);
+                                        svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter.data() + filterIndex);
+                                        svfloat32_t outputVector = svld1_f32(svptrue_b32(), output.data() + outputIndex);
 
                                         // run Vector MAC Unit
                                         outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
                                         // Store result back
-                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
+                                        svst1_f32(svptrue_b32(), output.data() + outputIndex, outputVector);
                                     }
                                 }
                             }
