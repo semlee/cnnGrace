@@ -72,7 +72,7 @@ kj = r
 ki = s
 */
 
-void naive_conv_fp(naive_conv_t* param, const std::vector<float>& input, std::vector<float>& output, const float* filter, const float* bias) {
+void naive_conv_fp(naive_conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
