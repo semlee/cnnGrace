@@ -485,7 +485,7 @@ int main (int argc, char** argv) {
 
 #if defined(_OPENMP)
     int nThreads = omp_get_max_threads() / (RB_p * RB_q); /* number of threads */
-    omp_set_num_threads(numThreads);
+    omp_set_num_threads(nThreads);
 #else
     int nThreads = 1; /* number of threads */
 #endif
