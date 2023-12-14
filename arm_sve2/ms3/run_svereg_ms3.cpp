@@ -672,7 +672,12 @@ int main (int argc, char** argv) {
 
         start = high_resolution_clock::now();
         for (int i = 0; i < iters; i++) {
-            arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+#if defined(_OPENMP)
+#           pragma omp parallel
+#endif
+            {
+                arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+            }
         }
         end = high_resolution_clock::now();
 
@@ -689,6 +694,10 @@ int main (int argc, char** argv) {
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
         printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
+        printf("PERFDUMP,FP,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%.5g\n", 
+                nThreads, nImg, nIfm, nOfm, ifw, ifh, kw, kh, stride, padw, padh, 
+                l_total, ((double)(l_total/iters)), (flops*1e-9)/l_total);
+                
         // cout << "Input" << endl;
         // for (int i = 0; i < 10; i++) {
         //     cout << conv_input[i] << " ";

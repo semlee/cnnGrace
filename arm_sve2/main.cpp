@@ -450,17 +450,21 @@ int main (int argc, char** argv) {
         reg_block_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
         end = high_resolution_clock::now();
 
-        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+        duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
         //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = (double)duration_sec.count() * 1e-3;
+        double l_total = duration_sec.count() * 1e-6;
         
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
-        printf("Total Time = %.5g\n", (double)l_total);
+        printf("Total Time = %.5g\n", l_total);
         printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
         printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
+
+        printf("PERFDUMP,FP,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%.5g\n", 
+                nThreads, nImg, nIfm, nOfm, ifw, ifh, kw, kh, stride, padw, padh, 
+                l_total, ((double)(l_total/iters)), (flops*1e-9)/l_total);
     }
     if (type == 'A' || type == 'U') {
         cout << "##########################################\n";
