@@ -180,7 +180,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
     int img, ofm, ifm, oj_b, oj, ij, oi_b, oi, ii, kj, ki, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
+    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki, ijo, iio)
 #endif                                              
     for (img = 0; img < nImg; img++) { //N
         for (ofm = 0; ofm < nOfm; ofm+= svcntw()) { //C_b
@@ -193,12 +193,15 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                         ii = oi * stride_w;
                         for (kj = 0; kj < kh; kj++) { //R
                             for (ki = 0; ki < kw; ki++) { //S
+#if defined (_OPENMP)
+                                #pragma omp parallel for private(p, q)
+#endif                               
                                 for (p = 0; p < RB_p; p++) { //P
-                                ijo = ij + stride_h * p - pad_h;
-                                if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                for (q = 0; q < RB_q; q++) { //Q
-                                    iio = ii + stride_w * q - pad_w;
-                                    if (iio + ki < 0 || iio + ki >= ifw) continue;      
+                                    ijo = ij + stride_h * p - pad_h;
+                                    if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                    for (q = 0; q < RB_q; q++) { //Q
+                                        iio = ii + stride_w * q - pad_w;
+                                        if (iio + ki < 0 || iio + ki >= ifw) continue;      
                                         const svbool_t pred_ofm = svwhilelt_b32(ofm, nOfm);
                                         const svbool_t pred_ifm = svwhilelt_b32(ifm, nIfm); 
                                         const svbool_t pred_all = svand_b_z(svptrue_b32(), pred_ofm, pred_ifm); // Combined predicate for filter
@@ -481,7 +484,8 @@ int main (int argc, char** argv) {
     int RB_q = 1;
 
 #if defined(_OPENMP)
-    int nThreads = omp_get_max_threads(); /* number of threads */
+    int nThreads = omp_get_max_threads() / (RB_p * RB_q); /* number of threads */
+    omp_set_num_threads(numThreads);
 #else
     int nThreads = 1; /* number of threads */
 #endif
