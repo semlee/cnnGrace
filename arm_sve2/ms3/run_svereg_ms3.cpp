@@ -282,7 +282,7 @@ void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const flo
     int K_b = K/VLEN;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
 #endif
     for (int n = 0; n < N; n++) {
         for (int k_b = 0; k_b < K_b; k_b++) {
@@ -355,7 +355,7 @@ void arm_sve_conv_uw(conv_t* param, const float* input, const float* output, flo
 
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+    #pragma omp parallel for private(n, k_b, c_b, oj_b, oi_b, oj, oi, ii, ij, r, s, p ,q, k ,c)
 #endif
     for (int n = 0; n < N; n++) {
         for (int k_b = 0; k_b < K_b; k_b++) {
