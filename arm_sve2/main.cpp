@@ -333,6 +333,7 @@ int main (int argc, char** argv) {
     std::vector<float> conv_output(outputSize, 0.0f);
     std::vector<float> conv_output_bp = conv_output;
     std::vector<float> conv_output_wu = conv_output;
+    std::vector<float> conv_output_save(outputSize, 0.0f);
 
     std::vector<float> conv_filter(filterSize);
     std::vector<float> conv_filter_wu(filterSize);
@@ -497,9 +498,10 @@ int main (int argc, char** argv) {
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
         int error_count = 0;
+        reg_block_conv_fp(&conv_param, conv_input_save, conv_output_save, conv_filter_save, conv_bias);
 
         for (int i = 0; i < outputSize; i++) {
-            if (conv_output[i] != naive_output[i]) {
+            if (conv_output_save[i] != naive_output[i]) {
                 error_count++;
             }
         }
