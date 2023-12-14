@@ -181,9 +181,9 @@ void arm_sve_conv_fp_original(conv_t* param, const float* input, float* output, 
     int Q_b = Q/RB_q;
     int n, k_b, c_b, oj, oj_b, ij, oi, oi_b, ii, r, s, c, k, p, q, ijo, iio;
 
-#if defined (_OPENMP)
-    #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
-#endif
+// #if defined (_OPENMP)
+//     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
+// #endif
     for (n = 0; n < N; n++) {
         for (k_b = 0; k_b < K_b; k_b++) {
             for (c_b = 0; c_b < C_b; c_b++) {
