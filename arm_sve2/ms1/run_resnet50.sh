@@ -9,7 +9,7 @@
 # Compile individual source files
 
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -O3 -fopenmp run_naive_ms1.cpp -std=c++11
+g++ -o conv_layer -O0 -fopenmp run_naive_ms1.cpp -std=c++11
 
 ITERS=10
 MB=72
