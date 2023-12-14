@@ -7,7 +7,7 @@
 
 # Compile the C++ file
 # Compile individual source files
-g++ -o conv_layer -march=native run_svereg_ms3.cpp -std=c++11
+g++ -o conv_layer -march=native -O0 run_svereg_ms3.cpp -std=c++11
 
 ITERS=1000
 MB=1
