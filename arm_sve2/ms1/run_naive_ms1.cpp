@@ -603,12 +603,14 @@ int main (int argc, char** argv) {
     cout << "##########################################\n";
 
     start = high_resolution_clock::now();
-    naive_conv_fp_original(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    for (int i = 0; i < iters; i++) {
+        naive_conv_fp_original(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
+    }
     end = high_resolution_clock::now();
 
-    duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
     //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-    double l_total = (double)duration_sec.count() * 1e-3;
+    double l_total = duration_sec.count() * 1e-6;
     
 
     double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
