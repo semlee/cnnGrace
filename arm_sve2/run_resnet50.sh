@@ -14,7 +14,7 @@ g++ -c ms2/regblock_ms2.cpp -o regblock_ms2.o -std=c++11
 # Link object files to create the executable
 g++ main.o naive_ms1.o regblock_ms2.o -o conv_layer -O3 -std=c++11
 
-ITERS=1000
+ITERS=10
 MB=1 #OMP_NUM_THREADS
 TYPE='F'
 FORMAT='L'

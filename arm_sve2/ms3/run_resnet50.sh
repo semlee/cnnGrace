@@ -10,7 +10,7 @@
 export OMP_NUM_THREADS=72
 g++ -o conv_layer -fopenmp -march=native -O0 run_svereg_ms3.cpp -std=c++11
 
-ITERS=1000
+ITERS=10
 MB=72
 TYPE='F'
 FORMAT='L'

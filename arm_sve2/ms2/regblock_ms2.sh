@@ -5,7 +5,7 @@
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 1
 
-iters=1000
+iters=10
 ifw=16
 ifh=16
 nImg=5

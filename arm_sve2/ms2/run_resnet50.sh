@@ -10,7 +10,7 @@
 export OMP_NUM_THREADS=72
 g++ -o conv_layer -O0 -fopenmp run_regblock_ms2.cpp -std=c++11
 
-ITERS=1000
+ITERS=10
 MB=72
 TYPE='F'
 FORMAT='L'
