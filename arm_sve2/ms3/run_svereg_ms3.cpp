@@ -499,6 +499,9 @@ int main (int argc, char** argv) {
     if (argc > i) padw       = atoi(argv[i++]);
     if (argc > i) padh       = atoi(argv[i++]);
     if (argc > i) stride     = atoi(argv[i++]);
+    if (argc > i) VLEN       = atoi(argv[i++]);
+    if (argc > i) RB_p       = atoi(argv[i++]);
+    if (argc > i) RB_q       = atoi(argv[i++]);   
     if (argc > i) type       = *(argv[i++]);
     if (argc > i) format     = *(argv[i++]);
     if (argc > i) padding_mode = atoi(argv[i++]);
