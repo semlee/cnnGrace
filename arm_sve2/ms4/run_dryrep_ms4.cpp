@@ -399,6 +399,10 @@ int main (int argc, char** argv) {
     delete[] conv_filter;
     delete[] conv_bias;
 
+    delete[] inputIndex;
+    delete[] outputIndex;
+    delete[] filterIndex;
+
     printf("##########################################\n");
     printf("#                Complete.               #\n");
     printf("##########################################\n");
