@@ -303,8 +303,8 @@ int main (int argc, char** argv) {
     size_t* filterIndex = new size_t[dryrunSize];
     size_t* outputIndex = new size_t[dryrunSize];
 
-    fill_random(conv_input, nImg, nIfm, ifhp, ifwp);
-    fill_random(conv_filter, nOfm, nIfm, kh, kw);
+    fill_random_array(conv_input, inputSize);
+    fill_random_array(conv_filter, outputSize);
     bool debug = true;
 
 
@@ -343,7 +343,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         cout << "               Dryrun Phase               \n";
         cout << "##########################################\n";
-        dryrun_conv_fp(conv_param, inputIndex, outputIndex, filterIndex);
+        dryrun_conv_fp(&conv_param, inputIndex, outputIndex, filterIndex);
         cout << "                Complete                  \n";
         cout << "##########################################\n";
         cout << "               Replay Phase               \n";
