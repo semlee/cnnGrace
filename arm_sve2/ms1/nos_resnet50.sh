@@ -2,10 +2,11 @@
 
 # Compile the C++ file
 # Compile individual source files
-g++ -o conv_layer -O0 run_naive_ms1.cpp -std=c++11
+export OMP_NUM_THREADS=10
+g++ -o conv_layer -O3 -fopenmp run_naive_ms1.cpp -std=c++11
 
 ITERS=1000
-MB=1
+MB=10
 TYPE='F'
 FORMAT='L'
 PAD=1

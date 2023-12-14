@@ -3,14 +3,15 @@
 #SBATCH -t 0-00:30:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
-#SBATCH -c 1
+#SBATCH -c 72
 
 # Compile the C++ file
 # Compile individual source files
-g++ -o conv_layer -O0 run_regblock_ms2.cpp -std=c++11
+export OMP_NUM_THREADS=72
+g++ -o conv_layer -O0 -fopenmp run_regblock_ms2.cpp -std=c++11
 
 ITERS=1000
-MB=1
+MB=72
 TYPE='F'
 FORMAT='L'
 PAD=1
