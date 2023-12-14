@@ -8,7 +8,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -fopenmp -march=native -O0 run_dryrep_ms4.cpp -std=c++11
+g++ -o conv_layer -fopenmp -march=native -O3 run_dryrep_ms4.cpp -std=c++11
 
 ITERS=10
 MB=72
