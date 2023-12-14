@@ -420,8 +420,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         start = high_resolution_clock::now();
-        // naive_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
-        naive_conv_fp(&naive_param, conv_input, conv_output, conv_filter, conv_bias);
+        reg_block_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
         end = high_resolution_clock::now();
 
         duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
