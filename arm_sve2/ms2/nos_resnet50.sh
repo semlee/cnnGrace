@@ -3,7 +3,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=10
-g++ -o conv_layer -O0 -fno-unroll-loops -fopnemp run_regblock_ms2.cpp -std=c++11
+g++ -o conv_layer -O3 -fno-unroll-loops -fopnemp run_regblock_ms2.cpp -std=c++11
 
 ITERS=10
 MB=10
