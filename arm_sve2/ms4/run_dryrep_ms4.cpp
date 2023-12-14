@@ -131,10 +131,11 @@ void dryrun_conv_fp(conv_t* param, size_t* inputIndex, size_t* outputIndex, size
 
 void replay_conv_fp(float* input, float* output, float* filter, float* bias, size_t* inputIndex, size_t* filterIndex, size_t* outputIndex, size_t dryrunSize) {
 
+    size_t i;
 #if defined (_OPENMP)
     #pragma omp parallel for private(i)
 #endif                                              
-    for (size_t i = 0; i < dryrunSize; i++) {
+    for (i = 0; i < dryrunSize; i++) {
         // Load vectors using SVE intrinsics
         svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex[i]);
         svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex[i]);
@@ -144,7 +145,7 @@ void replay_conv_fp(float* input, float* output, float* filter, float* bias, siz
         outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
         // Store result back
-        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
+        svst1_f32(svptrue_b32(), output + outputIndex[i], outputVector);
     }
 }
 
