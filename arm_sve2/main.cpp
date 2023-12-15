@@ -482,6 +482,24 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
+
+        cout << "Input" << endl;
+        for (int i = 0; i < 10; i++) {
+            cout << conv_input[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Filter" << endl;
+        for (int i = 0; i < 10; i++) {
+            cout << conv_filter[i] << " ";
+        }
+        cout << endl;
+
+        cout << "Output" << endl;
+        for (int i = 0; i < outputSize; i++) {
+            cout << conv_output[i] << " ";
+        }
+
         int error_count = 0;
 
         for (int i = 0; i < outputSize; i++) {
