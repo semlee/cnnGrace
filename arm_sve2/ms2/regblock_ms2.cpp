@@ -66,11 +66,11 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
 
                                         for (p = 0; p < RB_p; p++) { //P
                                             ijo = ij + stride_h * p;
-                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                            // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
                                                               
                                             for (q = 0; q < RB_q; q++) { //Q
                                                 iio = ii + stride_w * q;
-                                                if (iio + ki < 0 || iio + ki >= ifw) continue;
+                                                // if (iio + ki < 0 || iio + ki >= ifw) continue;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
                                                                         (ijo + kj) * ifwp * VLEN + 
