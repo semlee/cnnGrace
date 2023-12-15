@@ -99,18 +99,6 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         }
                     }
                 }
-#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-            // Apply ReLU activation function
-            for (int oj = 0; oj < ofh; oj++) {
-                for (int oi = 0; oi < ofw; oi++) {
-                    int reluIndex = img * nOfm_b * ofhp * ofwp +
-                                    ofm_b * nOfm_b * ofhp * ofwp +
-                                    oj * ofwp +
-                                    oi;
-                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
-                }
-            }
-#endif
             }
         }
     }
