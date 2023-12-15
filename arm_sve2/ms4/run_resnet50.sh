@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -t 02:00:00
+#SBATCH -t 01:00:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
