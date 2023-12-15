@@ -680,7 +680,12 @@ int main (int argc, char** argv) {
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
 
+#if defined(_OPENMP)
+        start = omp_get_wtime();
+#else
         start = high_resolution_clock::now();
+#endif    
+
         for (int i = 0; i < iters; i++) {
 #if defined(_OPENMP)
 #           pragma omp parallel
@@ -689,12 +694,14 @@ int main (int argc, char** argv) {
                 arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
             }
         }
+#if defined(_OPENMP)
+        end = omp_get_wtime();
+        double l_total = (end - start);
+#else
         end = high_resolution_clock::now();
-
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        
         double l_total = duration_sec.count() * 1e-6;
+#endif 
         
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
