@@ -3,12 +3,12 @@
 #SBATCH -t 0-00:30:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
-#SBATCH -c 72
+#SBATCH -c 1
 
 # Compile the C++ file
 # Compile individual source files
-export OMP_NUM_THREADS=72
-g++ -o conv_layer -O0 -fopenmp run_regblock_ms2.cpp -std=c++11
+# export OMP_NUM_THREADS=72
+g++ -o conv_layer -O0 run_regblock_ms2.cpp -std=c++11
 
 ITERS=10
 MB=72
@@ -33,7 +33,7 @@ stride_values=(2 1 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1)
 
 # Iterate over the indices of the arrays
 for i in "${!ifw_values[@]}"; do
-    srun -N 1 -p cg1-high --exclusive ./conv_layer \
+    taskset 0x00000001 srun -N 1 -p cg1-high --exclusive ./conv_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} $nImg_values ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD
