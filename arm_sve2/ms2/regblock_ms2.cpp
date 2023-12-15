@@ -76,19 +76,17 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     int nOfm_b = nOfm/VLEN;
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    volatile int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+    // volatile int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
-    for (img = 0; img < nImg; img++) { //N
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K_b
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { //C_b
-                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
+    for (int img = 0; img < nImg; img++) { // N
+        for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) //K_b {
+            for (int ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (int oj_b = 0; oj_b < ofh_b; oj_b++) {
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
-                    //std::cout << "oj = " << oj << ", ij = " << ij << std::endl;
-                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
+                    for (int oi_b = 0; oi_b < ofw_b; oi_b ++) {
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
-                        //std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
                         auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
                         auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
                         auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
@@ -102,6 +100,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
             }
         }
     }
+    
 }
 
 void reg_block_conv_bp(conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save) {
