@@ -79,7 +79,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     // volatile int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
     for (int img = 0; img < nImg; img++) { // N
-        for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) //K_b {
+        for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K_b {
             for (int ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
                 for (int oj_b = 0; oj_b < ofh_b; oj_b++) {
                     int oj = oj_b * RB_p;
@@ -100,7 +100,6 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
             }
         }
     }
-    
 }
 
 void reg_block_conv_bp(conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save) {
