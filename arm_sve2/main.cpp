@@ -407,7 +407,7 @@ int main (int argc, char** argv) {
 
         start = high_resolution_clock::now();
         for (int i = 0 ; i < iters; i++) {
-            g(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
+            reg_block_conv_fp(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
         }
         end = high_resolution_clock::now();
 
