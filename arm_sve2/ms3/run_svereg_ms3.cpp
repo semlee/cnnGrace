@@ -78,10 +78,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
-
-#if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm_b, ifm_b, oj, oi, ij, ii, kj, ki, p, q, ijo, iio)
-#endif                                              
+                                          
     for (img = 0; img < nImg; img++) { //N
         for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //C_b
             for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {  //K_b
@@ -180,10 +177,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
     int nOfm_b = nOfm / VLEN;
     int nIfm_b = nIfm / VLEN;
     int img, ofm, ifm, oj_b, oj, ij, oi_b, oi, ii, kj, ki, p, q, ijo, iio;
-
-#if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki, ijo, iio)
-#endif                                              
+                                           
     for (img = 0; img < nImg; img++) { //N
         for (ofm = 0; ofm < nOfm_b; ofm++) { //C_b
             for (ifm = 0; ifm < nIfm_b; ifm++) {  //K_b
