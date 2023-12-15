@@ -89,7 +89,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                     oj = oj_b * RB_p;
                     ij = oj * stride_h;
                     for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
-                        oi = oi_b * RB_p;
+                        oi = oi_b * RB_q;
                         ii = oi * stride_w;
                         for (kj = 0; kj < kh; kj++) { //R
                             for (ki = 0; ki < kw; ki++) { //S
