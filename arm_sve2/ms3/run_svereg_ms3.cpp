@@ -176,7 +176,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
 
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    int VLEN = svcntw()
+    int VLEN = svcntw();
     int nOfm_b = nOfm / VLEN;
     int nIfm_b = nIfm / VLEN;
     int img, ofm, ifm, oj_b, oj, ij, oi_b, oi, ii, kj, ki, p, q, ijo, iio;
@@ -186,7 +186,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
 #endif                                              
     for (img = 0; img < nImg; img++) { //N
         for (ofm = 0; ofm < nOfm_b; ofm++) { //C_b
-            for (ifm = 0; ifm < nOfm_b; ifm++) {  //K_b
+            for (ifm = 0; ifm < nIfm_b; ifm++) {  //K_b
                 for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h;
