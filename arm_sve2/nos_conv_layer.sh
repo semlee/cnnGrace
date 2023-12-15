@@ -14,7 +14,7 @@ g++ main.o naive_ms1.o regblock_ms2.o -o conv_layer -O3 -fopenmp -mavx2 -std=c++
 # perf record -g -- 
 
 #./conv_layer iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
-./conv_layer 1000 16 16 5 5 64 3 3 1 1 1 4 1 1 'F' 'L' 0
+./conv_layer 1000 224 224 10 3 64 7 7 3 3 2 4 7 7 'F' 'L' 1
 
 rm naive_ms1.o 
 rm regblock_ms2.o
