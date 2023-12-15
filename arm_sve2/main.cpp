@@ -507,13 +507,13 @@ int main (int argc, char** argv) {
 
         int error_count = 0;
 
-        for (int i = 0; i < outputSize; i++) {
+        for (size_t i = 0; i < outputSize; i++) {
             if (conv_output[i] != 0) {
                 cout << conv_output[i] << " ";
             }
         }
 
-        for (int i = 0; i < outputSize; i++) {
+        for (size_t i = 0; i < outputSize; i++) {
             if (conv_output[i] != naive_output[i]) {
                 error_count++;
             }
