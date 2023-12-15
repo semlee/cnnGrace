@@ -6,16 +6,16 @@
 #SBATCH -c 72
 
 iters=10
-ifw=56
-ifh=56
+ifw=224
+ifh=224
 nImg=72
-nIfm=64
-nOfm=256
-kw=1
-kh=1
-padw=0
-padh=0
-stride=1
+nIfm=3
+nOfm=64
+kw=7
+kh=7
+padw=3
+padh=3
+stride=2
 VLEN=4 #128bit = 32bit * 4
 RB_p=7
 RB_q=7
