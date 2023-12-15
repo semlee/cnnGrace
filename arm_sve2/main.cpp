@@ -484,13 +484,13 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
 
         cout << "Input" << endl;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             cout << naive_input[i] << " ";
         }
         cout << endl;
 
         cout << "Filter" << endl;
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             cout << naive_filter[i] << " ";
         }
         cout << endl;

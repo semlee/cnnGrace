@@ -80,13 +80,11 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                                         (ijo + kj) * ifwp * VLEN + 
                                                                         (iio + ki) * VLEN +
                                                                         ifm;
-                                                size_t outputIndex =    img * nOfm * ofhp * ofwp * RB_p * RB_q +
-                                                                        ofm_b * ofhp * ofwp * VLEN * RB_p * RB_q +
-                                                                        oj * ofwp * VLEN * RB_q +
-                                                                        oi * VLEN * RB_p +
-                                                                        ofm * RB_p * RB_q +
-                                                                        p * RB_q + 
-                                                                        RB_q;
+                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                        ofm_b * ofhp * ofwp * VLEN + 
+                                                                        (oj + p) * ofwp * VLEN + 
+                                                                        (oi + q) * VLEN +
+                                                                        ofm;
                                                 
                                                 output[outputIndex] += filter[filterIndex] * input[inputIndex];
                                             }
