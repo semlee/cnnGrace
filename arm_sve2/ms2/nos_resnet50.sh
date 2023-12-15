@@ -5,7 +5,7 @@
 export OMP_NUM_THREADS=10
 g++ -o conv_layer -O0 -fopenmp run_regblock_ms2.cpp -std=c++11
 
-ITERS=10
+ITERS=1
 MB=10
 TYPE='F'
 FORMAT='L'
