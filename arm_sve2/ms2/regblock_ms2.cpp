@@ -61,34 +61,26 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                             for (ki = 0; ki < kw; ki++) {
                                 for (ofm = 0; ofm < VLEN; ofm++) {
                                     for (ifm = 0; ifm < VLEN; ifm++) {
-                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
-                                                                ifm_b * kh * kw * VLEN * VLEN + 
-                                                                kj * kw * VLEN * VLEN + 
-                                                                ki * VLEN * VLEN + 
-                                                                ifm * VLEN + 
-                                                                ofm;
-#if defined (_OPENMP)
-                                        #pragma omp unroll full
-#endif   
+                                        size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw + 
+                                                                (ifm_b * VLEN + ifm) * kh * kw * VLEN + 
+                                                                kj * kw + 
+                                                                ki;
+                                                                
                                         for (p = 0; p < RB_p; p++) { //P
-                                            ijo = ij + stride_h * p - pad_h;
-                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-#if defined (_OPENMP)
-                                            #pragma omp unroll full
-#endif                                                                   
+                                            ijo = ij + stride_h * p;
+                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;                                                              
                                             for (q = 0; q < RB_q; q++) {
                                                 iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                        ifm_b * ifhp * ifwp * VLEN+ 
-                                                                        (ijo + kj) * ifwp * VLEN + 
-                                                                        (iio + ki) * VLEN +
-                                                                        ifm;
+                                                                        (ifm_b * VLEN + ifm) * ifhp * ifwp + 
+                                                                        (ijo + kj) * ifwp + 
+                                                                        (iio + ki);
+                                                                        
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                        ofm_b * ofhp * ofwp * VLEN + 
-                                                                        (oj + p) * ofwp * VLEN + 
-                                                                        (oi + q) * VLEN +
-                                                                        ofm;
+                                                                        (ofm_b * VLEN + ofm) * ofhp * ofwp + 
+                                                                        (oj + p) * ofwp + 
+                                                                        (oi + q);
                                                 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
                                             }
