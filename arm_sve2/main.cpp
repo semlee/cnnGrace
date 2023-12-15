@@ -485,18 +485,23 @@ int main (int argc, char** argv) {
 
         cout << "Input" << endl;
         for (int i = 0; i < 10; i++) {
-            cout << conv_input[i] << " ";
+            cout << naive_input[i] << " ";
         }
         cout << endl;
 
         cout << "Filter" << endl;
         for (int i = 0; i < 10; i++) {
-            cout << conv_filter[i] << " ";
+            cout << naive_filter[i] << " ";
         }
         cout << endl;
 
-        cout << "Output" << endl;
-        for (int i = 0; i < outputSize; i++) {
+        cout << "Naive Output" << endl;
+        for (int i = 0; i < 10; i++) {
+            cout << naive_output[i] << " ";
+        }
+
+        cout << "Conv Output" << endl;
+        for (int i = 0; i < 10; i++) {
             cout << conv_output[i] << " ";
         }
 
