@@ -8,7 +8,7 @@
 iters=10
 ifw=56
 ifh=56
-nImg=1
+nImg=72
 nIfm=64
 nOfm=256
 kw=1
