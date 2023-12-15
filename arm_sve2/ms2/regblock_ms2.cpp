@@ -60,14 +60,41 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                             for (ki = 0; ki < kw; ki++) {
                                 for (ofm = 0; ofm < VLEN; ofm++) {
                                     for (ifm = 0; ifm < VLEN; ifm++) {
-                                        for (p = 0; p < RB_p; p++) {
-                                            ijo = ij + stride_h * p;
+#if defined (_OPENMP)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm, p, q)
+#endif
+
+    for (img = 0; img < nImg; img++) {
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+                    oj = oj_b * RB_p;
+                    ij = oj * stride_h - pad_h;
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                        oi = oi_b * RB_p;
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; kj++) {
+                            for (ki = 0; ki < kw; ki++) {
+                                for (ofm = 0; ofm < VLEN; ofm++) {
+                                    for (ifm = 0; ifm < VLEN; ifm++) {
+                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
+                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN + 
+                                                                ifm * VLEN + 
+                                                                ofm;
+#if defined (_OPENMP)
+                                        #pragma omp unroll full
+#endif   
+                                        for (p = 0; p < RB_p; p++) { //P
+                                            ijo = ij + stride_h * p - pad_h;
                                             if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+#if defined (_OPENMP)
+                                            #pragma omp unroll full
+#endif                                                                   
                                             for (q = 0; q < RB_q; q++) {
                                                 iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
-                                                //O[n][k_b][oj+p][oi+q][k] += W[k_b][c_b][r][s][c][k] ∗ I[n][c_b][ijo + r][iio + s][c]
-                                                // Check boundary conditions
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         ifm_b * ifhp * ifwp * VLEN+ 
                                                                         (ijo + kj) * ifwp * VLEN + 
@@ -77,12 +104,6 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                                         ofm_b * ofhp * ofwp * VLEN + 
                                                                         (oj + p) * ofwp * VLEN + 
                                                                         (oi + q) * VLEN +
-                                                                        ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
-                                                                        ifm_b * kh * kw * VLEN * VLEN + 
-                                                                        kj * kw * VLEN * VLEN + 
-                                                                        ki * VLEN * VLEN + 
-                                                                        ifm * VLEN + 
                                                                         ofm;
                                                 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];
