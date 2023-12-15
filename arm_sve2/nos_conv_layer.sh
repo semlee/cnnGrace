@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Compile individual source files
-g++ -g -Wall -c main.cpp -o main.o -fopenmp -std=c++11
-g++ -g -Wall -c ms1/naive_ms1.cpp -o naive_ms1.o -fopenmp -std=c++11
-g++ -g -Wall -c ms2/regblock_ms2.cpp -o regblock_ms2.o -fopenmp -std=c++11
+g++ -g -Wall -O0 -c main.cpp -o main.o -fopenmp -std=c++11
+g++ -g -Wall -O0 -c ms1/naive_ms1.cpp -o naive_ms1.o -fopenmp -std=c++11
+g++ -g -Wall -O0 -c ms2/regblock_ms2.cpp -o regblock_ms2.o -fopenmp -std=c++11
 # g++ -c ms3/regsve_ms3.cpp -o regsve_ms3.o -march=native -std=c++11
 
 # Link object files to create the executable
