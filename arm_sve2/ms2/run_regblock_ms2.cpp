@@ -99,9 +99,21 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                             for (ki = 0; ki < kw; ki++) {
                                 for (ofm = 0; ofm < VLEN; ofm++) {
                                     for (ifm = 0; ifm < VLEN; ifm++) {
-                                        for (p = 0; p < RB_p; p++) {
-                                            ijo = ij + stride_h * p;
+                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
+                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN + 
+                                                                ifm * VLEN + 
+                                                                ofm;
+#if defined (_OPENMP)
+                                        #pragma omp unroll full
+#endif   
+                                        for (p = 0; p < RB_p; p++) { //P
+                                            ijo = ij + stride_h * p - pad_h;
                                             if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+#if defined (_OPENMP)
+                                            #pragma omp unroll full
+#endif                                                                   
                                             for (q = 0; q < RB_q; q++) {
                                                 iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
@@ -115,12 +127,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                         (oj + p) * ofwp * VLEN + 
                                                                         (oi + q) * VLEN +
                                                                         ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
-                                                                        ifm_b * kh * kw * VLEN * VLEN + 
-                                                                        kj * kw * VLEN * VLEN + 
-                                                                        ki * VLEN * VLEN + 
-                                                                        ifm * VLEN + 
-                                                                        ofm;
+                                                
                                                 // size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                 //                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
                                                 //                         (ij + kj) * ifwp + 
@@ -718,7 +725,12 @@ int main (int argc, char** argv) {
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
 
+#if defined(_OPENMP)
+        start = omp_get_wtime();
+#else
         start = high_resolution_clock::now();
+#endif    
+
         for (int i = 0; i < iters; i++) {
 #if defined(_OPENMP)
 #           pragma omp parallel
@@ -726,13 +738,16 @@ int main (int argc, char** argv) {
             {
                 arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
             }
-        }   
+        }
+#if defined(_OPENMP)
+        end = omp_get_wtime();
+        double l_total = (end - start);
+#else
         end = high_resolution_clock::now();
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
         double l_total = duration_sec.count() * 1e-6;
+#endif 
         
-
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
         printf("Total Time = %.5g\n", (double)l_total);
