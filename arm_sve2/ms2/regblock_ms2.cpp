@@ -56,12 +56,12 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         ii = oi * stride_w - pad_w;
                         std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
                             CONV(std::vector<float>(input.begin() +  img * nIfm * ifhp * ifwp + 
-                                                        ifm_b * ifhp * ifwp * VLEN+ ), 
+                                                        ifm_b * ifhp * ifwp * VLEN), 
                                 std::vector<float>(output.begin() + img * nOfm * ofhp * ofwp + 
-                                                        ofm_b * ofhp * ofwp * VLEN + ),
+                                                        ofm_b * ofhp * ofwp * VLEN),
                                 std::vector<float>(filter.begin() + ofm_b * nIfm * kh * kw * VLEN + 
-                                                        ifm_b * kh * kw * VLEN * VLEN + ),
-                                kh, kw, VLEN, RB_p, RB_q, ij, ii, stride_h, stride_w);
+                                                        ifm_b * kh * kw * VLEN * VLEN),
+                                kh, kw, VLEN, RB_p, RB_q, ij, ii, ifwp, ofwp, stride_h, stride_w);
                     }
                 }
             }
@@ -70,7 +70,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
 
 }
 
-void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int ij, int ii, int stride_h, int stride_w) {
+void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
    int kj, ki, ofm, ifm, p, q, ijo, iio;
    for (kj = 0; kj < kh; kj++) { //R
         for (ki = 0; ki < kw; ki++) { //S
