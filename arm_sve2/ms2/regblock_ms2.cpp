@@ -82,11 +82,11 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
         for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) //K_b {
             for (int ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
                 for (int oj_b = 0; oj_b < ofh_b; oj_b++) {
-                    oj = oj_b * RB_p;
-                    ij = oj * stride_h - pad_h;
+                    int oj = oj_b * RB_p;
+                    int ij = oj * stride_h - pad_h;
                     for (int oi_b = 0; oi_b < ofw_b; oi_b ++) {
-                        oi = oi_b * RB_q;
-                        ii = oi * stride_w - pad_w;
+                        int oi = oi_b * RB_q;
+                        int ii = oi * stride_w - pad_w;
                         auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
                         auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
                         auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
