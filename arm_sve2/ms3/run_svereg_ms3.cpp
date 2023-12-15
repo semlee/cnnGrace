@@ -176,6 +176,7 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
 
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
+    int VLEN = svcntw();
     int img, ofm, ifm, oj_b, oj, ij, oi_b, oi, ii, kj, ki, p, q, ijo, iio;
 
 #if defined (_OPENMP)
