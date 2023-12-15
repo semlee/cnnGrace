@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <vector>
 
 //used for performance count
 #include <chrono>
@@ -46,7 +47,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void dryrun_conv_fp(conv_t* param, size_t* inputIndex, size_t* outputIndex, size_t* filterIndex) {
+void dryrun_conv_fp(conv_t* param, std::vector<size_t> inputIndex, std::vector<size_t> outputIndex, std::vector<size_t> filterIndex) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -129,7 +130,7 @@ void dryrun_conv_fp(conv_t* param, size_t* inputIndex, size_t* outputIndex, size
 
 }
 
-void replay_conv_fp(float* input, float* output, float* filter, float* bias, size_t* inputIndex, size_t* filterIndex, size_t* outputIndex, size_t dryrunSize) {
+void replay_conv_fp(float* input, float* output, float* filter, float* bias, std::vector<size_t> inputIndex, std::vector<size_t> filterIndex, std::vector<size_t> outputIndex, size_t dryrunSize) {
 
     size_t i;
 #if defined (_OPENMP)
@@ -299,9 +300,9 @@ int main (int argc, char** argv) {
     float* conv_filter = new float[filterSize];
     float* conv_bias = new float[nOfm];
 
-    size_t* inputIndex = new size_t[dryrunSize];
-    size_t* filterIndex = new size_t[dryrunSize];
-    size_t* outputIndex = new size_t[dryrunSize];
+    std::vector<size_t> inputIndex(dryrunSize);
+    std::vector<size_t> filterIndex(dryrunSize);
+    std::vector<size_t> outputIndex(dryrunSize);
 
     fill_random_array(conv_input, inputSize);
     fill_random_array(conv_filter, outputSize);
@@ -415,9 +416,6 @@ int main (int argc, char** argv) {
     delete[] conv_filter;
     delete[] conv_bias;
 
-    delete[] inputIndex;
-    delete[] outputIndex;
-    delete[] filterIndex;
 
     printf("##########################################\n");
     printf("#                Complete.               #\n");
