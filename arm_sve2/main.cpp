@@ -499,20 +499,22 @@ int main (int argc, char** argv) {
         for (int i = 0; i < 100; i++) {
             cout << naive_output[i] << " ";
         }
+        cout << endl;
 
         cout << "Conv Output" << endl;
         for (int i = 0; i < 100; i++) {
             cout << conv_output[i] << " ";
         }
-
+        cout << endl;
         int error_count = 0;
 
         for (size_t i = 0; i < outputSize; i++) {
             if (conv_output[i] != 0) {
                 cout << conv_output[i] << " ";
             }
-        }
-
+        }  
+        cout << endl;
+        
         for (size_t i = 0; i < outputSize; i++) {
             if (conv_output[i] != naive_output[i]) {
                 error_count++;
