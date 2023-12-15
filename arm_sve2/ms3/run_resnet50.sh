@@ -7,11 +7,11 @@
 
 # Compile the C++ file
 # Compile individual source files
-# export OMP_NUM_THREADS=72
+export OMP_NUM_THREADS=72
 g++ -o conv_layer -march=native -O0 run_svereg_ms3.cpp -std=c++11
 
 ITERS=10
-MB=1
+MB=72
 TYPE='F'
 FORMAT='L'
 PAD=1
@@ -33,10 +33,11 @@ stride_values=(2 1 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1)
 
 # Iterate over the indices of the arrays
 for i in "${!ifw_values[@]}"; do
-    taskset 0x00000001 srun -N 1 -p cg1-high --exclusive ./conv_layer \
+    srun -N 1 -p cg1-high --exclusive ./conv_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} $nImg_values ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD 
 done
 
+#taskset 0x00000001
 rm conv_layer
