@@ -11,6 +11,40 @@
 #endif
 // #include <arm_sve.h>
 
+void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
+   int kj, ki, ofm, ifm, p, q, ijo, iio;
+   for (kj = 0; kj < kh; kj++) { //R
+        for (ki = 0; ki < kw; ki++) { //S
+            for (ofm = 0; ofm < VLEN; ofm++) { //k
+                for (ifm = 0; ifm < VLEN; ifm++) { //c
+                    size_t filterIndex =    kj * kw * VLEN * VLEN + 
+                                            ki * VLEN * VLEN + 
+                                            ifm * VLEN + 
+                                            ofm;
+
+                    for (p = 0; p < RB_p; p++) { //P
+                        ijo = ij + stride_h * p;
+                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                            
+                        for (q = 0; q < RB_q; q++) { //Q
+                            iio = ii + stride_w * q;
+                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
+                            size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
+                                                    (iio + ki) * VLEN +
+                                                    ifm;
+                            size_t outputIndex =    (oj + p) * ofwp * VLEN + 
+                                                    (oi + q) * VLEN +
+                                                    ofm;
+                            
+                            output[outputIndex] += filter[filterIndex] * input[inputIndex];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
@@ -63,40 +97,6 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                             std::vector<float>(outputIndex, outputIndex +subvecSize),
                             std::vector<float>(filterIndex, filterIndex + subvecSize),
                             kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
-                    }
-                }
-            }
-        }
-    }
-}
-
-void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
-   int kj, ki, ofm, ifm, p, q, ijo, iio;
-   for (kj = 0; kj < kh; kj++) { //R
-        for (ki = 0; ki < kw; ki++) { //S
-            for (ofm = 0; ofm < VLEN; ofm++) { //k
-                for (ifm = 0; ifm < VLEN; ifm++) { //c
-                    size_t filterIndex =    kj * kw * VLEN * VLEN + 
-                                            ki * VLEN * VLEN + 
-                                            ifm * VLEN + 
-                                            ofm;
-
-                    for (p = 0; p < RB_p; p++) { //P
-                        ijo = ij + stride_h * p;
-                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                            
-                        for (q = 0; q < RB_q; q++) { //Q
-                            iio = ii + stride_w * q;
-                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
-                            size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
-                                                    (iio + ki) * VLEN +
-                                                    ifm;
-                            size_t outputIndex =    (oj + p) * ofwp * VLEN + 
-                                                    (oi + q) * VLEN +
-                                                    ofm;
-                            
-                            output[outputIndex] += filter[filterIndex] * input[inputIndex];
-                        }
                     }
                 }
             }
