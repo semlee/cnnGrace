@@ -50,24 +50,24 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                 for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
-                    std::cout << "oj = " << oj << ", ij = " << ij << std::endl;
+                    //std::cout << "oj = " << oj << ", ij = " << ij << std::endl;
                     for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
-                        std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
-                            CONV(std::vector<float>(input.begin() + img * nIfm * ifhp * ifwp + 
-                                                        ifm_b * ifhp * ifwp * VLEN), 
-                                std::vector<float>(output.begin() + img * nOfm * ofhp * ofwp + 
-                                                        ofm_b * ofhp * ofwp * VLEN),
-                                std::vector<float>(filter.begin() + ofm_b * nIfm * kh * kw * VLEN + 
-                                                        ifm_b * kh * kw * VLEN * VLEN),
-                                kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
+                        //std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
+                        auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
+                        auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
+                        auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
+                        auto subvecSize = VLEN * VLEN * RB_p * RB_q;
+                        CONV(std::vector<float>(inputIndex, inputIndex + subvecSize), 
+                            std::vector<float>(outputIndex, outputIndex +subvecSize),
+                            std::vector<float>(filterIndex, filterIndex + subvecSize),
+                            kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
                     }
                 }
             }
         }
     }
-
 }
 
 void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
