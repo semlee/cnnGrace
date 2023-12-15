@@ -686,7 +686,7 @@ int main (int argc, char** argv) {
 #           pragma omp parallel
 #endif
             {
-                arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+                arm_sve_conv_fp_mod(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
             }
         }
 #if defined(_OPENMP)
