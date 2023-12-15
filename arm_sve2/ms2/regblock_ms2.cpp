@@ -45,7 +45,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
 
 #if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm, p, q)
+    #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm)
 #endif
 
     for (img = 0; img < nImg; img++) { //N
@@ -55,7 +55,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
                     for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
-                        oi = oi_b * RB_p;
+                        oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
                         for (kj = 0; kj < kh; kj++) { //R
                             for (ki = 0; ki < kw; ki++) { //S
