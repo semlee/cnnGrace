@@ -50,9 +50,11 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                 for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
+                    std::cout << "oj = " << oj << ", ij = " << ij << std::endl;
                     for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
+                        std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
                         for (kj = 0; kj < kh; kj++) { //R
                             for (ki = 0; ki < kw; ki++) { //S
                                 for (ofm = 0; ofm < VLEN; ofm++) { //k
