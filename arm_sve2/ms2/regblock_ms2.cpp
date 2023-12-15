@@ -55,48 +55,53 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
                         std::cout << "oi = " << oi << ", ii = " << ii << std::endl;
-                        for (kj = 0; kj < kh; kj++) { //R
-                            for (ki = 0; ki < kw; ki++) { //S
-                                for (ofm = 0; ofm < VLEN; ofm++) { //k
-                                    for (ifm = 0; ifm < VLEN; ifm++) { //c
-                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
-                                                                ifm_b * kh * kw * VLEN * VLEN + 
-                                                                kj * kw * VLEN * VLEN + 
-                                                                ki * VLEN * VLEN + 
-                                                                ifm * VLEN + 
-                                                                ofm;
-
-                                        for (p = 0; p < RB_p; p++) { //P
-                                            ijo = ij + stride_h * p;
-                                            // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                                              
-                                            for (q = 0; q < RB_q; q++) { //Q
-                                                iio = ii + stride_w * q;
-                                                // if (iio + ki < 0 || iio + ki >= ifw) continue;
-                                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                        ifm_b * ifhp * ifwp * VLEN+ 
-                                                                        (ijo + kj) * ifwp * VLEN + 
-                                                                        (iio + ki) * VLEN +
-                                                                        ifm;
-                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                        ofm_b * ofhp * ofwp * VLEN + 
-                                                                        (oj + p) * ofwp * VLEN + 
-                                                                        (oi + q) * VLEN +
-                                                                        ofm;
-                                                
-                                                output[outputIndex] += filter[filterIndex] * input[inputIndex];
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                            CONV(std::vector<float>(input.begin() +  img * nIfm * ifhp * ifwp + 
+                                                        ifm_b * ifhp * ifwp * VLEN+ ), 
+                                std::vector<float>(output.begin() + img * nOfm * ofhp * ofwp + 
+                                                        ofm_b * ofhp * ofwp * VLEN + ),
+                                std::vector<float>(filter.begin() + ofm_b * nIfm * kh * kw * VLEN + 
+                                                        ifm_b * kh * kw * VLEN * VLEN + ),
+                                kh, kw, VLEN, RB_p, RB_q, ij, ii, stride_h, stride_w);
                     }
                 }
             }
         }
     }
 
+}
+
+void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int ij, int ii, int stride_h, int stride_w) {
+   int kj, ki, ofm, ifm, p, q, ijo, iio;
+   for (kj = 0; kj < kh; kj++) { //R
+        for (ki = 0; ki < kw; ki++) { //S
+            for (ofm = 0; ofm < VLEN; ofm++) { //k
+                for (ifm = 0; ifm < VLEN; ifm++) { //c
+                    size_t filterIndex =    kj * kw * VLEN * VLEN + 
+                                            ki * VLEN * VLEN + 
+                                            ifm * VLEN + 
+                                            ofm;
+
+                    for (p = 0; p < RB_p; p++) { //P
+                        ijo = ij + stride_h * p;
+                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                            
+                        for (q = 0; q < RB_q; q++) { //Q
+                            iio = ii + stride_w * q;
+                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
+                            size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
+                                                    (iio + ki) * VLEN +
+                                                    ifm;
+                            size_t outputIndex =    (oj + p) * ofwp * VLEN + 
+                                                    (oi + q) * VLEN +
+                                                    ofm;
+                            
+                            output[outputIndex] += filter[filterIndex] * input[inputIndex];
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void reg_block_conv_bp(conv_t* param, std::vector<float>& input, const std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& naive_input_save) {
