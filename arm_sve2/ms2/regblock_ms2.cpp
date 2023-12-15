@@ -90,9 +90,9 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
                         auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
                         auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
-                        auto subvecSize = VLEN * VLEN * RB_p * RB_q;
+                        auto subvecSize = kh * kw * VLEN * VLEN * RB_p * RB_q;
                         CONV(std::vector<float>(inputIndex, inputIndex + subvecSize), 
-                            std::vector<float>(outputIndex, outputIndex +subvecSize),
+                            std::vector<float>(outputIndex, outputIndex + subvecSize),
                             std::vector<float>(filterIndex, filterIndex + subvecSize),
                             kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
                     }
