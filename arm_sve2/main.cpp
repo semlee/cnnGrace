@@ -49,8 +49,8 @@ int main (int argc, char** argv) {
     conv_t conv_param;
     naive_conv_t naive_param;
 
-    int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
-    int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
+    volatile int ifhp, ifwp, ofhp, ofwp, ofh, ofw;
+    volatile int stride_h, stride_w, pad_h, pad_w, pad_h_in, pad_w_in, pad_h_out, pad_w_out;
     
     //void* scratch;
     //size_t scratch_size = 0;
@@ -407,7 +407,7 @@ int main (int argc, char** argv) {
 
         start = high_resolution_clock::now();
         for (int i = 0 ; i < iters; i++) {
-            reg_block_conv_fp(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
+            g(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
         }
         end = high_resolution_clock::now();
 
