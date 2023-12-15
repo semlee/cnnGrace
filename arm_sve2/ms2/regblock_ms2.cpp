@@ -17,18 +17,16 @@ void CONV(const std::vector<float> input, std::vector<float> output, const std::
         for (ki = 0; ki < kw; ki++) { //S
             for (ofm = 0; ofm < VLEN; ofm++) { //k
                 for (ifm = 0; ifm < VLEN; ifm++) { //c
-                    size_t filterIndex =    kj * kw * VLEN * VLEN + 
+                    for (p = 0; p < RB_p; p++) { //P
+                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;                 
+                        for (q = 0; q < RB_q; q++) { //Q
+                            ijo = ij + stride_h * p;
+                            iio = ii + stride_w * q;
+                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
+                            size_t filterIndex =    kj * kw * VLEN * VLEN + 
                                             ki * VLEN * VLEN + 
                                             ifm * VLEN + 
                                             ofm;
-
-                    for (p = 0; p < RB_p; p++) { //P
-                        ijo = ij + stride_h * p;
-                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-                                            
-                        for (q = 0; q < RB_q; q++) { //Q
-                            iio = ii + stride_w * q;
-                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
                             size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
                                                     (iio + ki) * VLEN +
                                                     ifm;
@@ -82,9 +80,9 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
         for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K_b {
             for (int ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
                 for (int oj_b = 0; oj_b < ofh_b; oj_b++) {
-                    int oj = oj_b * RB_p;
-                    int ij = oj * stride_h - pad_h;
                     for (int oi_b = 0; oi_b < ofw_b; oi_b ++) {
+                        int oj = oj_b * RB_p;
+                        int ij = oj * stride_h - pad_h;
                         int oi = oi_b * RB_q;
                         int ii = oi * stride_w - pad_w;
                         auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
