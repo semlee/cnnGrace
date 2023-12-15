@@ -192,9 +192,10 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                         ii = oi * stride_w;
                         for (kj = 0; kj < kh; kj++) { //R
                             for (ki = 0; ki < kw; ki++) { //S
-#if defined (_OPENMP)
-                                #pragma omp parallel for private(p, q)
-#endif                               
+                                size_t filterIndex =    ofm * nIfm * kh * kw * VLEN + 
+                                                        ifm * kh * kw * VLEN * VLEN + 
+                                                        kj * kw * VLEN * VLEN + 
+                                                        ki * VLEN * VLEN;
                                 for (p = 0; p < RB_p; p++) { //P
                                     ijo = ij + stride_h * p - pad_h;
                                     if (ijo + kj < 0 || ijo + kj >= ifh) continue;
@@ -215,18 +216,13 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
                                                                 (oj + p) * ofwp * VLEN + 
                                                                 (oi + q) * VLEN;
 
-                                        size_t filterIndex =    ofm * nIfm * kh * kw * VLEN + 
-                                                                ifm * kh * kw * VLEN * VLEN + 
-                                                                kj * kw * VLEN * VLEN + 
-                                                                ki * VLEN * VLEN;
-
                                         // Load vectors using SVE intrinsics
                                         svfloat32_t inputVector = svld1_f32(pred_ifm, input + inputIndex);
                                         svfloat32_t filterVector = svld1_f32(pred_all, filter + filterIndex);
                                         svfloat32_t outputVector = svld1_f32(pred_ofm, output + outputIndex);
 
                                         // run Vector MAC Unit
-                                        outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
+                                        outputVector = svmla_f32_m(pred_all, outputVector, inputVector, filterVector);
 
                                         // Store result back
                                         svst1_f32(pred_ofm, output + outputIndex, outputVector);
