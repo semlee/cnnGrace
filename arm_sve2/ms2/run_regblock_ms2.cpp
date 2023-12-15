@@ -104,16 +104,10 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                 kj * kw * VLEN * VLEN + 
                                                                 ki * VLEN * VLEN + 
                                                                 ifm * VLEN + 
-                                                                ofm;
-#if defined (_OPENMP)
-                                        #pragma omp unroll full
-#endif   
+                                                                ofm; 
                                         for (p = 0; p < RB_p; p++) { //P
                                             ijo = ij + stride_h * p - pad_h;
-                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
-#if defined (_OPENMP)
-                                            #pragma omp unroll full
-#endif                                                                   
+                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;                                                             
                                             for (q = 0; q < RB_q; q++) {
                                                 iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
