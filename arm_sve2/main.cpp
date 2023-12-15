@@ -496,12 +496,12 @@ int main (int argc, char** argv) {
         cout << endl;
 
         cout << "Naive Output" << endl;
-        for (int i = 0; i < outputSize; i++) {
+        for (int i = 0; i < 100; i++) {
             cout << naive_output[i] << " ";
         }
 
         cout << "Conv Output" << endl;
-        for (int i = 0; i < outputSize; i++) {
+        for (int i = 0; i < 100; i++) {
             cout << conv_output[i] << " ";
         }
 
