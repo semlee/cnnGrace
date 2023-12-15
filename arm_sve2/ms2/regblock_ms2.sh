@@ -3,7 +3,9 @@
 #SBATCH -t 0-01:00:00
 #SBATCH -J regblock_run
 #SBATCH -o output-%j.out -e output-%j.err
+#SBATCH -N 1
 #SBATCH -c 72
+#SBATCH -p c2-2x240gb 
 
 iters=10
 ifw=16
@@ -29,7 +31,7 @@ if [ $? -eq 0 ]; then
 
     # Run the compiled program with command-line arguments using srun
     #./naive_ms1 iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
-    srun -N 1 -p cg1-high --exclusive ./regblock_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
+    srun -N 1 --exclusive ./regblock_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
 
     # Optionally, you can pass command-line arguments stored in a file
     # srun -N 1 -p cg1-high --exclusive ./naive_layer $(cat input_args.txt)

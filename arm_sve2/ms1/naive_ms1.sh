@@ -3,7 +3,10 @@
 #SBATCH -t 0-00:30:00
 #SBATCH -J naive_run
 #SBATCH -o output-%j.out -e output-%j.err
+#SBATCH -N 1
 #SBATCH -c 1
+#SBATCH -p c2-2x240gb 
+
 
 iters=1000
 ifw=16
@@ -29,7 +32,7 @@ if [ $? -eq 0 ]; then
 
     # Run the compiled program with command-line arguments using srun
     #./naive_ms1 iters ifw ifh nImg nIfm nOfm kw kh padw padh stride type format padding_mode
-    srun -N 1 -p cg1-high --exclusive ./naive_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
+    srun -N 1 --exclusive ./naive_layer $iters $ifw $ifh $nImg $nIfm $nOfm $kw $kh $padw $padh $stride $type $format $padding_mode
 
     # Optionally, pass command-line arguments stored in a file
     # srun -N 1 -p cg1-high --exclusive ./naive_layer $(cat input_args.txt)

@@ -3,7 +3,9 @@
 #SBATCH -t 0-00:30:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
+#SBATCH -N 1
 #SBATCH -c 1
+#SBATCH -p c2-2x240gb 
 
 # Compile the C++ file
 # Compile individual source files

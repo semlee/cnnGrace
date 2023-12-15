@@ -4,6 +4,7 @@
 #SBATCH -J conv_layer
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
+#SBATCH -N 1
 #SBATCH -p c2-2x240gb 
 iters=10
 ifw=224

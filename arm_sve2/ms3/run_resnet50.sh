@@ -4,6 +4,8 @@
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
+#SBATCH -N 1
+#SBATCH -p c2-2x240gb 
 
 # Compile the C++ file
 # Compile individual source files
@@ -33,7 +35,7 @@ stride_values=(2 1 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1)
 
 # Iterate over the indices of the arrays
 for i in "${!ifw_values[@]}"; do
-    srun -N 1 -p cg1-high --exclusive ./conv_layer \
+    srun -N 1 --exclusive ./conv_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} $nImg_values ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD 
