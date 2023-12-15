@@ -379,23 +379,14 @@ int main (int argc, char** argv) {
     printf("SIZE Output  (1): %10.2f MiB\n", (double)(1*nOfm*ofhp*ofwp*   sizeof(float))/(1024.0*1024.0) );
     printf("SIZE Weight     : %10.2f MiB\n", (double)(nIfm*nOfm*kw*kh*    sizeof(float))/(1024.0*1024.0) );
 
+#if defined(_OPENMP)
+    double start;
+    double end;
+#else
     high_resolution_clock::time_point start;
     high_resolution_clock::time_point end;
     duration<double, std::milli> duration_sec;
-
-    printf("##########################################\n");
-    printf("#            Naive Computation           #\n");
-    printf("##########################################\n");
-    if (type == 'A' || type == 'F') { 
-        naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
-    }
-    // if (type == 'A' || type == 'B') {
-    //     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
-    // }
-    // if (type == 'A' || type == 'U') {
-    //     naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
-    // }
-
+#endif
     printf("##########################################\n");
     printf("#           Performance Analysis         #\n");
     printf("##########################################\n");
@@ -404,17 +395,28 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
-
+#if defined(_OPENMP)
+        start = omp_get_wtime();
+#else
         start = high_resolution_clock::now();
-        for (int i = 0 ; i < iters; i++) {
-            reg_block_conv_fp(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
-        }
-        end = high_resolution_clock::now();
+#endif    
 
+        for (int i = 0; i < iters; i++) {
+#if defined(_OPENMP)
+#           pragma omp parallel
+#endif
+            {
+                reg_block_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+            }
+        }
+#if defined(_OPENMP)
+        end = omp_get_wtime();
+        double l_total = (end - start);
+#else
+        end = high_resolution_clock::now();
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
         double l_total = duration_sec.count() * 1e-6;
-        
+#endif 
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
@@ -482,7 +484,7 @@ int main (int argc, char** argv) {
         cout << "##########################################\n";
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
-
+        naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
         cout << "Input" << endl;
         for (int i = 0; i < 100; i++) {
             cout << naive_input[i] << " ";
@@ -514,7 +516,7 @@ int main (int argc, char** argv) {
             }
         }  
         cout << endl;
-        
+
         for (size_t i = 0; i < outputSize; i++) {
             if (conv_output[i] != naive_output[i]) {
                 error_count++;
@@ -527,7 +529,7 @@ int main (int argc, char** argv) {
     //     cout << "               BACKWARD PASS              \n";
     //     cout << "##########################################\n";
     //     int error_count = 0;
-
+    //     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
     //     for (int i = 0; i < inputSize; i++) {
     //         if (conv_input[i] != naive_input[i]) {
     //             error_count++;
@@ -540,7 +542,7 @@ int main (int argc, char** argv) {
     //     cout << "               UPDATE WEIGHT              \n";
     //     cout << "##########################################\n";
     //     int error_count = 0;
-
+    //     naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
     //     for (int i = 0; i < filterSize; i++) {
     //         if (conv_filter_wu[i] != naive_filter_wu[i]) {
     //             error_count++;

@@ -98,9 +98,6 @@ void naive_conv_fp(naive_conv_t* param, const std::vector<float>& input, std::ve
     /* loop counters */
     int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
 
-#if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
-#endif
     for (img = 0; img < nImg; ++img) { //N
         for (ofm = 0; ofm < nOfm; ++ofm) { //K
             for (ifm = 0; ifm < nIfm; ++ifm) { //C
