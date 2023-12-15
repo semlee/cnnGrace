@@ -48,41 +48,41 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     #pragma omp parallel for private(img, ofm_b, ifm_b, oj_b, oi_b, ij, ii, kj, ki, ofm, ifm, p, q)
 #endif
 
-    for (img = 0; img < nImg; img++) {
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) {
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
-                for (oj_b = 0; oj_b < ofh_b; oj_b++) {
+    for (img = 0; img < nImg; img++) { //N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K_b
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { //C_b
+                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
-                    for (oi_b = 0; oi_b < ofw_b; oi_b++) {
+                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
                         oi = oi_b * RB_p;
                         ii = oi * stride_w - pad_w;
-                        for (kj = 0; kj < kh; kj++) {
-                            for (ki = 0; ki < kw; ki++) {
-                                for (ofm = 0; ofm < VLEN; ofm++) {
-                                    for (ifm = 0; ifm < VLEN; ifm++) {
-                                        size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw + 
-                                                                (ifm_b * VLEN + ifm) * kh * kw * VLEN + 
+                        for (kj = 0; kj < kh; kj++) { //R
+                            for (ki = 0; ki < kw; ki++) { //S
+                                for (ofm = 0; ofm < VLEN; ofm++) { //k
+                                    for (ifm = 0; ifm < VLEN; ifm++) { //c
+                                        size_t filterIndex =    (ofm_b * VLEN + ofm) * nIfm * kh * kw +
+                                                                (ifm_b * VLEN + ifm) * kh * kw +
                                                                 kj * kw + 
                                                                 ki;
-                                                                
+
                                         for (p = 0; p < RB_p; p++) { //P
                                             ijo = ij + stride_h * p;
-                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;                                                              
-                                            for (q = 0; q < RB_q; q++) {
+                                            if (ijo + kj < 0 || ijo + kj >= ifh) continue;
+                                                              
+                                            for (q = 0; q < RB_q; q++) { //Q
                                                 iio = ii + stride_w * q;
                                                 if (iio + ki < 0 || iio + ki >= ifw) continue;
                                                 size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                         (ifm_b * VLEN + ifm) * ifhp * ifwp + 
                                                                         (ijo + kj) * ifwp + 
                                                                         (iio + ki);
-                                                                        
                                                 size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                         (ofm_b * VLEN + ofm) * ofhp * ofwp + 
                                                                         (oj + p) * ofwp + 
                                                                         (oi + q);
                                                 
-                                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+                                                output[outputIndex] += filter[filterIndex] * input[inputIndex];
                                             }
                                         }
                                     }
