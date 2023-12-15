@@ -406,7 +406,7 @@ int main (int argc, char** argv) {
 #           pragma omp parallel
 #endif
             {
-                reg_block_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+                reg_block_conv_fp(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
             }
         }
 #if defined(_OPENMP)
