@@ -308,14 +308,14 @@ int main (int argc, char** argv) {
     
     /* Allocate memory for naive arrays */
     std::vector<float> naive_input(inputSize);
-    std::vector<float> naive_input_save(inputSize);
+    // std::vector<float> naive_input_save(inputSize);
 
     std::vector<float> naive_output(outputSize, 0.0f);
     std::vector<float> naive_output_bp = naive_output;
     std::vector<float> naive_output_wu = naive_output;
 
     std::vector<float> naive_filter(filterSize);
-    std::vector<float> naive_filter_wu(filterSize);
+    // std::vector<float> naive_filter_wu(filterSize);
 
     std::vector<float> naive_bias(nOfm);
 
@@ -324,46 +324,46 @@ int main (int argc, char** argv) {
     fill_random_array(naive_filter, filterSize);
 
     // Copy values
-    std::copy(naive_input.begin(), naive_input.end(), naive_input_save.begin());
+    // std::copy(naive_input.begin(), naive_input.end(), naive_input_save.begin());
 
     // Allocate memory for real convolutional arrays
-    std::vector<float> conv_input(inputSize);
-    std::vector<float> conv_input_save(inputSize);
+    // std::vector<float> conv_input(inputSize);
+    // std::vector<float> conv_input_save(inputSize);
 
     std::vector<float> conv_output(outputSize, 0.0f);
     std::vector<float> conv_output_bp = conv_output;
     std::vector<float> conv_output_wu = conv_output;
-    std::vector<float> conv_output_save(outputSize, 0.0f);
+    // std::vector<float> conv_output_save(outputSize, 0.0f);
 
-    std::vector<float> conv_filter(filterSize);
-    std::vector<float> conv_filter_wu(filterSize);
+    // std::vector<float> conv_filter(filterSize);
+    // std::vector<float> conv_filter_wu(filterSize);
 
-    std::vector<float> conv_bias(nOfm);
+    // std::vector<float> conv_bias(nOfm);
 
     // Copy values
-    std::copy(naive_input.begin(), naive_input.end(), conv_input.begin());
-    std::copy(naive_input.begin(), naive_input.end(), conv_input_save.begin());
-    std::copy(naive_filter.begin(), naive_filter.end(), conv_filter.begin());
+    // std::copy(naive_input.begin(), naive_input.end(), conv_input.begin());
+    // std::copy(naive_input.begin(), naive_input.end(), conv_input_save.begin());
+    // std::copy(naive_filter.begin(), naive_filter.end(), conv_filter.begin());
  
-    bool debug = false;
+    // bool debug = false;
 
-    if (debug) {
-        cout << " DEBUGGING MODE " << endl;
-        cout << "NAIVE vs. CONV INPUT\n" ;
-        int error_count = 0;
-        for (int i = 0; i < inputSize; i++) {
-            if (naive_input[i] != conv_input[i])
-                error_count++;
-        }
-        cout << "Error Count : " << error_count << endl;
-        cout << "NAIVE vs. CONV FILTER\n" ;
-        error_count = 0;
-        for (int i = 0; i < filterSize; i++) {
-            if (naive_filter_wu[i] != conv_filter_wu[i])
-                error_count++;
-        }
-        cout << "Error Count : " << error_count << endl;
-    }
+    // if (debug) {
+    //     cout << " DEBUGGING MODE " << endl;
+    //     cout << "NAIVE vs. CONV INPUT\n" ;
+    //     int error_count = 0;
+    //     for (int i = 0; i < inputSize; i++) {
+    //         if (naive_input[i] != conv_input[i])
+    //             error_count++;
+    //     }
+    //     cout << "Error Count : " << error_count << endl;
+    //     cout << "NAIVE vs. CONV FILTER\n" ;
+    //     error_count = 0;
+    //     for (int i = 0; i < filterSize; i++) {
+    //         if (naive_filter_wu[i] != conv_filter_wu[i])
+    //             error_count++;
+    //     }
+    //     cout << "Error Count : " << error_count << endl;
+    // }
 
     /* print some summary */
     printf("##########################################\n");
@@ -387,29 +387,14 @@ int main (int argc, char** argv) {
     printf("#            Naive Computation           #\n");
     printf("##########################################\n");
     if (type == 'A' || type == 'F') { 
-        start = high_resolution_clock::now();
         naive_conv_fp(&naive_param, naive_input, naive_output, naive_filter, naive_bias);
-        end = high_resolution_clock::now();
-
-        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = (double)duration_sec.count() * 1e-3;
-        
-
-        double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
-
-        printf("Total Time = %.5g\n", (double)l_total);
-        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
-        printf("fp time = %.5g\n", ((double)(l_total/iters)));
-        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
-        
     }
-    if (type == 'A' || type == 'B') {
-        naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
-    }
-    if (type == 'A' || type == 'U') {
-        naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
-    }
+    // if (type == 'A' || type == 'B') {
+    //     naive_conv_bp(&naive_param, naive_input, naive_output_bp, naive_filter, naive_input_save);
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     naive_conv_uw(&naive_param, naive_input_save, naive_output_wu, naive_filter_wu);
+    // }
 
     printf("##########################################\n");
     printf("#           Performance Analysis         #\n");
@@ -422,7 +407,7 @@ int main (int argc, char** argv) {
 
         start = high_resolution_clock::now();
         for (int i = 0 ; i < iters; i++) {
-            reg_block_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
+            reg_block_conv_fp(&conv_param, naive_input, conv_output, naive_filter, naive_bias);
         }
         end = high_resolution_clock::now();
 
@@ -442,52 +427,52 @@ int main (int argc, char** argv) {
         //     ifw, ifh, kw, kh, stride, padw, padh, ((double)(l_total/iters)), (flops*1e-9)/l_total, norms_fwd.l1_ref, norms_fwd.l1_tst,
         //     norms_fwd.l2_abs, norms_fwd.l2_rel, norms_fwd.linf_abs, norms_fwd.linf_rel, norms_fwd.normf_rel);
     }
-    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
-        cout << "##########################################\n";
-        cout << "               BACKWARD PASS              \n";
-        cout << "##########################################\n";
+    // if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
+    //     cout << "##########################################\n";
+    //     cout << "               BACKWARD PASS              \n";
+    //     cout << "##########################################\n";
 
-        start = high_resolution_clock::now();
-        reg_block_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
-        end = high_resolution_clock::now();
+    //     start = high_resolution_clock::now();
+    //     reg_block_conv_bp(&conv_param, conv_input, conv_output_bp, conv_filter, conv_input_save);
+    //     end = high_resolution_clock::now();
 
-        duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = duration_sec.count() * 1e-6;
+    //     duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
+    //     //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    //     double l_total = duration_sec.count() * 1e-6;
         
 
-        double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+    //     double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
-        printf("Total Time = %.5g\n", l_total);
-        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
-        printf("fp time = %.5g\n", ((double)(l_total/iters)));
-        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
+    //     printf("Total Time = %.5g\n", l_total);
+    //     printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+    //     printf("fp time = %.5g\n", ((double)(l_total/iters)));
+    //     printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
 
-        printf("PERFDUMP,FP,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%.5g\n", 
-                nThreads, nImg, nIfm, nOfm, ifw, ifh, kw, kh, stride, padw, padh, 
-                l_total, ((double)(l_total/iters)), (flops*1e-9)/l_total);
-    }
-    if (type == 'A' || type == 'U') {
-        cout << "##########################################\n";
-        cout << "               UPDATE WEIGHT              \n";
-        cout << "##########################################\n";
+    //     printf("PERFDUMP,FP,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%.5g\n", 
+    //             nThreads, nImg, nIfm, nOfm, ifw, ifh, kw, kh, stride, padw, padh, 
+    //             l_total, ((double)(l_total/iters)), (flops*1e-9)/l_total);
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     cout << "##########################################\n";
+    //     cout << "               UPDATE WEIGHT              \n";
+    //     cout << "##########################################\n";
 
-        start = high_resolution_clock::now();
-        reg_block_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
-        end = high_resolution_clock::now();
+    //     start = high_resolution_clock::now();
+    //     reg_block_conv_uw(&conv_param, conv_input_save, conv_output_wu, conv_filter_wu);
+    //     end = high_resolution_clock::now();
 
-        duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
-        //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
-        double l_total = (double)duration_sec.count() * 1e-3;
+    //     duration_sec = std::chrono::duration_cast<duration<double, std::milli>>(end - start);
+    //     //cout << "Total time consumed: " << duration_sec.count() << "ms\n";
+    //     double l_total = (double)duration_sec.count() * 1e-3;
         
 
-        double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
+    //     double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
-        printf("Total Time = %.5g\n", (double)l_total);
-        printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
-        printf("fp time = %.5g\n", ((double)(l_total/iters)));
-        printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
-    }
+    //     printf("Total Time = %.5g\n", (double)l_total);
+    //     printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
+    //     printf("fp time = %.5g\n", ((double)(l_total/iters)));
+    //     printf("GFLOPS  = %.5g\n", (flops*1e-9)/l_total);
+    // }
 
     printf("##########################################\n");
     printf("#           Correctness Checking         #\n");
@@ -507,45 +492,45 @@ int main (int argc, char** argv) {
         }
         cout << "Error Count: " << error_count << "/" << outputSize << "\n";
     }
-    if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
-        cout << "##########################################\n";
-        cout << "               BACKWARD PASS              \n";
-        cout << "##########################################\n";
-        int error_count = 0;
+    // if ( (type == 'A' || type == 'B') && (nIfm > 3) ) {
+    //     cout << "##########################################\n";
+    //     cout << "               BACKWARD PASS              \n";
+    //     cout << "##########################################\n";
+    //     int error_count = 0;
 
-        for (int i = 0; i < inputSize; i++) {
-            if (conv_input[i] != naive_input[i]) {
-                error_count++;
-            }
-        }
-        cout << "Error Count: " << error_count << "/" << inputSize << "\n";
-    }
-    if (type == 'A' || type == 'U') {
-        cout << "##########################################\n";
-        cout << "               UPDATE WEIGHT              \n";
-        cout << "##########################################\n";
-        int error_count = 0;
+    //     for (int i = 0; i < inputSize; i++) {
+    //         if (conv_input[i] != naive_input[i]) {
+    //             error_count++;
+    //         }
+    //     }
+    //     cout << "Error Count: " << error_count << "/" << inputSize << "\n";
+    // }
+    // if (type == 'A' || type == 'U') {
+    //     cout << "##########################################\n";
+    //     cout << "               UPDATE WEIGHT              \n";
+    //     cout << "##########################################\n";
+    //     int error_count = 0;
 
-        for (int i = 0; i < filterSize; i++) {
-            if (conv_filter_wu[i] != naive_filter_wu[i]) {
-                error_count++;
-            }
-        }
-        cout << "Error Count: " << error_count << "/" << filterSize << "\n";
-    }
+    //     for (int i = 0; i < filterSize; i++) {
+    //         if (conv_filter_wu[i] != naive_filter_wu[i]) {
+    //             error_count++;
+    //         }
+    //     }
+    //     cout << "Error Count: " << error_count << "/" << filterSize << "\n";
+    // }
 
-    if (debug) {
-        cout << "DEBUGGING MODE" << endl;
-        cout << "NAIVE vs. CONV OUTPUT" << endl;
-        for (int i = 0; i < outputSize; i++) {
-            cout << naive_output[i];
-        }
-        cout << endl;
-        for (int i = 0; i < outputSize; i++) {
-            cout << conv_output[i];
-        }
-        cout << endl;
-    }
+    // if (debug) {
+    //     cout << "DEBUGGING MODE" << endl;
+    //     cout << "NAIVE vs. CONV OUTPUT" << endl;
+    //     for (int i = 0; i < outputSize; i++) {
+    //         cout << naive_output[i];
+    //     }
+    //     cout << endl;
+    //     for (int i = 0; i < outputSize; i++) {
+    //         cout << conv_output[i];
+    //     }
+    //     cout << endl;
+    // }
     printf("##########################################\n");
     printf("#           Cleaning Up data...          #\n");
     printf("##########################################\n");

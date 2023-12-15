@@ -3,7 +3,7 @@
 #SBATCH -t 0-01:00:00
 #SBATCH -J regblock_run
 #SBATCH -o output-%j.out -e output-%j.err
-#SBATCH -c 1
+#SBATCH -c 72
 
 iters=10
 ifw=16
