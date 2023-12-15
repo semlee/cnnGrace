@@ -11,7 +11,7 @@
 g++ -o conv_layer -O0 run_regblock_ms2.cpp -std=c++11
 
 ITERS=10
-MB=72
+MB=1
 TYPE='F'
 FORMAT='L'
 PAD=1
