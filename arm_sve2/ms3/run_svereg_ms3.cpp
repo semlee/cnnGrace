@@ -73,53 +73,58 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
     int RB_p      = param->RB_p;
     int RB_q      = param->RB_q;
 
-    int nIfm_b = nIfm/VLEN;
-    int nOfm_b = nOfm/VLEN;
+    int nIfm_b = nIfm / VLEN + (nIfm % VLEN != 0);
+    int nOfm_b = nOfm / VLEN + (nOfm % VLEN != 0);
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
-                                          
-    for (img = 0; img < nImg; img++) { //N
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //C_b
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {  //K_b
-                for (oj_b = 0; oj_b < ofh_b; oj_b++) { //P_b
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
+
+
+    for (img = 0; img < nImg; ++img) { //N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { //C
+                for (oj_b = 0; oj_b < ofh_b; ++oj_b) { //P
                     oj = oj_b * RB_p;
-                    ij = oj * stride_h;
-                    for (oi_b = 0; oi_b < ofw_b; oi_b++) { //Q_b
+                    ij = oj * stride_h - pad_h;
+                    for (oi_b = 0; oi_b < ofw_b; ++oi_b) { //Q
                         oi = oi_b * RB_q;
-                        ii = oi * stride_w;
-                        for (kj = 0; kj < kh; kj++) { //R
-                            for (ki = 0; ki < kw; ki++) { //S
-                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; ++kj) { //R
+                            if (ij+kj < 0 || ij+kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ++ki) { //S
+                                if (ii+ki < 0 || ii+ki >= ifw) continue;
+                                size_t filterIndex =    ofm_b * nIfm_b * kh * kw * VLEN * VLEN + 
                                                         ifm_b * kh * kw * VLEN * VLEN + 
                                                         kj * kw * VLEN * VLEN + 
-                                                        ki * VLEN * VLEN;
-                                for (p = 0; p < RB_p; p++) { //P
-                                ijo = ij + stride_h * p - pad_h;
-                                if (ijo + kj < 0 || ijo + kj >= ifh) continue; 
-                                    for (q = 0; q < RB_q; q++) { //Q
-                                        iio = ii + stride_w * q - pad_w;
-                                        if (iio + ki < 0 || iio + ki >= ifw) continue;      
-                                            size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                                    ifm_b * ifhp * ifwp * VLEN+ 
-                                                                    (ijo + kj) * ifwp * VLEN + 
-                                                                    (iio + ki) * VLEN;
-                                                                    
-                                            size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                    ofm_b * ofhp * ofwp * VLEN + 
-                                                                    (oj + p) * ofwp * VLEN + 
-                                                                    (oi + q) * VLEN;  
+                                                        ki * VLEN * VLEN +
+                                                        ifm * VLEN +
+                                                        ofm;
+                                for (p = 0; p < RB_p; p++) {
+                                    ij0 = ij + stride_h * p;
+                                    if (ij0 + kj < 0 || ij0 + kj >= ifh) continue;   
+                                    for (q = 0; q < RB_q; q++) {
+                                        ii0 = ii + stride_w * q;
+                                        if (ii0 + ki < 0 || ii0 + ki >= ifw) continue; 
+                                        size_t inputIndex =     img * nIfm_b * ifhp * ifwp * VLEN + 
+                                                                ifm_b * ifhp * ifwp * VLEN + 
+                                                                (ij0 + kj) * ifwp * VLEN + 
+                                                                (ii0 + ki) * VLEN +
+                                                                ifm; 
+                                        size_t outputIndex =    img * nOfm_b * ofhp * ofwp * VLEN + 
+                                                                ofm_b * ofhp * ofwp * VLEN+ 
+                                                                (oj + p) * ofwp * VLEN+ 
+                                                                (oi + q) * VLEN +
+                                                                ofm;
+                                        // Load vectors using SVE intrinsics
+                                        svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
+                                        svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
+                                        svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
 
-                                            // Load vectors using SVE intrinsics
-                                            svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
-                                            svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
-                                            svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
+                                        // run Vector MAC Unit
+                                        outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
 
-                                            // run Vector MAC Unit
-                                            outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
-
-                                            // Store result back
-                                            svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
+                                        // Store result back
+                                        svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
                                     }
                                 }
                             }
@@ -127,18 +132,6 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                     }
                 }
             }
-#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-        // Apply ReLU activation function
-            for (int oj = 0; oj < ofh; oj++) {
-                for (int oi = 0; oi < ofw; oi++) {
-                    int reluIndex = img * nOfm_b * ofhp * ofwp +
-                                    ofm_b * nOfm_b * ofhp * ofwp +
-                                    oj * ofwp +
-                                    oi;
-                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
-                }
-            }
-#endif
         }
     }
 
