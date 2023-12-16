@@ -241,12 +241,12 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                 ii0 = ii + stride_w * q;
                                                 if (ii0+ki < 0 || ii0+ki >= ifw) continue;
                                                 size_t inputIndex =     img * nIfm * ifh * ifw + 
-                                                                        (ifm_b * nIfm_b + ifm) * ifhp * ifwp + 
-                                                                        (ij + kj) * ifwp + 
+                                                                        (ifm_b * nIfm_b + ifm) * ifh * ifw + 
+                                                                        (ij + kj) * ifw + 
                                                                         (ii + ki);
-                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                                        (ofm * nOfm_b + ofm) * ofhp * ofwp + 
-                                                                        oj * ofwp + 
+                                                size_t outputIndex =    img * nOfm * ofh * ofw + 
+                                                                        (ofm * nOfm_b + ofm) * ofh * ofw + 
+                                                                        oj * ofw + 
                                                                         oi;
                                                 size_t filterIndex =    (ofm * nOfm_b + ofm) * nIfm * kh * kw + 
                                                                         (ifm_b * nIfm_b + ifm) * kh * kw + 
