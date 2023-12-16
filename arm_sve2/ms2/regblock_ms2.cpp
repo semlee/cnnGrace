@@ -13,7 +13,7 @@
 // #include <arm_sve.h>
 
 void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int ifh, int ifw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
-   int kj, ki, ofm, ifm, p, q, ijo, iio;
+   int kj, ki, ofm, ifm, p, q, ij0, ii0;
    for (kj = 0; kj < kh; ++kj) { //R
         if (ij+kj < 0 || ij+kj >= ifh) continue;
         for (ki = 0; ki < kw; ++ki) { //S
@@ -30,8 +30,8 @@ void CONV(const std::vector<float> input, std::vector<float> output, const std::
                         for (q = 0; q < RB_q; q++) {
                             ii0 = ii + stride_w * q;
                             if (ii0 + ki < 0 || ii0 + ki >= ifw) continue; 
-                            size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
-                                                    (iio + ki) * VLEN +
+                            size_t inputIndex =     (ij0 + kj) * ifwp * VLEN + 
+                                                    (ii0 + ki) * VLEN +
                                                     ifm;
                             size_t outputIndex =    (oj + p) * ofwp * VLEN + 
                                                     (oi + q) * VLEN +
