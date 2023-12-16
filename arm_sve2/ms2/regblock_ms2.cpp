@@ -12,22 +12,24 @@
 #endif
 // #include <arm_sve.h>
 
-void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
+void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
    int kj, ki, ofm, ifm, p, q, ijo, iio;
-   for (kj = 0; kj < kh; kj++) { //R
-        for (ki = 0; ki < kw; ki++) { //S
-            for (ofm = 0; ofm < VLEN; ofm++) { //k
-                for (ifm = 0; ifm < VLEN; ifm++) { //c
-                    for (p = 0; p < RB_p; p++) { //P
-                        // if (ijo + kj < 0 || ijo + kj >= ifh) continue;                 
-                        for (q = 0; q < RB_q; q++) { //Q
-                            ijo = ij + stride_h * p;
-                            iio = ii + stride_w * q;
-                            // if (iio + ki < 0 || iio + ki >= ifw) continue;
-                            size_t filterIndex =    kj * kw * VLEN * VLEN + 
-                                                    ki * VLEN * VLEN + 
-                                                    ifm * VLEN + 
-                                                    ofm;
+   for (kj = 0; kj < kh; ++kj) { //R
+        if (ij+kj < 0 || ij+kj >= ifh) continue;
+        for (ki = 0; ki < kw; ++ki) { //S
+            if (ii+ki < 0 || ii+ki >= ifw) continue;
+            for (ofm = 0; ofm < VLEN && ofm_b * VLEN + ofm < nOfm; ofm++) {
+                for (ifm = 0; ifm < VLEN && ifm_b * VLEN + ifm < nIfm; ifm++) {
+                    size_t filterIndex =    kj * kw * VLEN * VLEN + 
+                                            ki * VLEN * VLEN + 
+                                            ifm * VLEN + 
+                                            ofm;
+                    for (p = 0; p < RB_p; p++) {
+                        ij0 = ij + stride_h * p;
+                        if (ij0 + kj < 0 || ij0 + kj >= ifh) continue;   
+                        for (q = 0; q < RB_q; q++) {
+                            ii0 = ii + stride_w * q;
+                            if (ii0 + ki < 0 || ii0 + ki >= ifw) continue; 
                             size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
                                                     (iio + ki) * VLEN +
                                                     ifm;
@@ -44,7 +46,7 @@ void CONV(const std::vector<float> input, std::vector<float> output, const std::
     }
 }
 
-void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
+void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -75,17 +77,17 @@ void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, 
     int nOfm_b = nOfm / VLEN + (nOfm % VLEN != 0);
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    // volatile int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
 
-    for (int img = 0; img < nImg; img++) { // N
-        for (int ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K_b {
-            for (int ifm_b = 0; ifm_b < nIfm_b; ifm_b++) {
-                for (int oj_b = 0; oj_b < ofh_b; oj_b++) {
-                    for (int oi_b = 0; oi_b < ofw_b; oi_b ++) {
-                        int oj = oj_b * RB_p;
-                        int ij = oj * stride_h - pad_h;
-                        int oi = oi_b * RB_q;
-                        int ii = oi * stride_w - pad_w;
+    for (img = 0; img < nImg; ++img) { //N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { //C
+                for (oj_b = 0; oj_b < ofh_b; ++oj_b) { //P
+                    for (oi_b = 0; oi_b < ofw_b; ++oi_b) { //Q
+                        oj = oj_b * RB_p;
+                        ij = oj * stride_h - pad_h;
+                        oi = oi_b * RB_q;
+                        ii = oi * stride_w - pad_w;
                         auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
                         auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
                         auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
@@ -93,12 +95,13 @@ void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, 
                         CONV(std::vector<float>(inputIndex, inputIndex + subvecSize), 
                             std::vector<float>(outputIndex, outputIndex + subvecSize),
                             std::vector<float>(filterIndex, filterIndex + subvecSize),
-                            kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
+                            kh, kw, ofm_b, ifm_b, nOfm, nIfm, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
                     }
                 }
             }
         }
     }
+    
 }
 
 void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
@@ -187,7 +190,7 @@ void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::
     }
 }
 
-void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
+void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
