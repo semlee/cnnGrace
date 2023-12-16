@@ -5,7 +5,7 @@
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
 #SBATCH -N 1
-#SBATCH -p c2-2x240gb 
+#SBATCH -p cg1-cpu480gb-gpu96gb
 iters=10
 ifw=224
 ifh=224
