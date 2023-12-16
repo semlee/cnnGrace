@@ -105,8 +105,8 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                         if (ii0 + ki < 0 || ii0 + ki >= ifw) continue; 
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                 ifm * ifhp * ifwp * VLEN+ 
-                                                                (ijo + kj) * ifwp * VLEN + 
-                                                                (iio + ki) * VLEN;
+                                                                (ij0 + kj) * ifwp * VLEN + 
+                                                                (ii0 + ki) * VLEN;
                                                                 
                                         size_t outputIndex =    img * nOfm * ofhp * ofwp + 
                                                                 ofm * ofhp * ofwp * VLEN + 
