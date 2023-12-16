@@ -88,9 +88,9 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         ij = oj * stride_h - pad_h;
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
-                        auto inputIndex = input.begin() + img * nIfm * ifhp * ifwp + ifm_b * ifhp * ifwp * VLEN;
-                        auto outputIndex = output.begin() + img * nOfm * ofhp * ofwp + ofm_b * ofhp * ofwp * VLEN;
-                        auto filterIndex = filter.begin() + ofm_b * nIfm * kh * kw * VLEN + ifm_b * kh * kw * VLEN * VLEN;
+                        auto inputIndex = input.begin() + img * nIfm_b * ifhp * ifwp * VLEN + ifm_b * ifhp * ifwp * VLEN;
+                        auto outputIndex = output.begin() + img * nOfm_b * ofhp * ofwp * VLEN + ofm_b * ofhp * ofwp * VLEN;
+                        auto filterIndex = filter.begin() + ofm_b * nIfm_b * kh * kw * VLEN * VLEN + ifm_b * kh * kw * VLEN * VLEN;
                         auto subvecSize = kh * kw * VLEN * VLEN * RB_p * RB_q;
                         CONV(std::vector<float>(inputIndex, inputIndex + subvecSize), 
                             std::vector<float>(outputIndex, outputIndex + subvecSize),
