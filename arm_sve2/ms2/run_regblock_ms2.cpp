@@ -683,14 +683,10 @@ int main (int argc, char** argv) {
     printf("SIZE Output  (1): %10.2f MiB\n", (double)(1*nOfm*ofhp*ofwp*   sizeof(float))/(1024.0*1024.0) );
     printf("SIZE Weight     : %10.2f MiB\n", (double)(nIfm*nOfm*kw*kh*    sizeof(float))/(1024.0*1024.0) );
 
-// #if defined(_OPENMP)
-//     double start;
-//     double end;
-// #else
-//     high_resolution_clock::time_point start;
-//     high_resolution_clock::time_point end;
-//     duration<double, std::milli> duration_sec;
-// #endif
+#if defined(_OPENMP)
+    double omp_start;
+    double omp_end;
+#endif
     high_resolution_clock::time_point start;
     high_resolution_clock::time_point end;
     duration<double, std::milli> duration_sec;
@@ -711,13 +707,10 @@ int main (int argc, char** argv) {
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
 
-// #if defined(_OPENMP)
-//         start = omp_get_wtime();
-// #else
-//         start = high_resolution_clock::now();
-// #endif    
+#if defined(_OPENMP)
+        omp_start = omp_get_wtime();
+#endif    
         start = high_resolution_clock::now();
-
         for (int i = 0; i < iters; i++) {
 #if defined(_OPENMP)
 #           pragma omp parallel
@@ -726,19 +719,16 @@ int main (int argc, char** argv) {
                 arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
             }
         }
-// #if defined(_OPENMP)
-//         end = omp_get_wtime();
-//         double l_total = (end - start);
-// #else
-//         end = high_resolution_clock::now();
-//         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-//         double l_total = duration_sec.count() * 1e-6;
-// #endif 
         end = high_resolution_clock::now();
+#if defined(_OPENMP)
+        omp_end = omp_get_wtime();
+        double omp_time = (end - start);
+#endif 
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
         double l_total = duration_sec.count() * 1e-6;
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
+        printf("Openmp Time = %.5g\n", omp_time);
         printf("Total Time = %.5g\n", (double)l_total);
         printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
