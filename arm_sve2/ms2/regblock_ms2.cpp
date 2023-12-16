@@ -251,7 +251,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                 // size_t filterIndex =    (ofm * nOfm_b + ofm) * nIfm * kh * kw + 
                                                 //                         (ifm_b * nIfm_b + ifm) * kh * kw + 
                                                 //                         kj * kw + 
-                                                                        ki;
+                                                                        // ki;
                                                 size_t inputIndex =     img * nIfm_b * ifhp * ifwp * VLEN + 
                                                                         ifm_b * ifhp * ifwp * VLEN + 
                                                                         (ij0 + kj) * ifwp * VLEN + 
