@@ -101,7 +101,7 @@ void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, 
     }
 }
 
-void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
+void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -176,7 +176,6 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];        
                                             }
                                         }
-                                        
                                     }
                                 }
                             }
@@ -188,7 +187,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     }
 }
 
-void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
+void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -215,16 +214,16 @@ void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::
     int RB_p      = param->RB_p;
     int RB_q      = param->RB_q;
 
-    // int nIfm_b = static_cast<int>(std::round(static_cast<double>(nIfm) / static_cast<double>(VLEN)));
-    // int nOfm_b = static_cast<int>(std::round(static_cast<double>(nOfm) / static_cast<double>(VLEN)));
+    int nIfm_b = nIfm / VLEN + (nIfm % VLEN != 0);
+    int nOfm_b = nOfm / VLEN + (nOfm % VLEN != 0);
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
 
 
     for (img = 0; img < nImg; ++img) { //N
-        for (ofm_b = 0; ofm_b < nOfm; ofm_b += VLEN) { //K
-            for (ifm_b = 0; ifm_b < nIfm; ifm_b += VLEN) { //C
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { //K
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { //C
                 for (oj_b = 0; oj_b < ofh_b; ++oj_b) { //P
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
@@ -235,8 +234,8 @@ void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::
                             if (ij+kj < 0 || ij+kj >= ifh) continue;
                             for (ki = 0; ki < kw; ++ki) { //S
                                 if (ii+ki < 0 || ii+ki >= ifw) continue;
-                                for (ofm = 0; ofm < std::min(ofm_b + VLEN, nOfm); ofm++) {
-                                    for (ifm = 0; ifm < std::min(ifm_b + VLEN, nIfm); ifm++) {
+                                for (ofm = 0; ofm < VLEN && ofm_b * VLEN + ofm < nOfm; ofm++) {
+                                    for (ifm = 0; ifm < VLEN && ifm_b * VLEN + ifm < nIfm; ifm++) {
                                         for (p = 0; p < RB_p; p++) {
                                             for (q = 0; q < RB_q; q++) {
                                                 ij0 = ij + stride_h * p;
