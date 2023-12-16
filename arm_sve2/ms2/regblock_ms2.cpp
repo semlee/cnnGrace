@@ -134,7 +134,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     int ofw_b = ofw/RB_q;
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
 
-
+ssh ssh.axisapps.io  -l 73ca7effa71544c2af597185f8cd8f49
     for (img = 0; img < nImg; ++img) { //N
         for (ofm_b = 0; ofm_b < nOfm_b; ++ofm_b) { //K
             for (ifm_b = 0; ifm_b < nIfm_b; ++ifm_b) { //C
