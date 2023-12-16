@@ -148,9 +148,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         oi = oi_b * RB_q;
                         ii = oi * stride_w - pad_w;
                         for (kj = 0; kj < kh; ++kj) { //R
-                            if (ij+kj < 0 || ij+kj >= ifh) continue;
                             for (ki = 0; ki < kw; ++ki) { //S
-                                if (ii+ki < 0 || ii+ki >= ifw) continue;
                                 for (ofm = 0; ofm < VLEN && ofm_b * VLEN + ofm < nOfm; ofm++) {
                                     for (ifm = 0; ifm < VLEN && ifm_b * VLEN + ifm < nIfm; ifm++) {
                                         size_t filterIndex =    ofm_b * nIfm_b * kh * kw * VLEN * VLEN + 
