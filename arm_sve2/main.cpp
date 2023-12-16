@@ -511,7 +511,7 @@ int main (int argc, char** argv) {
         int error_count = 0;
 
         for (size_t i = 0; i < outputSize; i++) {
-            if (conv_output[i] == 0) {
+            if (naive_output[i] == 0) {
                 error_count++;
             }
         }  
