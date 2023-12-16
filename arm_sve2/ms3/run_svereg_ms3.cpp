@@ -46,7 +46,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -133,7 +133,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
 }
 
 
-void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
