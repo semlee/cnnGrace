@@ -131,7 +131,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     int nOfm_b = nOfm/VLEN;
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
-    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
 
 
     for (img = 0; img < nImg; ++img) { //N
