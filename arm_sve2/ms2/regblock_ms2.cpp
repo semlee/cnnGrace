@@ -24,9 +24,9 @@ void CONV(const std::vector<float> input, std::vector<float> output, const std::
                             iio = ii + stride_w * q;
                             // if (iio + ki < 0 || iio + ki >= ifw) continue;
                             size_t filterIndex =    kj * kw * VLEN * VLEN + 
-                                            ki * VLEN * VLEN + 
-                                            ifm * VLEN + 
-                                            ofm;
+                                                    ki * VLEN * VLEN + 
+                                                    ifm * VLEN + 
+                                                    ofm;
                             size_t inputIndex =     (ijo + kj) * ifwp * VLEN + 
                                                     (iio + ki) * VLEN +
                                                     ifm;
@@ -93,6 +93,81 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                             std::vector<float>(outputIndex, outputIndex + subvecSize),
                             std::vector<float>(filterIndex, filterIndex + subvecSize),
                             kh, kw, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg      = param->nImg;
+    int nIfm      = param->nIfm;
+    int nOfm      = param->nOfm;
+    int ifhp      = param->ifhp;
+    int ifwp      = param->ifwp;
+    int ofhp      = param->ofhp;
+    int ofwp      = param->ofwp;
+    int ifh       = param->ifh;
+    int ifw       = param->ifw;
+    int ofh       = param->ofh;
+    int ofw       = param->ofw;
+    int pad_h     = param->pad_h;
+    int pad_w     = param->pad_w;
+    int pad_h_in  = param->pad_h_in;
+    int pad_w_in  = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh        = param->kh;
+    int kw        = param->kw;
+    int stride_h  = param->stride_h;
+    int stride_w  = param->stride_w;
+    int VLEN      = param->VLEN;
+    int RB_p      = param->RB_p;
+    int RB_q      = param->RB_q;
+
+    int nIfm_b = nIfm/VLEN;
+    int nOfm_b = nOfm/VLEN;
+    int ofh_b = ofh/RB_p;
+    int ofw_b = ofw/RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ijo, iio;
+
+
+    for (img = 0; img < nImg; ++img) { //N
+        for (ofm = 0; ofm < nOfm; ++ofm) { //K
+            for (ifm = 0; ifm < nIfm; ++ifm) { //C
+                for (oj = 0; oj < ofh; ++oj) { //P
+                    ij = oj * stride_h - pad_h;
+                    for (oi = 0; oi < ofw; ++oi) { //Q
+                        ii = oi * stride_w - pad_w;
+                        for (kj = 0; kj < kh; ++kj) { //R
+                            if (ij+kj < 0 || ij+kj >= ifh) continue;
+                            for (ki = 0; ki < kw; ++ki) { //S
+                                if (ii+ki < 0 || ii+ki >= ifw) continue;
+                                // LIBXSMM_VLA_ACCESS(  4, output_t, img, ofm, oj, oi, nOfm, ofhp, ofwp) +=
+                                // LIBXSMM_VLA_ACCESS(4,  input_t, img, ifm, ij + kj, ii + ki, nIfm, ifhp, ifwp)
+                                // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
+                                // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
+                                // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
+                                
+                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                        ifm * ifhp * ifwp + 
+                                                        (ij + kj) * ifwp + 
+                                                        (ii + ki);
+                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                        ofm * ofhp * ofwp + 
+                                                        oj * ofwp + 
+                                                        oi;
+                                size_t filterIndex =    ofm * nIfm * kh * kw + 
+                                                        ifm * kh * kw + 
+                                                        kj * kw + 
+                                                        ki;
+
+                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
+
+                            }
+                        }
                     }
                 }
             }
