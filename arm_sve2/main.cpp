@@ -510,11 +510,11 @@ int main (int argc, char** argv) {
         cout << endl;
         int error_count = 0;
 
-        for (size_t i = 0; i < outputSize; i++) {
-            if (conv_output[i] != 0) {
-                cout << conv_output[i] << " ";
-            }
-        }  
+        // for (size_t i = 0; i < outputSize; i++) {
+        //     if (conv_output[i] != 0) {
+        //         cout << conv_output[i] << " ";
+        //     }
+        // }  
         cout << endl;
 
         for (size_t i = 0; i < outputSize; i++) {
