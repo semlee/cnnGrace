@@ -100,7 +100,7 @@ void reg_block_conv_fp_lanigiro(conv_t* param, const std::vector<float>& input, 
     }
 }
 
-void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
