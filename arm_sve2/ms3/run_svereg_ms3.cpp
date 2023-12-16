@@ -699,7 +699,13 @@ int main (int argc, char** argv) {
         printf("PERFDUMP,FP,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%.5g,%.5g,%.5g\n", 
                 nThreads, nImg, nIfm, nOfm, ifw, ifh, kw, kh, stride, padw, padh, 
                 l_total, ((double)(l_total/iters)), (flops*1e-9)/l_total);
-                
+        for (int i = 0; i < outputSize; i++) {
+            if (conv_output[i] == 0) {
+                error_count++;
+            }
+        }
+        cout << "Zeros: " << error_count << "/" << outputSize << "\n";
+        
         // cout << "Input" << endl;
         // for (int i = 0; i < 10; i++) {
         //     cout << conv_input[i] << " ";
