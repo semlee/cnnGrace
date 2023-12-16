@@ -136,8 +136,8 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
 
 
     for (img = 0; img < nImg; ++img) { //N
-        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b += VLEN) { //K
-            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b += VLEN) { //C
+        for (ofm_b = 0; ofm_b < nOfm; ofm_b += VLEN) { //K
+            for (ifm_b = 0; ifm_b < nIfm; ifm_b += VLEN) { //C
                 for (oj_b = 0; oj_b < ofh_b; ++oj_b) { //P
                     oj = oj_b * RB_p;
                     ij = oj * stride_h - pad_h;
