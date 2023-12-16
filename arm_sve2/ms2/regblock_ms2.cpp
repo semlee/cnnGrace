@@ -135,8 +135,8 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
 
 
     for (img = 0; img < nImg; ++img) { //N
-        for (ofm = 0; ofm < nOfm; ++ofm) { //K
-            for (ifm = 0; ifm < nIfm; ++ifm) { //C
+        for (ofm_b = 0; ofm_b < nOfm_b; ++ofm_b) { //K
+            for (ifm_b = 0; ifm_b < nIfm_b; ++ifm_b) { //C
                 for (oj = 0; oj < ofh; ++oj) { //P
                     ij = oj * stride_h - pad_h;
                     for (oi = 0; oi < ofw; ++oi) { //Q
@@ -145,27 +145,28 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                             if (ij+kj < 0 || ij+kj >= ifh) continue;
                             for (ki = 0; ki < kw; ++ki) { //S
                                 if (ii+ki < 0 || ii+ki >= ifw) continue;
-                                // LIBXSMM_VLA_ACCESS(  4, output_t, img, ofm, oj, oi, nOfm, ofhp, ofwp) +=
-                                // LIBXSMM_VLA_ACCESS(4,  input_t, img, ifm, ij + kj, ii + ki, nIfm, ifhp, ifwp)
-                                // * LIBXSMM_VLA_ACCESS(4, filter_t, ofm, ifm, kj, ki, nIfm, kh, kw);
-                                // output[n][k][oj][oi] += input[n][c][ij + r][ii + s] ∗ filter[k][c][r][s];
-                                // output[img][ofm][oj][oi] += input[img][ifm][ij + kj][ii + ki] ∗ filter[ofm][ifm][kj][ki];
-                                
-                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
-                                                        ifm * ifhp * ifwp + 
-                                                        (ij + kj) * ifwp + 
-                                                        (ii + ki);
-                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
-                                                        ofm * ofhp * ofwp + 
-                                                        oj * ofwp + 
-                                                        oi;
-                                size_t filterIndex =    ofm * nIfm * kh * kw + 
-                                                        ifm * kh * kw + 
-                                                        kj * kw + 
-                                                        ki;
+                                for (ofm = 0; ofm < VLEN; ++ofm) {
+                                    for (ifm = 0; ifm < VLEN; ++ifm) {
+                                        size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                                ifm_b * ifhp * ifwp * VLEN + 
+                                                                (ij + kj) * ifwp * VLEN + 
+                                                                (ii + ki) * VLEN +
+                                                                ofm;
+                                        size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                                ofm_b * ofhp * ofwp * VLEN + 
+                                                                oj * ofwp * VLEN + 
+                                                                oi * VLEN +
+                                                                ifm;
+                                        size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN * VLEN + 
+                                                                ifm_b * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN +
+                                                                ifm * VLEN +
+                                                                ofm;
 
-                                output[outputIndex] += input[inputIndex] * filter[filterIndex];
-
+                                        output[outputIndex] += input[inputIndex] * filter[filterIndex];
+                                    }
+                                }
                             }
                         }
                     }
