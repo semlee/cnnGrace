@@ -634,18 +634,14 @@ int main (int argc, char** argv) {
     printf("SIZE Output  (1): %10.2f MiB\n", (double)(1*nOfm*ofhp*ofwp*   sizeof(float))/(1024.0*1024.0) );
     printf("SIZE Weight     : %10.2f MiB\n", (double)(nIfm*nOfm*kw*kh*    sizeof(float))/(1024.0*1024.0) );
 
-// #if defined(_OPENMP)
-//     double start;
-//     double end;
-// #else
-//     high_resolution_clock::time_point start;
-//     high_resolution_clock::time_point end;
-//     duration<double, std::milli> duration_sec;
-// #endif
-
+#if defined(_OPENMP)
+    double start;
+    double end;
+#else
     high_resolution_clock::time_point start;
     high_resolution_clock::time_point end;
     duration<double, std::milli> duration_sec;
+#endif
 
     printf("##########################################\n");
     printf("#            Naive Computation           #\n");
@@ -663,12 +659,11 @@ int main (int argc, char** argv) {
         cout << "               FORWARD PASS               \n";
         cout << "##########################################\n";
 
-// #if defined(_OPENMP)
-//         start = omp_get_wtime();
-// #else
-//         start = high_resolution_clock::now();
-// #endif    
-    start = high_resolution_clock::now();
+#if defined(_OPENMP)
+        start = omp_get_wtime();
+#else
+        start = high_resolution_clock::now();
+#endif    
         for (int i = 0; i < iters; i++) {
 #if defined(_OPENMP)
 #           pragma omp parallel
@@ -677,17 +672,14 @@ int main (int argc, char** argv) {
                 arm_sve_conv_fp(&conv_param, conv_input, conv_output, conv_filter, conv_bias);
             }
         }
-// #if defined(_OPENMP)
-//         end = omp_get_wtime();
-//         double l_total = (end - start);
-// #else
-//         end = high_resolution_clock::now();
-//         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
-//         double l_total = duration_sec.count() * 1e-6;
-// #endif 
+#if defined(_OPENMP)
+        end = omp_get_wtime();
+        double l_total = (end - start);
+#else
         end = high_resolution_clock::now();
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
         double l_total = duration_sec.count() * 1e-6;
+#endif 
 
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 

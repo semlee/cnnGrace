@@ -10,7 +10,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -O3 run_regblock_ms2.cpp -std=c++11
+g++ -o conv_layer -O3 -fopenmp run_regblock_ms2.cpp -std=c++11
 
 ITERS=10
 MB=72
