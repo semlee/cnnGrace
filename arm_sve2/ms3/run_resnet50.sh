@@ -10,7 +10,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -march=native -O2 -fopenmp run_svereg_ms3.cpp --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 -std=c++11
+g++ -o conv_layer -march=native -O3 -fopenmp run_svereg_ms3.cpp --param aarch64-autovec-preference=2 --param aarch64-sve-compare-costs=1 -std=c++11
 
 ITERS=10
 MB=72
