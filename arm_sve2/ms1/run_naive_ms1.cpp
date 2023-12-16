@@ -621,7 +621,7 @@ int main (int argc, char** argv) {
     end = high_resolution_clock::now();
 #if defined(_OPENMP)
         omp_end = omp_get_wtime();
-        double omp_time = (end - start);
+        double omp_time = (omp_end - omp_start);
 #endif 
     duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
     //cout << "Total time consumed: " << duration_sec.count() << "ms\n";

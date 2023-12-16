@@ -674,7 +674,7 @@ int main (int argc, char** argv) {
         end = high_resolution_clock::now();
 #if defined(_OPENMP)
         omp_end = omp_get_wtime();
-        double omp_time = (end - start);
+        double omp_time = (omp_end - omp_start);
 #endif 
         duration_sec = std::chrono::duration_cast<duration<double, std::micro>>(end - start);
         double l_total = duration_sec.count() * 1e-6;
