@@ -240,34 +240,22 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                             for (q = 0; q < RB_q; q++) {
                                                 ii0 = ii + stride_w * q;
                                                 if (ii0+ki < 0 || ii0+ki >= ifw) continue;
-                                                size_t inputIndex =     img * nIfm * ifh * ifw + 
-                                                                        (ifm_b * nIfm_b + ifm) * ifh * ifw + 
-                                                                        (ij + kj) * ifw + 
-                                                                        (ii + ki);
-                                                size_t outputIndex =    img * nOfm * ofh * ofw + 
-                                                                        (ofm * nOfm_b + ofm) * ofh * ofw + 
-                                                                        oj * ofw + 
-                                                                        oi;
-                                                size_t filterIndex =    (ofm * nOfm_b + ofm) * nIfm * kh * kw + 
-                                                                        (ifm_b * nIfm_b + ifm) * kh * kw + 
+                                                size_t inputIndex =     img * nIfm_b * ifhp * ifwp * VLEN + 
+                                                                        ifm_b * ifhp * ifwp * VLEN + 
+                                                                        ifm * ifhp * ifwp +
+                                                                        (ij0 + kj) * ifwp + 
+                                                                        (ii0 + ki);
+                                                size_t outputIndex =    img * nOfm_b * ofhp * ofwp * VLEN + 
+                                                                        ofm_b * ofhp * ofwp * VLEN + 
+                                                                        ofm * ofhp * ofwp +
+                                                                        (oj + p) * ofwp + 
+                                                                        (oi + q);
+                                                size_t filterIndex =    ofm_b * nIfm_b * kh * kw * VLEN * VLEN + 
+                                                                        ofm * nIfm_b * kh * kw * VLEN +
+                                                                        ifm_b * kh * kw * VLEN + 
+                                                                        ifm * kh * kw +
                                                                         kj * kw + 
                                                                         ki;
-                                                // size_t inputIndex =     img * nIfm_b * ifhp * ifwp * VLEN + 
-                                                //                         ifm_b * ifhp * ifwp * VLEN + 
-                                                //                         (ij0 + kj) * ifwp * VLEN + 
-                                                //                         (ii0 + ki) * VLEN +
-                                                //                         ifm; 
-                                                // size_t outputIndex =    img * nOfm_b * ofhp * ofwp * VLEN + 
-                                                //                         ofm_b * ofhp * ofwp * VLEN+ 
-                                                //                         (oj + p) * ofwp * VLEN+ 
-                                                //                         (oi + q) * VLEN +
-                                                //                         ofm;
-                                                // size_t filterIndex =    ofm_b * nIfm_b * kh * kw * VLEN * VLEN + 
-                                                //                         ifm_b * kh * kw * VLEN * VLEN + 
-                                                //                         kj * kw * VLEN * VLEN + 
-                                                //                         ki * VLEN * VLEN +
-                                                //                         ifm * VLEN +
-                                                //                         ofm ;
 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];        
                                             }
