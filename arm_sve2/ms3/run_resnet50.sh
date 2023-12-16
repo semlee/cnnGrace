@@ -12,7 +12,7 @@
 export OMP_NUM_THREADS=72
 g++ -o conv_layer -march=native -O2 -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fopenmp run_svereg_ms3.cpp --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 -std=c++11
 
-ITERS=1000
+ITERS=10
 MB=72
 TYPE='F'
 FORMAT='L'
