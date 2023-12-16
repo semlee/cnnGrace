@@ -128,8 +128,8 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     int RB_p      = param->RB_p;
     int RB_q      = param->RB_q;
 
-    int nIfm_b = nIfm / VLEN + (nIfm % VLEN != 0);
-    int nOfm_b = nOfm / VLEN + (nOfm % VLEN != 0);
+    int nIfm_b = nIfm / VLEN;// + (nIfm % VLEN != 0);
+    int nOfm_b = nOfm / VLEN;//+ (nOfm % VLEN != 0);
     int ofh_b = ofh/RB_p;
     int ofw_b = ofw/RB_q;
     int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
