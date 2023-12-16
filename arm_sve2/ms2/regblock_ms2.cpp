@@ -46,7 +46,7 @@ void CONV(const std::vector<float> input, std::vector<float> output, const std::
     }
 }
 
-void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
+void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -104,7 +104,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
     
 }
 
-void reg_block_conv_fp_mod(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
+void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vector<float>& output, const std::vector<float>& filter, const std::vector<float>& bias)  {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
