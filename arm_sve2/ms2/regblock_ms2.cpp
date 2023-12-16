@@ -12,8 +12,8 @@
 #endif
 // #include <arm_sve.h>
 
-void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
-   int kj, ki, ofm, ifm, p, q, ijo, iio;
+void CONV(const std::vector<float> input, std::vector<float> output, const std::vector<float> filter, int kh, int kw, int ifh, int ifw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
+   int kj, ki, ofm, ifm, p, q, ij0, ii0;
    for (kj = 0; kj < kh; ++kj) { //R
         if (ij+kj < 0 || ij+kj >= ifh) continue;
         for (ki = 0; ki < kw; ++ki) { //S
@@ -95,7 +95,7 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                         CONV(std::vector<float>(inputIndex, inputIndex + subvecSize), 
                             std::vector<float>(outputIndex, outputIndex + subvecSize),
                             std::vector<float>(filterIndex, filterIndex + subvecSize),
-                            kh, kw, ofm_b, ifm_b, nOfm, nIfm, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
+                            kh, kw, ifh, ifw, ofm_b, ifm_b, nOfm, nIfm, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
                     }
                 }
             }
