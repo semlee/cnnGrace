@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH -t 0-00:30:00
+#SBATCH -t 0-01:00:00
 #SBATCH -J regblock_run
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 1
 #SBATCH -N 1
-#SBATCH -p c2-2x240gb 
+#SBATCH -p cg1-cpu480gb-gpu96gb
 
 iters=1000
 ifw=16
