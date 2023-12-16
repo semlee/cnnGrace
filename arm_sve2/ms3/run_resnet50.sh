@@ -10,7 +10,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -march=native -O3 -fopnemp run_svereg_ms3.cpp -std=c++11
+g++ -o conv_layer -march=native -O0 -fopnemp run_svereg_ms3.cpp -std=c++11
 
 ITERS=100
 MB=72
