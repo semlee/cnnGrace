@@ -166,22 +166,22 @@ void reg_block_conv_fp(conv_t* param, const std::vector<float>& input, std::vect
                                                 //                         (ifm_b * VLEN + ifm) * kh * kw + 
                                                 //                         kj * kw + 
                                                 //                         ki;
-                                                size_t inputIndex =     img * nIfm * ifhp * ifwp + 
+                                                size_t inputIndex =     img * nIfm_b * ifhp * ifwp * VLEN + 
                                                                         ifm_b * ifhp * ifwp * VLEN + 
                                                                         (ij0 + kj) * ifwp * VLEN + 
                                                                         (ii0 + ki) * VLEN +
                                                                         ifm; 
-                                                size_t outputIndex =    img * nOfm * ofhp * ofwp + 
+                                                size_t outputIndex =    img * nOfm_b * ofhp * ofwp * VLEN + 
                                                                         ofm_b * ofhp * ofwp * VLEN+ 
                                                                         (oj + p) * ofwp * VLEN+ 
                                                                         (oi + q) * VLEN +
                                                                         ofm;
-                                                size_t filterIndex =    ofm_b * nIfm * kh * kw * VLEN + 
+                                                size_t filterIndex =    ofm_b * nIfm_b * kh * kw * VLEN * VLEN + 
                                                                         ifm_b * kh * kw * VLEN * VLEN + 
                                                                         kj * kw * VLEN * VLEN + 
                                                                         ki * VLEN * VLEN +
                                                                         ifm * VLEN +
-                                                                        ofm;
+                                                                        ofm ;
 
                                                 output[outputIndex] += input[inputIndex] * filter[filterIndex];        
                                             }
