@@ -46,7 +46,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -177,10 +177,6 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                         ii = oi * stride_w - pad_w;
                         for (kj = 0; kj < kh; ++kj) { //R
                             for (ki = 0; ki < kw; ++ki) { //S
-                                size_t filterIndex =    ofm * nIfm * kh * kw * VLEN + 
-                                                        ifm * kh * kw * VLEN * VLEN + 
-                                                        kj * kw * VLEN * VLEN + 
-                                                        ki * VLEN * VLEN;
                                 for (p = 0; p < RB_p; p++) {
                                     ij0 = ij + stride_h * p;
                                     if (ij0 + kj < 0 || ij0 + kj >= ifh) continue;   
@@ -200,7 +196,10 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                                                 ofm * ofhp * ofwp * VLEN + 
                                                                 (oj + p) * ofwp * VLEN + 
                                                                 (oi + q) * VLEN;
-
+                                        size_t filterIndex =    ofm * nIfm * kh * kw * VLEN + 
+                                                                ifm * kh * kw * VLEN * VLEN + 
+                                                                kj * kw * VLEN * VLEN + 
+                                                                ki * VLEN * VLEN;
                                         // Load vectors using SVE intrinsics
                                         svfloat32_t inputVector = svld1_f32(pred_ifm, input + inputIndex);
                                         svfloat32_t filterVector = svld1_f32(pred_all, filter + filterIndex);
