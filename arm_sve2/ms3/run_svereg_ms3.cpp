@@ -154,7 +154,16 @@ void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, 
                     size_t outputIndex = (oj + p) * ofwp * VLEN + 
                                          (oi + q) * VLEN;
 
-                    output[outputIndex] += filter[filterIndex] * input[inputIndex];
+                    // Load vectors using SVE intrinsics
+                    svfloat32_t inputVector = svld1_f32(svptrue_b32(), input + inputIndex);
+                    svfloat32_t filterVector = svld1_f32(svptrue_b32(), filter + filterIndex);
+                    svfloat32_t outputVector = svld1_f32(svptrue_b32(), output + outputIndex);
+
+                    // run Vector MAC Unit
+                    outputVector = svmla_f32_m(svptrue_b32(), outputVector, inputVector, filterVector);
+
+                    // Store result back
+                    svst1_f32(svptrue_b32(), output + outputIndex, outputVector);
                 }
             }
         }
