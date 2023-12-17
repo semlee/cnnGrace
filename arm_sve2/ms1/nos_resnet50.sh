@@ -5,7 +5,7 @@
 export OMP_NUM_THREADS=10
 g++ -o conv_layer -O3 -fopenmp run_naive_ms1.cpp -std=c++11
 
-ITERS=1000
+ITERS=10
 MB=10
 TYPE='F'
 FORMAT='L'
