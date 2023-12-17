@@ -3,7 +3,7 @@
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=10
-g++ -o conv_layer -O2 -fno-tree-loop-vectorize -fno-tree-slp-vectorize-fopenmp run_regblock_ms2.cpp -std=c++11
+g++ -o conv_layer -O2 -fno-tree-loop-vectorize -fno-tree-slp-vectorize -fopenmp run_regblock_ms2.cpp -std=c++11
 
 ITERS=10
 MB=10
