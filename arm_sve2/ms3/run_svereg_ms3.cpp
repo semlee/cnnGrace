@@ -46,7 +46,7 @@ typedef struct {
   int RB_q;
 } conv_t;
 
-void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -132,8 +132,91 @@ void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const
 
 }
 
+ void CONV(const float* input, float* output, const float* filter, int kh, int kw, int ifh, int ifw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
+    int kj, ki, ofm, ifm, p, q, ij0, ii0;
+#if defined (_OPENMP)
+    #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+#endif
+    for (kj = 0; kj < kh; ++kj) { // R
+        if (ij + kj < 0 || ij + kj >= ifh) continue;
+        for (ki = 0; ki < kw; ++ki) { // S
+            if (ii + ki < 0 || ii + ki >= ifw) continue;
+            size_t filterIndex = kj * kw * VLEN * VLEN + 
+                                    ki * VLEN * VLEN;
+            for (p = 0; p < RB_p; p++) {
+                ij0 = ij + stride_h * p;
+                if (ij0 + kj < 0 || ij0 + kj >= ifh) continue;
+                for (q = 0; q < RB_q; q++) {
+                    ii0 = ii + stride_w * q;
+                    if (ii0 + ki < 0 || ii0 + ki >= ifw) continue;
+                    size_t inputIndex =  (ij0 + kj) * ifwp * VLEN + 
+                                         (ii0 + ki) * VLEN;
+                    size_t outputIndex = (oj + p) * ofwp * VLEN + 
+                                         (oi + q) * VLEN;
+
+                    output[outputIndex] += filter[filterIndex] * input[inputIndex];
+                }
+            }
+        }
+    }
+}
 
 void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
+    // Fetch data from param struct
+    int nImg = param->nImg;
+    int nIfm = param->nIfm;
+    int nOfm = param->nOfm;
+    int ifhp = param->ifhp;
+    int ifwp = param->ifwp;
+    int ofhp = param->ofhp;
+    int ofwp = param->ofwp;
+    int ifh = param->ifh;
+    int ifw = param->ifw;
+    int ofh = param->ofh;
+    int ofw = param->ofw;
+    int pad_h = param->pad_h;
+    int pad_w = param->pad_w;
+    int pad_h_in = param->pad_h_in;
+    int pad_w_in = param->pad_w_in;
+    int pad_h_out = param->pad_h_out;
+    int pad_w_out = param->pad_w_out;
+    int kh = param->kh;
+    int kw = param->kw;
+    int stride_h = param->stride_h;
+    int stride_w = param->stride_w;
+    int VLEN = param->VLEN;
+    int RB_p = param->RB_p;
+    int RB_q = param->RB_q;
+
+    int nIfm_b = nIfm / VLEN + (nIfm % VLEN != 0);
+    int nOfm_b = nOfm / VLEN + (nOfm % VLEN != 0);
+    int ofh_b = ofh / RB_p;
+    int ofw_b = ofw / RB_q;
+    int img, ofm_b, ifm_b, oj_b, oj, ij, oi_b, oi, ii, kj, ki, ofm, ifm, p, q, ij0, ii0;
+
+    for (img = 0; img < nImg; ++img) { // N
+        for (ofm_b = 0; ofm_b < nOfm_b; ofm_b++) { // K
+            for (ifm_b = 0; ifm_b < nIfm_b; ifm_b++) { // C
+                for (oj_b = 0; oj_b < ofh_b; ++oj_b) { // P
+                    for (oi_b = 0; oi_b < ofw_b; ++oi_b) { // Q
+                        oj = oj_b * RB_p;
+                        ij = oj * stride_h - pad_h;
+                        oi = oi_b * RB_q;
+                        ii = oi * stride_w - pad_w;
+                        auto inputIndex = img * nIfm_b * ifhp * ifwp * VLEN + ifm_b * ifhp * ifwp * VLEN;
+                        auto outputIndex = img * nOfm_b * ofhp * ofwp * VLEN + ofm_b * ofhp * ofwp * VLEN;
+                        auto filterIndex = ofm_b * nIfm_b * kh * kw * VLEN * VLEN + ifm_b * kh * kw * VLEN * VLEN;
+                        auto subvecSize = kh * kw * VLEN * VLEN * RB_p * RB_q;
+                        CONV(input + inputIndex, output + outputIndex, filter + filterIndex, kh, kw, ifh, ifw, ofm_b, ifm_b, nOfm, nIfm, VLEN, RB_p, RB_q, oj, oi, ij, ii, ifwp, ofwp, stride_h, stride_w);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void arm_sve_conv_fp_mod(conv_t* param, const float* input, float* output, const float* filter, const float* bias) {
     // Fetch data from param struct
     int nImg      = param->nImg;
     int nIfm      = param->nIfm;
@@ -217,21 +300,8 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                     }
                 }
             }
-#if defined(USE_FUSED_RELU) || defined(USE_FUSED_BIAS_RELU)
-        // Apply ReLU activation function
-            for (int oj = 0; oj < ofh; oj++) {
-                for (int oi = 0; oi < ofw; oi++) {
-                    int reluIndex = img * nOfm_b * ofhp * ofwp +
-                                    ofm_b * nOfm_b * ofhp * ofwp +
-                                    oj * ofwp +
-                                    oi;
-                    output[reluIndex] = (output[reluIndex] < 0.0f) ? 0.0f : output[reluIndex];
-                }
-            }
-#endif
         }
     }
-
 }
 
 void arm_sve_conv_bp(conv_t* param, float* input, const float* output, const float* filter, const float* naive_input_save) {
