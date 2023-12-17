@@ -34,6 +34,7 @@ for i in "${!ifw_values[@]}"; do
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} $nImg_values ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD \
+        | grep "PERFDUMP" \
         >> "$output_file"
 done
 
