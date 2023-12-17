@@ -134,9 +134,9 @@ void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, 
 
  void CONV(const float* input, float* output, const float* filter, int kh, int kw, int ifh, int ifw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
     int kj, ki, ofm, ifm, p, q, ij0, ii0;
-#if defined (_OPENMP)
-    #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
-#endif
+// #if defined (_OPENMP)
+//     #pragma omp parallel for private(kj, ki, p, q)
+// #endif
     for (kj = 0; kj < kh; ++kj) { // R
         if (ij + kj < 0 || ij + kj >= ifh) continue;
         for (ki = 0; ki < kw; ++ki) { // S
