@@ -3,18 +3,18 @@
 #SBATCH -t 0-02:00:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
-#SBATCH -c 72
+#SBATCH -c 1
 #SBATCH -N 1
 #SBATCH -p cg1-cpu480gb-gpu96gb
 
 # Compile the C++ file
 # Compile individual source files
-export OMP_NUM_THREADS=72
-g++ -o conv_layer -march=native -O3 -fopenmp --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 run_svereg_ms3.cpp -std=c++11
+# export OMP_NUM_THREADS=72
+g++ -o conv_layer -march=native -O3 --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 run_svereg_ms3.cpp -std=c++11
 # g++ -o conv_layer -march=native -O1 -fopenmp run_svereg_ms3.cpp -std=c++11
 
 ITERS=10
-MB=72
+MB=1
 TYPE='F'
 FORMAT='L'
 PAD=1
@@ -36,7 +36,7 @@ stride_values=(2 1 1 1 1 2 2 1 1 1 2 2 1 1 1 2 2 1 1 1)
 
 # Iterate over the indices of the arrays
 for i in "${!ifw_values[@]}"; do
-    srun -N 1 --exclusive ./conv_layer \
+    taskset 0x00000001 srun -N 1 --exclusive ./conv_layer \
         $ITERS ${ifw_values[$i]} ${ifh_values[$i]} $nImg_values ${nIfm_values[$i]} ${nOfm_values[$i]} \
         ${kw_values[$i]} ${kh_values[$i]} ${padw_values[$i]} ${padh_values[$i]} ${stride_values[$i]} \
         $VLEN $RB_p $RB_q $TYPE $FORMAT $PAD 
