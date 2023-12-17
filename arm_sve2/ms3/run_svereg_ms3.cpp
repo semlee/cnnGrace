@@ -757,7 +757,9 @@ int main (int argc, char** argv) {
         double l_total = duration_sec.count() * 1e-6;
         double flops = (double)nImg * (double)nIfm * (double)nOfm * (double)ofh * (double)ofw * (double)(2 * kh * kw) * (double)iters;
 
+#if defined(_OPENMP)
         printf("Openmp Time = %.5g\n", omp_time);
+#endif  
         printf("Total Time = %.5g\n", l_total);
         printf("GFLOP  = %.5g\n", flops*1e-9/(double)iters);
         printf("fp time = %.5g\n", ((double)(l_total/iters)));
