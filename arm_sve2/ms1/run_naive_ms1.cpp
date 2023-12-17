@@ -204,9 +204,6 @@ void naive_conv_fp_original(naive_conv_t* param, const float* input, float* outp
     /* loop counters */
     int img, ofm, ifm, oj, oi, ij, ii, kj, ki;
 
-#if defined (_OPENMP)
-    #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
-#endif
     for (img = 0; img < nImg; ++img) {
         for (ofm = 0; ofm < nOfm; ++ofm) {
             for (ifm = 0; ifm < nIfm; ++ifm) {

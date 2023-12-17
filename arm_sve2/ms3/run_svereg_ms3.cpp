@@ -129,7 +129,6 @@ void arm_sve_conv_fp_lanigiro(conv_t* param, const float* input, float* output, 
             }
         }
     }
-
 }
 
  void CONV(const float* input, float* output, const float* filter, int kh, int kw, int ifh, int ifw, int ofm_b, int ifm_b, int nOfm, int nIfm, int VLEN, int RB_p, int RB_q, int oj, int oi, int ij, int ii, int ifwp, int ofwp, int stride_h, int stride_w) {
@@ -278,7 +277,7 @@ void arm_sve_conv_fp(conv_t* param, const float* input, float* output, const flo
                                         const svbool_t pred_ofm = svwhilelt_b32(ofm, nOfm);
                                         const svbool_t pred_ifm = svwhilelt_b32(ifm, nIfm); 
                                         const svbool_t pred_all = svand_b_z(svptrue_b32(), pred_ofm, pred_ifm); // Combined predicate for filter
-                                        
+
                                         size_t inputIndex =     img * nIfm * ifhp * ifwp + 
                                                                 ifm * ifhp * ifwp * VLEN+ 
                                                                 (ij0 + kj) * ifwp * VLEN + 
