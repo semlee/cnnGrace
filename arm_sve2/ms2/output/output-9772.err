@@ -1,0 +1,66 @@
+run_regblock_ms2.cpp: In function ‘void arm_sve_conv_fp_original(conv_t*, const float*, float*, const float*, const float*)’:
+run_regblock_ms2.cpp:185:67: error: ‘kj’ has not been declared
+  185 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
+      |                                                                   ^~
+run_regblock_ms2.cpp:185:71: error: ‘ki’ has not been declared
+  185 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ij, ii, kj, ki)
+      |                                                                       ^~
+run_regblock_ms2.cpp: In function ‘void arm_sve_conv_bp(conv_t*, float*, const float*, const float*, const float*)’:
+run_regblock_ms2.cpp:284:38: error: ‘img’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                      ^~~
+run_regblock_ms2.cpp:284:43: error: ‘ofm’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                           ^~~
+run_regblock_ms2.cpp:284:48: error: ‘ifm’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                ^~~
+run_regblock_ms2.cpp:284:53: error: ‘oj’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                     ^~
+run_regblock_ms2.cpp:284:57: error: ‘oi’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                         ^~
+run_regblock_ms2.cpp:284:61: error: ‘ij’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                             ^~
+run_regblock_ms2.cpp:284:65: error: ‘ii’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                 ^~
+run_regblock_ms2.cpp:284:69: error: ‘kj’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                     ^~
+run_regblock_ms2.cpp:284:73: error: ‘ki’ has not been declared
+  284 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                         ^~
+run_regblock_ms2.cpp: In function ‘void arm_sve_conv_uw(conv_t*, const float*, const float*, float*)’:
+run_regblock_ms2.cpp:347:38: error: ‘img’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                      ^~~
+run_regblock_ms2.cpp:347:43: error: ‘ofm’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                           ^~~
+run_regblock_ms2.cpp:347:48: error: ‘ifm’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                ^~~
+run_regblock_ms2.cpp:347:53: error: ‘oj’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                     ^~
+run_regblock_ms2.cpp:347:57: error: ‘oi’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                         ^~
+run_regblock_ms2.cpp:347:61: error: ‘ij’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                             ^~
+run_regblock_ms2.cpp:347:65: error: ‘ii’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                 ^~
+run_regblock_ms2.cpp:347:69: error: ‘kj’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                     ^~
+run_regblock_ms2.cpp:347:73: error: ‘ki’ has not been declared
+  347 |     #pragma omp parallel for private(img, ofm, ifm, oj, oi, ij, ii, kj, ki)
+      |                                                                         ^~
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 9772 ON ss02-gh01 CANCELLED AT 2023-12-14T00:05:39 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 9772.1 ON ss02-gh01 CANCELLED AT 2023-12-14T00:05:39 DUE TO TIME LIMIT ***

@@ -1,0 +1,57 @@
+run_svereg_ms3.cpp: In function ‘void CONV(const float*, float*, const float*, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int, int)’:
+run_svereg_ms3.cpp:138:38: error: ‘n’ has not been declared
+  138 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+      |                                      ^
+run_svereg_ms3.cpp:138:41: error: ‘k_b’ has not been declared
+  138 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+      |                                         ^~~
+run_svereg_ms3.cpp:138:46: error: ‘c_b’ has not been declared
+  138 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+      |                                              ^~~
+run_svereg_ms3.cpp:138:67: error: ‘r’ has not been declared
+  138 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+      |                                                                   ^
+run_svereg_ms3.cpp:138:70: error: ‘s’ has not been declared
+  138 |     #pragma omp parallel for private(n, k_b, c_b, oj, oi, ii, ij, r, s)
+      |                                                                      ^
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+rm: cannot remove 'conv_layer': No such file or directory

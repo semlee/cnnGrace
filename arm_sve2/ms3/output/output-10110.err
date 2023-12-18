@@ -1,0 +1,20 @@
+g++: error: unrecognized command-line option ‘-fopnemp’; did you mean ‘-fopenmp’?
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+srun: error: ss02-gh01: task 0: Exited with exit code 2
+slurmstepd: error: execve(): /home/slee/project/arm_sve2/ms3/./conv_layer: No such file or directory
+rm: cannot remove 'conv_layer': No such file or directory

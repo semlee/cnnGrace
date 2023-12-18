@@ -1,0 +1,4 @@
+slurmstepd: error: _cgroup_procs_check: failed on path /sys/fs/cgroup/freezer/slurm/uid_1275/job_9932/step_batch/cgroup.procs: No such file or directory
+slurmstepd: error: unable to read '/sys/fs/cgroup/freezer/slurm/uid_1275/job_9932/step_batch/cgroup.procs'
+slurmstepd: error: _cgroup_procs_check: failed on path /sys/fs/cgroup/freezer/slurm/uid_1275/job_9932/step_batch/cgroup.procs: No such file or directory
+slurmstepd: error: unable to read '/sys/fs/cgroup/freezer/slurm/uid_1275/job_9932/step_batch/cgroup.procs'

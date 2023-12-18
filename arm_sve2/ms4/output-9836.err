@@ -1,0 +1,32 @@
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+srun: error: fc02-gg01: task 0: Segmentation fault (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+srun: error: fc02-gg01: task 0: Segmentation fault (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+terminate called after throwing an instance of 'std::bad_array_new_length'
+  what():  std::bad_array_new_length
+srun: error: fc02-gg01: task 0: Aborted (core dumped)
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** JOB 9836 ON fc02-gg01 CANCELLED AT 2023-12-14T13:12:38 DUE TO TIME LIMIT ***
+slurmstepd: error: *** STEP 9836.11 ON fc02-gg01 CANCELLED AT 2023-12-14T13:12:38 DUE TO TIME LIMIT ***
