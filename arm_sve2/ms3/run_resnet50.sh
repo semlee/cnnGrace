@@ -1,17 +1,17 @@
 #!/bin/bash
 
-#SBATCH -t 0-01:00:00
+#SBATCH -t 0-02:00:00
 #SBATCH -J run_resnet50
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
 #SBATCH -N 1
-#SBATCH -p defq
+#SBATCH -p cg1-cpu480gb-gpu96gb
 
 # Compile the C++ file
 # Compile individual source files
 export OMP_NUM_THREADS=72
-g++ -o conv_layer -march=native -O3 -fopenmp --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 run_svereg_ms3.cpp -std=c++11
-# g++ -o conv_layer -march=native -O3 -fopenmp run_svereg_ms3.cpp -std=c++11
+# g++ -o conv_layer -march=native -O3 -fopenmp --param aarch64-autovec-preference=4 --param aarch64-sve-compare-costs=1 run_svereg_ms3.cpp -std=c++11
+g++ -o conv_layer -march=native -O3 -fopenmp run_svereg_ms3.cpp -std=c++11
 
 ITERS=10
 MB=72
