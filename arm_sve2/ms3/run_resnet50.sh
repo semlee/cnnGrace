@@ -5,7 +5,7 @@
 #SBATCH -o output-%j.out -e output-%j.err
 #SBATCH -c 72
 #SBATCH -N 1
-#SBATCH -p cg1-cpu480gb-gpu96gb
+#SBATCH -p defq
 
 # Compile the C++ file
 # Compile individual source files
